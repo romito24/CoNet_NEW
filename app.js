@@ -6,6 +6,7 @@ const app = express();
 const authRoutes = require('./routes/auth'); 
 const spaceRoutes = require('./routes/spaces'); // <-- חדש: חיפוש מרחבים
 const orderRoutes = require('./routes/orders'); // <-- חדש: ניהול הזמנות
+const communityRoutes = require('./routes/communities');
 
 app.use(express.json()); 
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/spaces', spaceRoutes); // כל הבקשות ל-/api/spaces יגיעו ל-spaces.js
 app.use('/api/orders', orderRoutes); // כל הבקשות ל-/api/orders יגיעו ל-orders.js
+app.use('/api/communities', communityRoutes);
 
 // נתיב ברירת מחדל לבדיקה שהשרת חי
 app.get('/', (req, res) => {
