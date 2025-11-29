@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // 2. בדיקת הרשאות: האם המשתמש הוא 'community_manager'kk?
+        // 2. בדיקת הרשאות: האם המשתמש הוא 'community_manager'?
         const [users] = await db.query('SELECT user_type FROM users WHERE user_id = ?', [user_id]);
 
         if (users.length === 0) {
