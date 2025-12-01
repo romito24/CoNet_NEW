@@ -5,8 +5,6 @@ const verifyToken = require('../middleware/verifyToken');
 const nodemailer = require('nodemailer');
 const ics = require('ics');
 
-// --- 1. הגדרות שירות המיילים (Nodemailer) ---
-// ודאו שיש לכם את המשתנים EMAIL_USER ו-EMAIL_PASS בקובץ .env
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -15,7 +13,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// --- פונקציות עזר לזמנים ---
 function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -27,7 +24,6 @@ function getMinutesFromDate(dateObj) {
     return date.getHours() * 60 + date.getMinutes();
 }
 
-// --- פונקציה לשליחת מייל עם קובץ ICS ---
 async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) {
     const startArr = [
         orderDetails.start_time.getFullYear(),
@@ -64,7 +60,7 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
             }
 
             const mailOptions = {
-                from: `"NoReplayconet" <${process.env.EMAIL_USER}>`, 
+                from: `"NoReplyconet" <${process.env.EMAIL_USER}>`, 
                 to: userEmail,
                 subject: `אישור הזמנה: ${spaceName}`,
                 text: 'היי, ההזמנה שלך אושרה בהצלחה! מצורף קובץ זימון ליומן.',
@@ -89,7 +85,7 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
 }
 
 // ==========================================
-// נתיב ראשי: יצירת הזמנה (POST /create)
+// יצירת הזמנה
 // ==========================================
 router.post('/create', verifyToken, async (req, res) => {
     const { space_id, start_time, end_time, event_id, attendees_count } = req.body;
@@ -97,7 +93,6 @@ router.post('/create', verifyToken, async (req, res) => {
     
     const requestedSeats = attendees_count && attendees_count > 0 ? attendees_count : 1;
 
-    // ולידציות בסיסיות
     if (!space_id || !start_time || !end_time) return res.status(400).json({ message: 'חסרים פרטים ליצירת ההזמנה' });
 
     const start = new Date(start_time);
@@ -108,17 +103,14 @@ router.post('/create', verifyToken, async (req, res) => {
     if (start < now) return res.status(400).json({ message: 'לא ניתן להזמין לעבר' });
 
     try {
-        // 1. שליפת פרטי המרחב
         const [spaces] = await db.execute('SELECT * FROM spaces WHERE space_id = ?', [space_id]);
         if (spaces.length === 0) return res.status(404).json({ message: 'המרחב לא נמצא' });
         const space = spaces[0];
 
-        // 2. בדיקות לוגיות למרחב
         if (space.space_status === 'close') return res.status(400).json({ message: 'המרחב סגור כרגע להזמנות' });
         if (space.capacity === 'full') return res.status(409).json({ message: 'המרחב מסומן כמלא (Full)' });
         if (requestedSeats > space.seats_available) return res.status(400).json({ message: `אין מספיק מקום במרחב (פנוי: ${space.seats_available})` });
 
-        // 3. בדיקת שעות פתיחה
         const startMinutes = getMinutesFromDate(start);
         const endMinutes = getMinutesFromDate(end);
         const openMinutes = timeToMinutes(space.opening_hours);
@@ -128,7 +120,6 @@ router.post('/create', verifyToken, async (req, res) => {
             return res.status(400).json({ message: `ההזמנה חייבת להיות בתוך שעות הפתיחה: ${space.opening_hours} - ${space.closing_hours}` });
         }
 
-        // 4. בדיקת חפיפה ותפוסה
         const overlapSql = `
             SELECT SUM(attendees_count) as total_booked
             FROM orders 
@@ -144,12 +135,12 @@ router.post('/create', verifyToken, async (req, res) => {
             return res.status(409).json({ message: `אין מספיק מקום פנוי בשעות אלו. נותרו ${seatsLeft} מקומות.` });
         }
 
-        // 5. עדכון סטטוס המרחב אם התמלא
+        // עדכון סטטוס המרחב אם התמלא
         if ((currentOccupancy + requestedSeats) === space.seats_available) {
             await db.execute("UPDATE spaces SET capacity = 'full' WHERE space_id = ?", [space_id]);
         }
 
-        // 6. יצירת ההזמנה ב-DB
+        // יצירת ההזמנה ב-DB
         const insertSql = `
             INSERT INTO orders (user_id, space_id, event_id, start_time, end_time, status, attendees_count)
             VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -157,18 +148,17 @@ router.post('/create', verifyToken, async (req, res) => {
         const [insertResult] = await db.execute(insertSql, [user_id, space_id, event_id || null, start_time, end_time, 'approved', requestedSeats]);
 
         // ============================================================
-        // שליחת מייל עם זימון לכולם (ללא תלות בסוג החשבון)
+        // שליחת מייל עם זימון
         // ============================================================
         
         let emailStatus = 'skipped';
 
-        // א. שליפת האימייל של המשתמש (שינוי חשוב: אנחנו שולפים רק את המייל!)
         const [users] = await db.execute('SELECT email FROM users WHERE user_id = ?', [user_id]);
         
         if (users.length > 0 && users[0].email) {
             const orderDetails = { start_time: start, end_time: end, attendees_count: requestedSeats };
             
-            // ב. שליחת המייל
+            // שליחת המייל
             console.log(`Sending ICS invite to: ${users[0].email}`);
             const emailSuccess = await sendEmailWithInvite(
                 users[0].email, 
@@ -179,7 +169,7 @@ router.post('/create', verifyToken, async (req, res) => {
             emailStatus = emailSuccess ? 'sent' : 'failed';
         }
 
-        // 7. החזרת תשובה ללקוח
+        // החזרת תשובה ללקוח
         res.status(201).json({ 
             message: 'ההזמנה בוצעה בהצלחה', 
             orderId: insertResult.insertId,
@@ -192,7 +182,7 @@ router.post('/create', verifyToken, async (req, res) => {
     }
 });
 
-// --- ביטול והיסטוריה (נשאר ללא שינוי) ---
+// --- ביטול והיסטוריה  ---
 router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
     const { orderId } = req.params;
     const user_id = req.user.user_id;
