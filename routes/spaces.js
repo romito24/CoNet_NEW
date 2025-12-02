@@ -1,59 +1,34 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const verifyToken = require('../middleware/verifyToken'); 
 
 // --- פונקציית עזר לבניית קישור לגוגל מפות ---
 const buildGoogleMapsUrl = (space) => {
-    // Place ID 
-    if (space.google_place_id) {
-        return `https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${space.google_place_id}`;
-    }
-    //  לקואורדינטות 
-    if (space.latitude && space.longitude) {
-        return `https://www.google.com/maps/search/?api=1&query=${space.latitude},${space.longitude}`;
-    }
-    //  לפי הכתובת
+    if (space.google_place_id) return `https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${space.google_place_id}`;
+    if (space.latitude && space.longitude) return `https://www.google.com/maps/search/?api=1&query=${space.latitude},${space.longitude}`;
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(space.address)}`;
 };
 
-// --- חיפוש מרחבים ---
+// ==================================================
+// חיפוש מרחבים
+// ==================================================
 router.post('/search', async (req, res) => {
     const { required_facilities, user_lat, user_lng, radius_km } = req.body;
 
     try {
-        let sqlSelect = `
-            SELECT 
-                s.*,
-                GROUP_CONCAT(DISTINCT f.facility_name SEPARATOR ', ') AS facilities_names
-        `;
+        let sqlSelect = `SELECT s.*, GROUP_CONCAT(DISTINCT f.facility_name SEPARATOR ', ') AS facilities_names`;
 
-        // חישוב מרחק 
         if (user_lat && user_lng) {
-            sqlSelect += `,
-                ( 6371 * acos( cos( radians(?) ) *
-                  cos( radians( s.latitude ) ) *
-                  cos( radians( s.longitude ) - radians(?) ) +
-                  sin( radians(?) ) *
-                  sin( radians( s.latitude ) ) )
-                ) AS distance
-            `;
+            sqlSelect += `, ( 6371 * acos( cos( radians(?) ) * cos( radians( s.latitude ) ) * cos( radians( s.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( s.latitude ) ) ) ) AS distance`;
         } else {
             sqlSelect += `, NULL as distance`;
         }
 
-        let sqlFrom = `
-            FROM spaces s
-            LEFT JOIN space_facilities sf ON s.space_id = sf.space_id
-            LEFT JOIN facilities f ON sf.facility_id = f.facility_id
-            WHERE s.space_status = 'open' 
-            AND s.capacity = 'not full'
-        `;
-
+        let sqlFrom = ` FROM spaces s LEFT JOIN space_facilities sf ON s.space_id = sf.space_id LEFT JOIN facilities f ON sf.facility_id = f.facility_id WHERE s.space_status = 'open' AND s.capacity = 'not full'`;
+        
         const params = [];
-
-        if (user_lat && user_lng) {
-            params.push(user_lat, user_lng, user_lat);
-        }
+        if (user_lat && user_lng) params.push(user_lat, user_lng, user_lat);
 
         if (required_facilities && required_facilities.length > 0) {
             sqlFrom += ` AND sf.facility_id IN (?)`;
@@ -61,57 +36,47 @@ router.post('/search', async (req, res) => {
         }
 
         let finalSql = sqlSelect + sqlFrom + ` GROUP BY s.space_id`;
-
+        
         const havingConditions = [];
-
         if (required_facilities && required_facilities.length > 0) {
             havingConditions.push(`COUNT(DISTINCT sf.facility_id) = ?`);
             params.push(required_facilities.length);
         }
-
-        // סינון לפי רדיוס)
         if (user_lat && user_lng && radius_km) {
             havingConditions.push(`distance < ?`);
             params.push(radius_km);
         }
 
-        if (havingConditions.length > 0) {
-            finalSql += ` HAVING ` + havingConditions.join(' AND ');
-        }
+        if (havingConditions.length > 0) finalSql += ` HAVING ` + havingConditions.join(' AND ');
 
-        //  מיון התוצאות
-        if (user_lat && user_lng) {
-            finalSql += ` ORDER BY distance ASC`; // הכי קרוב למעלה
-        } else {
-            finalSql += ` ORDER BY s.space_name ASC`;
-        }
+        if (user_lat && user_lng) finalSql += ` ORDER BY distance ASC`;
+        else finalSql += ` ORDER BY s.space_name ASC`;
 
         const [rows] = await db.query(finalSql, params);
 
         const enrichedResults = rows.map(space => {
             const facilitiesList = space.facilities_names ? space.facilities_names.split(', ') : [];
-
             return {
                 ...space,
                 latitude: space.latitude ? parseFloat(space.latitude) : null,
                 longitude: space.longitude ? parseFloat(space.longitude) : null,
                 distance: space.distance ? parseFloat(space.distance).toFixed(1) + ' km' : null,
-                
-                facilities: facilitiesList, 
-                google_maps_url: buildGoogleMapsUrl(space), 
+                facilities: facilitiesList,
+                google_maps_url: buildGoogleMapsUrl(space),
                 booking_url: `/booking.html?space_id=${space.space_id}`
             };
         });
 
         res.json(enrichedResults);
-
     } catch (error) {
         console.error("Error searching spaces:", error);
         res.status(500).json({ message: 'שגיאה בחיפוש מרחבים' });
     }
 });
 
-// --- הצגת כל הפיצ'רים ---
+// ==================================================
+// קבלת רשימת פיצ'רים
+// ==================================================
 router.get('/facilities', async (req, res) => {
     try {
         const [facilities] = await db.query('SELECT * FROM facilities ORDER BY facility_name ASC');
@@ -119,6 +84,116 @@ router.get('/facilities', async (req, res) => {
     } catch (error) {
         console.error("Error fetching facilities:", error);
         res.status(500).json({ message: 'שגיאה בשליפת פיצ\'רים' });
+    }
+});
+
+// ==================================================
+// הוספת מרחב
+// ==================================================
+router.post('/add', verifyToken, async (req, res) => {
+    
+    if (req.user.user_type !== 'space_manager') {
+        return res.status(403).json({ message: 'אין גישה: פעולה זו מותרת למנהלי מרחב בלבד.' });
+    }
+
+    const { 
+        space_name, address, description, opening_hours, closing_hours, 
+        seats_available, latitude, longitude, google_place_id, facilities 
+    } = req.body;
+
+    if (!space_name || !address || !seats_available) {
+        return res.status(400).json({ message: 'חסרים שדות חובה' });
+    }
+
+    try {
+        // בדיקת כפילות
+        let checkSql = 'SELECT space_id FROM spaces WHERE (space_name = ? AND address = ?)';
+        const checkParams = [space_name, address];
+        if (google_place_id) {
+            checkSql += ' OR google_place_id = ?';
+            checkParams.push(google_place_id);
+        }
+        const [existing] = await db.query(checkSql, checkParams);
+        if (existing.length > 0) return res.status(409).json({ message: 'המרחב כבר קיים במערכת' });
+
+        // הוספה ל-DB 
+        const insertSql = `
+            INSERT INTO spaces 
+            (space_name, address, description, opening_hours, closing_hours, seats_available, latitude, longitude, google_place_id, space_status, capacity, manager_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', 'not full', ?)
+        `;
+
+        const [result] = await db.query(insertSql, [
+            space_name, address, description, opening_hours, closing_hours, 
+            seats_available, latitude, longitude, google_place_id, req.user.user_id
+        ]);
+
+        const newSpaceId = result.insertId;
+
+        // הוספת פיצ'רים
+        if (facilities && Array.isArray(facilities) && facilities.length > 0) {
+            const facilityValues = facilities.map(fId => [newSpaceId, fId]);
+            await db.query('INSERT INTO space_facilities (space_id, facility_id) VALUES ?', [facilityValues]);
+        }
+
+        res.status(201).json({ message: 'המרחב נוסף בהצלחה', spaceId: newSpaceId });
+
+    } catch (error) {
+        console.error("Error adding space:", error);
+        res.status(500).json({ message: 'שגיאה בהוספת המרחב' });
+    }
+});
+
+// ==================================================
+// עריכת מרחב
+// ==================================================
+router.put('/:id', verifyToken, async (req, res) => {
+    const spaceId = req.params.id;
+    const updates = req.body;
+    const userId = req.user.user_id;
+
+    try {
+        const [spaceCheck] = await db.query('SELECT manager_id FROM spaces WHERE space_id = ?', [spaceId]);
+        
+        if (spaceCheck.length === 0) return res.status(404).json({ message: 'המרחב לא נמצא' });
+        
+        if (spaceCheck[0].manager_id !== userId && req.user.user_type !== 'admin') {
+            return res.status(403).json({ message: 'אין לך הרשאה לערוך מרחב זה' });
+        }
+
+        const allowedFields = ['space_name', 'address', 'description', 'opening_hours', 'closing_hours', 'seats_available', 'space_status', 'latitude', 'longitude', 'google_place_id'];
+        let updateQuery = 'UPDATE spaces SET ';
+        const updateParams = [];
+        let hasUpdates = false;
+
+        for (const field of allowedFields) {
+            if (updates[field] !== undefined) {
+                updateQuery += `${field} = ?, `;
+                updateParams.push(updates[field]);
+                hasUpdates = true;
+            }
+        }
+
+        if (hasUpdates) {
+            updateQuery = updateQuery.slice(0, -2) + ' WHERE space_id = ?';
+            updateParams.push(spaceId);
+            await db.query(updateQuery, updateParams);
+        }
+
+        // עדכון פיצ'רים
+        if (updates.facilities && Array.isArray(updates.facilities)) {
+            await db.query('DELETE FROM space_facilities WHERE space_id = ?', [spaceId]);
+            if (updates.facilities.length > 0) {
+                const facilityValues = updates.facilities.map(fId => [spaceId, fId]);
+                await db.query('INSERT INTO space_facilities (space_id, facility_id) VALUES ?', [facilityValues]);
+            }
+        }
+
+        res.json({ message: 'המרחב עודכן בהצלחה' });
+
+    } catch (error) {
+        console.error("Error updating space:", error);
+        res.status(500).json({ message: 'שגיאה בעדכון המרחב' });
     }
 });
 
