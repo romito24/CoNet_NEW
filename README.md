@@ -156,6 +156,37 @@ pm2 start app.js --name conet_backend
 נתיב: GET /api/spaces/facilities
 
 
+**הוספת מרחב חדש**
+
+מותר למנהלי מרחב בלבד
+מוסיף מרחב חדש למערכת, כולל שיוך פיצ'רים וקישור למנהל היוצר.
+
+נתיב: POST /api/spaces/add
+
+גוף הבקשה (JSON):
+
+{
+  "space_name": "OpenSpace TLV",
+  "address": "Rothschild 22",
+  "seats_available": 20,
+  "facilities": [1, 3]
+}
+
+**עריכת מרחב קיים**
+
+מותר רק למנהל שיצר את המרחב (או אדמין)
+מאפשר לעדכן פרטים של מרחב קיים.
+
+נתיב: PUT /api/spaces/:id
+
+גוף הבקשה (JSON): (שולחים רק את השדות שרוצים לעדכן)
+
+{
+  "seats_available": 25,
+  "description": "Updated description"
+}
+
+
 **4.קהילות (Communities)**
 
 קובץ: routes/communities.js
