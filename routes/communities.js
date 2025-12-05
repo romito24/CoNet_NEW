@@ -85,7 +85,7 @@ router.get('/my-communities', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// הצטרפות לקהילה (POST /join) - אופציונלי אך מומלץ
+// הצטרפות לקהילה (POST /join) 
 // ==========================================
 router.post('/join', verifyToken, async (req, res) => {
     const { community_id } = req.body;
