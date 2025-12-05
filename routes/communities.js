@@ -15,7 +15,7 @@ router.post('/', verifyToken, async (req, res) => {
     }
 
     try {
-        // 1. בדיקת הרשאות (רק מנהל קהילה יכול ליצור)
+        // בדיקת הרשאות (רק מנהל קהילה יכול ליצור)
         const [users] = await db.query('SELECT user_type FROM users WHERE user_id = ?', [user_id]);
 
         if (users.length === 0) return res.status(404).json({ message: "משתמש לא נמצא" });
@@ -23,13 +23,13 @@ router.post('/', verifyToken, async (req, res) => {
             return res.status(403).json({ message: "אין לך הרשאה ליצור קהילה." });
         }
 
-        // 2. בדיקת כפילות שם
+        // בדיקת כפילות שם
         const [existingCommunity] = await db.query('SELECT community_id FROM communities WHERE community_name = ?', [community_name]);
         if (existingCommunity.length > 0) {
             return res.status(409).json({ message: "קהילה בשם זה כבר קיימת." });
         }
 
-        // 3. יצירת הקהילה
+        // יצירת הקהילה
         const insertQuery = `
             INSERT INTO communities (community_name, main_subject, image_url, establishment_date)
             VALUES (?, ?, ?, ?)
@@ -38,8 +38,7 @@ router.post('/', verifyToken, async (req, res) => {
         const [result] = await db.query(insertQuery, [community_name, main_subject, image_url, establishment_date]);
         const newCommunityId = result.insertId;
 
-        // 4. בונוס חשוב: הוספת המנהל שיצר את הקהילה כחבר בקהילה (כדי שיראה אותה ב"קהילות שלי")
-        // אנחנו מגדירים לו תפקיד 'manager' (או מה שה-ENUM שלך מאפשר, אחרת member)
+        // הוספת המנהל שיצר כחבר ומנהל בקהילה
         const linkQuery = `INSERT INTO community_users (community_id, user_id, role) VALUES (?, ?, 'manager')`;
         await db.query(linkQuery, [newCommunityId, user_id]);
 
@@ -56,28 +55,76 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// הקהילות שלי (GET /my-communities)
+// עריכת קהילה (PUT /:id) 
+// ==========================================
+router.put('/:id', verifyToken, async (req, res) => {
+    const communityId = req.params.id;
+    const updates = req.body;
+    const userId = req.user.user_id;
+
+    try {
+        // 1. בדיקת הרשאות: האם המשתמש הוא מנהל של הקהילה הזו?
+        // אנחנו בודקים בטבלת הקישור אם יש לו תפקיד 'manager' עבור ה-ID הזה
+        const [roleCheck] = await db.query(
+            'SELECT role FROM community_users WHERE community_id = ? AND user_id = ?', 
+            [communityId, userId]
+        );
+
+        if (roleCheck.length === 0) {
+            return res.status(404).json({ message: "אינך חבר בקהילה זו או שהקהילה לא קיימת" });
+        }
+
+        if (roleCheck[0].role !== 'manager' && req.user.user_type !== 'admin') {
+            return res.status(403).json({ message: "רק מנהל הקהילה יכול לערוך את פרטיה" });
+        }
+
+        // 2. בניית שאילתת עדכון דינמית (כמו במרחבים)
+        const allowedFields = ['community_name', 'main_subject', 'image_url', 'establishment_date'];
+        let updateQuery = 'UPDATE communities SET ';
+        const updateParams = [];
+        let hasUpdates = false;
+
+        for (const field of allowedFields) {
+            if (updates[field] !== undefined) {
+                updateQuery += `${field} = ?, `;
+                updateParams.push(updates[field]);
+                hasUpdates = true;
+            }
+        }
+
+        if (!hasUpdates) {
+            return res.status(400).json({ message: "לא נשלחו שדות לעדכון" });
+        }
+
+        updateQuery = updateQuery.slice(0, -2); // מוריד פסיק אחרון
+        updateQuery += ' WHERE community_id = ?';
+        updateParams.push(communityId);
+
+        await db.query(updateQuery, updateParams);
+
+        res.json({ message: "הקהילה עודכנה בהצלחה" });
+
+    } catch (error) {
+        console.error("Error updating community:", error);
+        res.status(500).json({ message: "שגיאה בעדכון הקהילה" });
+    }
+});
+
+// ==========================================
+// כל הקהילות שאני חבר בהן (GET /my-communities)
 // ==========================================
 router.get('/my-communities', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
 
     try {
-        // שליפה חכמה עם JOIN:
-        // אנחנו רוצים את פרטי הקהילה (מטבלת communities)
-        // עבור כל שורה בטבלת הקישור (community_users) ששייכת למשתמש הנוכחי
         const query = `
-            SELECT 
-                c.*, 
-                cu.role as my_role 
+            SELECT c.*, cu.role as my_role 
             FROM communities c
             JOIN community_users cu ON c.community_id = cu.community_id
             WHERE cu.user_id = ?
         `;
-        
         const [communities] = await db.query(query, [user_id]);
-        
         res.json(communities);
-
     } catch (error) {
         console.error("Error fetching my communities:", error);
         res.status(500).json({ message: "שגיאה בשליפת הקהילות שלי" });
@@ -85,7 +132,28 @@ router.get('/my-communities', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// הצטרפות לקהילה (POST /join) 
+// קהילות בניהולי בלבד (GET /my-managing) 
+// ==========================================
+router.get('/my-managing', verifyToken, async (req, res) => {
+    const user_id = req.user.user_id;
+
+    try {
+        const query = `
+            SELECT c.*, cu.role as my_role 
+            FROM communities c
+            JOIN community_users cu ON c.community_id = cu.community_id
+            WHERE cu.user_id = ? AND cu.role = 'manager'
+        `;
+        const [communities] = await db.query(query, [user_id]);
+        res.json(communities);
+    } catch (error) {
+        console.error("Error fetching managed communities:", error);
+        res.status(500).json({ message: "שגיאה בשליפת הקהילות בניהולי" });
+    }
+});
+
+// ==========================================
+// הצטרפות לקהילה (POST /join)
 // ==========================================
 router.post('/join', verifyToken, async (req, res) => {
     const { community_id } = req.body;
@@ -94,15 +162,10 @@ router.post('/join', verifyToken, async (req, res) => {
     if (!community_id) return res.status(400).json({ message: "חובה לשלוח מזהה קהילה" });
 
     try {
-        // בדיקה אם המשתמש כבר חבר
         const [exists] = await db.query('SELECT * FROM community_users WHERE community_id = ? AND user_id = ?', [community_id, user_id]);
-        if (exists.length > 0) {
-            return res.status(409).json({ message: "אתה כבר חבר בקהילה זו" });
-        }
+        if (exists.length > 0) return res.status(409).json({ message: "אתה כבר חבר בקהילה זו" });
 
-        // הוספה לטבלת הקישור
         await db.query('INSERT INTO community_users (community_id, user_id, role) VALUES (?, ?, "member")', [community_id, user_id]);
-
         res.status(200).json({ message: "הצטרפת לקהילה בהצלחה!" });
 
     } catch (error) {
