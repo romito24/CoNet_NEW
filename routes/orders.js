@@ -84,12 +84,11 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
 }
 
 // =================================================================
-// יצירת הזמנה
+// יצירת הזמנה (לוגיקה משותפת)
 // =================================================================
 const createOrderLogic = async (orderData) => {
     const { space_id, user_id, start_time, end_time, event_id, attendees_count } = orderData;
     
-    // ברירת מחדל ל-1 אם לא נשלח
     const requestedSeats = attendees_count && attendees_count > 0 ? attendees_count : 1;
 
     const start = new Date(start_time);
@@ -106,7 +105,9 @@ const createOrderLogic = async (orderData) => {
 
     // 2. בדיקות לוגיות
     if (space.space_status === 'close') throw { status: 400, message: 'המרחב סגור כרגע להזמנות' };
-    if (space.capacity === 'full') throw { status: 409, message: 'המרחב מסומן כמלא (Full)' };
+    
+    // שינוי: הוסרה בדיקת space.capacity === 'full'
+
     if (requestedSeats > space.seats_available) throw { status: 400, message: `אין מספיק מקום במרחב (פנוי: ${space.seats_available})` };
 
     // 3. בדיקת שעות פתיחה
@@ -136,10 +137,6 @@ const createOrderLogic = async (orderData) => {
         throw { status: 409, message: `אין מספיק מקום פנוי בשעות אלו. נותרו ${seatsLeft} מקומות.` };
     }
 
-    // 5. עדכון סטטוס המרחב אם התמלא
-    if ((currentOccupancy + requestedSeats) === space.seats_available) {
-        await db.execute("UPDATE spaces SET capacity = 'full' WHERE space_id = ?", [space_id]);
-    }
 
     // 6. יצירת ההזמנה ב-DB
     const insertSql = `
@@ -173,6 +170,7 @@ const createOrderLogic = async (orderData) => {
 };
 
 // ==========================================
+// Route: יצירת הזמנה
 // ==========================================
 router.post('/create', verifyToken, async (req, res) => {
     try {
@@ -188,6 +186,7 @@ router.post('/create', verifyToken, async (req, res) => {
     }
 });
 
+// Route: ביטול הזמנה 
 router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
     const { orderId } = req.params;
     const user_id = req.user.user_id;
@@ -199,11 +198,8 @@ router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
         if (order.status === 'canceled') return res.status(400).json({ message: 'כבר מבוטלת' });
 
         await db.execute("UPDATE orders SET status = 'canceled' WHERE order_id = ?", [orderId]);
-        const space_id = order.space_id;
-        const [spaces] = await db.execute('SELECT capacity FROM spaces WHERE space_id = ?', [space_id]);
-        if (spaces.length > 0 && spaces[0].capacity === 'full') {
-            await db.execute("UPDATE spaces SET capacity = 'not full' WHERE space_id = ?", [space_id]);
-        }
+        
+
         res.json({ message: 'ההזמנה בוטלה בהצלחה' });
     } catch (error) {
         console.error(error);
