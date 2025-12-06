@@ -10,7 +10,7 @@ const buildGoogleMapsUrl = (space) => {
 };
 
 // ==================================================
-// חיפוש מרחבים
+// חיפוש מרחבים 
 // ==================================================
 router.post('/search', async (req, res) => {
     const { required_facilities, user_lat, user_lng, radius_km } = req.body;
@@ -24,7 +24,7 @@ router.post('/search', async (req, res) => {
             sqlSelect += `, NULL as distance`;
         }
 
-        let sqlFrom = ` FROM spaces s LEFT JOIN space_facilities sf ON s.space_id = sf.space_id LEFT JOIN facilities f ON sf.facility_id = f.facility_id WHERE s.space_status = 'open' AND s.capacity = 'not full'`;
+        let sqlFrom = ` FROM spaces s LEFT JOIN space_facilities sf ON s.space_id = sf.space_id LEFT JOIN facilities f ON sf.facility_id = f.facility_id WHERE s.space_status = 'open'`;
         
         const params = [];
         if (user_lat && user_lng) params.push(user_lat, user_lng, user_lat);
@@ -48,7 +48,6 @@ router.post('/search', async (req, res) => {
 
         if (havingConditions.length > 0) finalSql += ` HAVING ` + havingConditions.join(' AND ');
 
-        // מיון
         if (user_lat && user_lng) finalSql += ` ORDER BY distance ASC`;
         else finalSql += ` ORDER BY s.space_name ASC`;
 
@@ -124,8 +123,8 @@ router.post('/add', verifyToken, async (req, res) => {
 
         const insertSql = `
             INSERT INTO spaces 
-            (space_name, address, description, opening_hours, closing_hours, seats_available, latitude, longitude, google_place_id, space_status, capacity, manager_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', 'not full', ?)
+            (space_name, address, description, opening_hours, closing_hours, seats_available, latitude, longitude, google_place_id, space_status, manager_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?)
         `;
 
         const [result] = await db.query(insertSql, [
