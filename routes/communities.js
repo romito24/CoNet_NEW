@@ -38,7 +38,7 @@ router.post('/', verifyToken, async (req, res) => {
         const [result] = await db.query(insertQuery, [community_name, main_subject, image_url, establishment_date]);
         const newCommunityId = result.insertId;
 
-        // הוספת המנהל שיצר כחבר ומנהל בקהילה
+        // הוספת המנהל שיצר כחבר ומנהל בקהילה בטבלת הקישור
         const linkQuery = `INSERT INTO community_users (community_id, user_id, role) VALUES (?, ?, 'manager')`;
         await db.query(linkQuery, [newCommunityId, user_id]);
 
@@ -55,7 +55,7 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// עריכת קהילה (PUT /:id) 
+// עריכת קהילה (PUT /:id) - מתוקן!
 // ==========================================
 router.put('/:id', verifyToken, async (req, res) => {
     const communityId = req.params.id;
@@ -63,22 +63,28 @@ router.put('/:id', verifyToken, async (req, res) => {
     const userId = req.user.user_id;
 
     try {
-        // 1. בדיקת הרשאות: האם המשתמש הוא מנהל של הקהילה הזו?
-        // אנחנו בודקים בטבלת הקישור אם יש לו תפקיד 'manager' עבור ה-ID הזה
+        // 1. קודם כל: האם הקהילה קיימת בכלל?
+        const [communityExists] = await db.query('SELECT community_id FROM communities WHERE community_id = ?', [communityId]);
+        
+        if (communityExists.length === 0) {
+            return res.status(404).json({ message: "הקהילה לא נמצאה" });
+        }
+
+        // 2. בדיקת הרשאות: האם המשתמש הוא מנהל של הקהילה הזו?
         const [roleCheck] = await db.query(
             'SELECT role FROM community_users WHERE community_id = ? AND user_id = ?', 
             [communityId, userId]
         );
 
-        if (roleCheck.length === 0) {
-            return res.status(404).json({ message: "אינך חבר בקהילה זו או שהקהילה לא קיימת" });
+        // שליפת התפקיד (אם קיים)
+        const userRole = roleCheck.length > 0 ? roleCheck[0].role : null;
+
+        // אם המשתמש הוא לא המנהל (גם אם הוא סתם חבר, וגם אם הוא בכלל לא בקהילה)
+        if (userRole !== 'manager' && req.user.user_type !== 'admin') {
+            return res.status(403).json({ message: "אין לך הרשאה לערוך את הקהילה (נדרש מנהל קהילה)" });
         }
 
-        if (roleCheck[0].role !== 'manager' && req.user.user_type !== 'admin') {
-            return res.status(403).json({ message: "רק מנהל הקהילה יכול לערוך את פרטיה" });
-        }
-
-        // 2. בניית שאילתת עדכון דינמית (כמו במרחבים)
+        // 3. המשך לעדכון...
         const allowedFields = ['community_name', 'main_subject', 'image_url', 'establishment_date'];
         let updateQuery = 'UPDATE communities SET ';
         const updateParams = [];
@@ -96,7 +102,7 @@ router.put('/:id', verifyToken, async (req, res) => {
             return res.status(400).json({ message: "לא נשלחו שדות לעדכון" });
         }
 
-        updateQuery = updateQuery.slice(0, -2); // מוריד פסיק אחרון
+        updateQuery = updateQuery.slice(0, -2); 
         updateQuery += ' WHERE community_id = ?';
         updateParams.push(communityId);
 
@@ -132,7 +138,7 @@ router.get('/my-communities', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// קהילות בניהולי בלבד (GET /my-managing) 
+// קהילות בניהולי בלבד (GET /my-managing)
 // ==========================================
 router.get('/my-managing', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
