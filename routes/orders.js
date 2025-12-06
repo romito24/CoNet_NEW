@@ -5,14 +5,13 @@ const verifyToken = require('../middleware/verifyToken');
 const nodemailer = require('nodemailer');
 const ics = require('ics');
 
+// --- הגדרות מייל ---
 const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
+// --- פונקציות עזר ---
 function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -84,105 +83,111 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
     });
 }
 
-// ==========================================
+// =================================================================
 // יצירת הזמנה
-// ==========================================
-router.post('/create', verifyToken, async (req, res) => {
-    const { space_id, start_time, end_time, event_id, attendees_count } = req.body;
-    const user_id = req.user.user_id;
+// =================================================================
+const createOrderLogic = async (orderData) => {
+    const { space_id, user_id, start_time, end_time, event_id, attendees_count } = orderData;
     
+    // ברירת מחדל ל-1 אם לא נשלח
     const requestedSeats = attendees_count && attendees_count > 0 ? attendees_count : 1;
-
-    if (!space_id || !start_time || !end_time) return res.status(400).json({ message: 'חסרים פרטים ליצירת ההזמנה' });
 
     const start = new Date(start_time);
     const end = new Date(end_time);
     const now = new Date();
 
-    if (start >= end) return res.status(400).json({ message: 'שעת ההתחלה חייבת להיות לפני הסיום' });
-    if (start < now) return res.status(400).json({ message: 'לא ניתן להזמין לעבר' });
+    if (start >= end) throw { status: 400, message: 'שעת ההתחלה חייבת להיות לפני הסיום' };
+    if (start < now) throw { status: 400, message: 'לא ניתן להזמין לעבר' };
 
+    // 1. שליפת פרטי המרחב
+    const [spaces] = await db.execute('SELECT * FROM spaces WHERE space_id = ?', [space_id]);
+    if (spaces.length === 0) throw { status: 404, message: 'המרחב לא נמצא' };
+    const space = spaces[0];
+
+    // 2. בדיקות לוגיות
+    if (space.space_status === 'close') throw { status: 400, message: 'המרחב סגור כרגע להזמנות' };
+    if (space.capacity === 'full') throw { status: 409, message: 'המרחב מסומן כמלא (Full)' };
+    if (requestedSeats > space.seats_available) throw { status: 400, message: `אין מספיק מקום במרחב (פנוי: ${space.seats_available})` };
+
+    // 3. בדיקת שעות פתיחה
+    const startMinutes = getMinutesFromDate(start);
+    const endMinutes = getMinutesFromDate(end);
+    const openMinutes = timeToMinutes(space.opening_hours);
+    const closeMinutes = timeToMinutes(space.closing_hours);
+
+    if (startMinutes < openMinutes || endMinutes > closeMinutes) {
+        throw { status: 400, message: `ההזמנה חייבת להיות בתוך שעות הפתיחה: ${space.opening_hours} - ${space.closing_hours}` };
+    }
+
+    // 4. בדיקת חפיפה ותפוסה
+    const overlapSql = `
+        SELECT SUM(attendees_count) as total_booked
+        FROM orders 
+        WHERE space_id = ? 
+        AND status = 'approved' 
+        AND start_time < ? 
+        AND end_time > ?
+    `;
+    const [occupancyResult] = await db.execute(overlapSql, [space_id, end, start]);
+    const currentOccupancy = parseInt(occupancyResult[0].total_booked) || 0;
+    
+    if ((currentOccupancy + requestedSeats) > space.seats_available) {
+        const seatsLeft = space.seats_available - currentOccupancy;
+        throw { status: 409, message: `אין מספיק מקום פנוי בשעות אלו. נותרו ${seatsLeft} מקומות.` };
+    }
+
+    // 5. עדכון סטטוס המרחב אם התמלא
+    if ((currentOccupancy + requestedSeats) === space.seats_available) {
+        await db.execute("UPDATE spaces SET capacity = 'full' WHERE space_id = ?", [space_id]);
+    }
+
+    // 6. יצירת ההזמנה ב-DB
+    const insertSql = `
+        INSERT INTO orders (user_id, space_id, event_id, start_time, end_time, status, attendees_count)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [insertResult] = await db.execute(insertSql, [
+        user_id, space_id, event_id || null, start, end, 'approved', requestedSeats
+    ]);
+
+    // 7. שליחת מייל
+    let emailStatus = 'skipped';
+    const [users] = await db.execute('SELECT email FROM users WHERE user_id = ?', [user_id]);
+    
+    if (users.length > 0 && users[0].email) {
+        try {
+            await sendEmailWithInvite(users[0].email, { start_time: start, end_time: end, attendees_count: requestedSeats }, space.space_name, space.address);
+            emailStatus = 'sent';
+        } catch (e) {
+            console.error("Email send failed", e);
+            emailStatus = 'failed';
+        }
+    }
+
+    return { 
+        success: true, 
+        orderId: insertResult.insertId,
+        emailStatus,
+        message: 'ההזמנה בוצעה בהצלחה'
+    };
+};
+
+// ==========================================
+// ==========================================
+router.post('/create', verifyToken, async (req, res) => {
     try {
-        const [spaces] = await db.execute('SELECT * FROM spaces WHERE space_id = ?', [space_id]);
-        if (spaces.length === 0) return res.status(404).json({ message: 'המרחב לא נמצא' });
-        const space = spaces[0];
-
-        if (space.space_status === 'close') return res.status(400).json({ message: 'המרחב סגור כרגע להזמנות' });
-        if (space.capacity === 'full') return res.status(409).json({ message: 'המרחב מסומן כמלא (Full)' });
-        if (requestedSeats > space.seats_available) return res.status(400).json({ message: `אין מספיק מקום במרחב (פנוי: ${space.seats_available})` });
-
-        const startMinutes = getMinutesFromDate(start);
-        const endMinutes = getMinutesFromDate(end);
-        const openMinutes = timeToMinutes(space.opening_hours);
-        const closeMinutes = timeToMinutes(space.closing_hours);
-
-        if (startMinutes < openMinutes || endMinutes > closeMinutes) {
-            return res.status(400).json({ message: `ההזמנה חייבת להיות בתוך שעות הפתיחה: ${space.opening_hours} - ${space.closing_hours}` });
-        }
-
-        const overlapSql = `
-            SELECT SUM(attendees_count) as total_booked
-            FROM orders 
-            WHERE space_id = ? 
-            AND status = 'approved' 
-            AND start_time < ? 
-            AND end_time > ?
-        `;
-        const [occupancyResult] = await db.execute(overlapSql, [space_id, end_time, start_time]);
-        const currentOccupancy = parseInt(occupancyResult[0].total_booked) || 0;
-        
-        if ((currentOccupancy + requestedSeats) > space.seats_available) {
-            return res.status(409).json({ message: `אין מספיק מקום פנוי בשעות אלו. נותרו ${seatsLeft} מקומות.` });
-        }
-
-        // עדכון סטטוס המרחב אם התמלא
-        if ((currentOccupancy + requestedSeats) === space.seats_available) {
-            await db.execute("UPDATE spaces SET capacity = 'full' WHERE space_id = ?", [space_id]);
-        }
-
-        // יצירת ההזמנה ב-DB
-        const insertSql = `
-            INSERT INTO orders (user_id, space_id, event_id, start_time, end_time, status, attendees_count)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `;
-        const [insertResult] = await db.execute(insertSql, [user_id, space_id, event_id || null, start_time, end_time, 'approved', requestedSeats]);
-
-        // ============================================================
-        // שליחת מייל עם זימון
-        // ============================================================
-        
-        let emailStatus = 'skipped';
-
-        const [users] = await db.execute('SELECT email FROM users WHERE user_id = ?', [user_id]);
-        
-        if (users.length > 0 && users[0].email) {
-            const orderDetails = { start_time: start, end_time: end, attendees_count: requestedSeats };
-            
-            // שליחת המייל
-            console.log(`Sending ICS invite to: ${users[0].email}`);
-            const emailSuccess = await sendEmailWithInvite(
-                users[0].email, 
-                orderDetails, 
-                space.space_name, 
-                space.address
-            );
-            emailStatus = emailSuccess ? 'sent' : 'failed';
-        }
-
-        // החזרת תשובה ללקוח
-        res.status(201).json({ 
-            message: 'ההזמנה בוצעה בהצלחה', 
-            orderId: insertResult.insertId,
-            emailStatus: emailStatus
+        const result = await createOrderLogic({
+            ...req.body,
+            user_id: req.user.user_id
         });
-
+        res.status(201).json(result);
     } catch (error) {
-        console.error("Error creating order:", error);
-        res.status(500).json({ message: 'שגיאה בביצוע ההזמנה' });
+        console.error("Order creation failed:", error);
+        const status = error.status || 500;
+        res.status(status).json({ message: error.message || 'שגיאה ביצירת ההזמנה' });
     }
 });
 
-// --- ביטול והיסטוריה  ---
 router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
     const { orderId } = req.params;
     const user_id = req.user.user_id;
@@ -217,4 +222,4 @@ router.get('/my-orders', verifyToken, async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = { router, createOrderLogic };
