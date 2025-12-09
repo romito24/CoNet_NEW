@@ -4,6 +4,19 @@ const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 const { createOrderLogic } = require('./orders'); 
 
+// --- פונקציות עזר לזמנים ---
+function timeToMinutes(timeStr) {
+    if (!timeStr) return 0;
+    if (typeof timeStr !== 'string') return 0;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
+function getMinutesFromDate(dateObj) {
+    const date = new Date(dateObj);
+    return date.getHours() * 60 + date.getMinutes();
+}
+
 // ==========================================
 // 1. האירועים שלי (GET /my-events)
 // ==========================================
@@ -53,7 +66,7 @@ router.post('/create', verifyToken, async (req, res) => {
     let newEventId = null;
 
     try {
-        // א. בדיקת הרשאה (האם המשתמש הוא מנהל הקהילה?)
+        // א. בדיקת הרשאה
         const [roleCheck] = await db.query(
             'SELECT role FROM community_users WHERE community_id = ? AND user_id = ?', 
             [community_id, owner_id]
@@ -63,7 +76,7 @@ router.post('/create', verifyToken, async (req, res) => {
             return res.status(403).json({ message: "רק מנהל הקהילה יכול ליצור אירועים" });
         }
 
-        // ב. יצירת האירוע בטבלת events (קודם כל יוצרים כדי לקבל ID)
+        // ב. יצירת אירוע ב-DB
         const eventParticipants = max_participants || 10;
 
         const insertEventSql = `
@@ -75,41 +88,144 @@ router.post('/create', verifyToken, async (req, res) => {
         ]);
         newEventId = eventResult.insertId;
 
-        // ג. יצירת הזמנה (שריון מקום) באמצעות הלוגיקה המשותפת!
-        // ממירים תאריך ושעה לפורמט מלא
+        // ג. יצירת הזמנה (שריון מקום)
         const startDateTime = `${event_date}T${start_hour}`;
         const endDateTime = `${event_date}T${finish_hour}`;
 
-        // שימוש בפונקציה מתוך orders.js
         await createOrderLogic({
             space_id: space_id,
-            user_id: owner_id,          // המנהל מזמין את המקום
+            user_id: owner_id,
             start_time: startDateTime,
             end_time: endDateTime,
-            attendees_count: eventParticipants, // תופסים מקום לפי כמות המשתתפים המקסימלית
-            event_id: newEventId        // קישור לאירוע
+            attendees_count: eventParticipants, 
+            event_id: newEventId
         });
 
-        // אם לא הייתה שגיאה ב-createOrderLogic, הכל הצליח
         res.status(201).json({ message: "האירוע נוצר והמקום שוריין בהצלחה!", eventId: newEventId });
 
     } catch (error) {
         console.error("Error creating event:", error);
 
-        // ד. Rollback: ביטול יצירת האירוע אם ההזמנה נכשלה (למשל כי אין מקום)
+        // Rollback
         if (newEventId) {
             await db.query('DELETE FROM events WHERE event_id = ?', [newEventId]);
-            console.log(`Rollback: Event ${newEventId} deleted because booking failed.`);
         }
 
         const status = error.status || 500;
-        const message = error.message || "שגיאה ביצירת האירוע (ייתכן שאין מקום פנוי)";
+        const message = error.message || "שגיאה ביצירת האירוע";
         res.status(status).json({ message });
     }
 });
 
 // ==========================================
-// 3. הרשמה לאירוע (POST /:eventId/register)
+// 3. עריכת אירוע (PUT /:eventId) - חדש!
+// ==========================================
+router.put('/:eventId', verifyToken, async (req, res) => {
+    const eventId = req.params.eventId;
+    const { event_name, event_date, start_hour, finish_hour, space_id, max_participants } = req.body;
+    const userId = req.user.user_id;
+
+    try {
+        // 1. בדיקת קיום האירוע ובעלות
+        const [events] = await db.query('SELECT * FROM events WHERE event_id = ?', [eventId]);
+        if (events.length === 0) return res.status(404).json({ message: "האירוע לא נמצא" });
+        
+        const currentEvent = events[0];
+
+        // 2. הרשאות (רק ה-Owner או Admin)
+        if (currentEvent.owner_id !== userId && req.user.user_type !== 'admin') {
+            return res.status(403).json({ message: "אין לך הרשאה לערוך אירוע זה (רק ליוצר האירוע)" });
+        }
+
+        // 3. הכנת נתונים (שימוש בקיים אם לא נשלח חדש)
+        // המרת תאריך לפורמט YYYY-MM-DD
+        let oldDate = currentEvent.event_date;
+        if (oldDate instanceof Date) oldDate = oldDate.toISOString().split('T')[0];
+        
+        const newDate = event_date || oldDate;
+        const newStart = start_hour || currentEvent.start_hour;
+        const newFinish = finish_hour || currentEvent.finish_hour;
+        const newSpaceId = space_id || currentEvent.space_id;
+        const newMaxParticipants = max_participants || currentEvent.max_participants;
+
+        // 4. בדיקת זמינות מחדש (רק אם שונו פרטים קריטיים)
+        const needsRevalidation = (space_id || event_date || start_hour || finish_hour || max_participants);
+
+        if (needsRevalidation) {
+            const startDateTime = new Date(`${newDate}T${newStart}`);
+            const endDateTime = new Date(`${newDate}T${newFinish}`);
+
+            // א. בדיקת המרחב
+            const [spaces] = await db.execute('SELECT * FROM spaces WHERE space_id = ?', [newSpaceId]);
+            if (spaces.length === 0) return res.status(404).json({ message: 'המרחב לא נמצא' });
+            const space = spaces[0];
+
+            if (space.space_status === 'close') return res.status(400).json({ message: 'המרחב סגור' });
+
+            // ב. בדיקת שעות פתיחה
+            const startMinutes = getMinutesFromDate(startDateTime);
+            const endMinutes = getMinutesFromDate(endDateTime);
+            const openMinutes = timeToMinutes(space.opening_hours);
+            const closeMinutes = timeToMinutes(space.closing_hours);
+
+            if (startMinutes < openMinutes || endMinutes > closeMinutes) {
+                return res.status(400).json({ message: "שעות האירוע חורגות משעות הפתיחה של המרחב" });
+            }
+
+            // ג. בדיקת תפוסה (בניכוי האירוע עצמו!)
+            const overlapSql = `
+                SELECT SUM(attendees_count) as total_booked
+                FROM orders 
+                WHERE space_id = ? 
+                AND status = 'approved' 
+                AND start_time < ? 
+                AND end_time > ?
+                AND event_id != ? 
+            `;
+            
+            const [occupancyResult] = await db.execute(overlapSql, [newSpaceId, endDateTime, startDateTime, eventId]);
+            const currentOccupancy = parseInt(occupancyResult[0].total_booked) || 0;
+
+            if (currentOccupancy + newMaxParticipants > space.seats_available) {
+                return res.status(409).json({ message: "אין מספיק מקום במרחב לשינויים אלו בשעות המבוקשות" });
+            }
+
+            // ד. עדכון ההזמנה בטבלת orders
+            const updateOrderSql = `
+                UPDATE orders 
+                SET space_id = ?, start_time = ?, end_time = ?, attendees_count = ?
+                WHERE event_id = ? AND status != 'canceled'
+            `;
+            await db.query(updateOrderSql, [newSpaceId, startDateTime, endDateTime, newMaxParticipants, eventId]);
+        }
+
+        // 5. עדכון פרטי האירוע בטבלת events
+        const updateEventSql = `
+            UPDATE events 
+            SET event_name = ?, event_date = ?, start_hour = ?, finish_hour = ?, space_id = ?, max_participants = ?
+            WHERE event_id = ?
+        `;
+        
+        await db.query(updateEventSql, [
+            event_name || currentEvent.event_name,
+            newDate,
+            newStart,
+            newFinish,
+            newSpaceId,
+            newMaxParticipants,
+            eventId
+        ]);
+
+        res.json({ message: "האירוע עודכן בהצלחה" });
+
+    } catch (error) {
+        console.error("Error updating event:", error);
+        res.status(500).json({ message: "שגיאה בעדכון האירוע" });
+    }
+});
+
+// ==========================================
+// 4. הרשמה לאירוע (POST /:eventId/register)
 // ==========================================
 router.post('/:eventId/register', verifyToken, async (req, res) => {
     const eventId = req.params.eventId;
@@ -120,7 +236,6 @@ router.post('/:eventId/register', verifyToken, async (req, res) => {
         if (events.length === 0) return res.status(404).json({ message: "האירוע לא נמצא" });
         const event = events[0];
 
-        // בדיקת חברות בקהילה
         const [membership] = await db.query(
             'SELECT * FROM community_users WHERE community_id = ? AND user_id = ?',
             [event.community_id, userId]
@@ -130,7 +245,6 @@ router.post('/:eventId/register', verifyToken, async (req, res) => {
             return res.status(403).json({ message: "על מנת שנוכל לאשר את הגעתך עליך להירשם לקהילה" });
         }
 
-        // בדיקת מקום פנוי בהרשמה
         const [countResult] = await db.query(
             'SELECT COUNT(*) as current_count FROM event_participants WHERE event_id = ? AND status = "registered"',
             [eventId]
@@ -141,7 +255,6 @@ router.post('/:eventId/register', verifyToken, async (req, res) => {
             return res.status(409).json({ message: "לצערנו, ההרשמה לאירוע הסתיימה (אין מקום פנוי)" });
         }
 
-        // בדיקת הרשמה קיימת
         const [existing] = await db.query(
             'SELECT * FROM event_participants WHERE event_id = ? AND user_id = ?',
             [eventId, userId]
@@ -173,7 +286,7 @@ router.post('/:eventId/register', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// 4. ביטול הרשמה לאירוע (PATCH /:eventId/cancel)
+// 5. ביטול הרשמה לאירוע (PATCH /:eventId/cancel)
 // ==========================================
 router.patch('/:eventId/cancel', verifyToken, async (req, res) => {
     const eventId = req.params.eventId;
@@ -197,7 +310,7 @@ router.patch('/:eventId/cancel', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// 5. כל האירועים (GET /all)
+// 6. כל האירועים של CONET (GET /all)
 // ==========================================
 router.get('/all', async (req, res) => {
     const { community_id } = req.query;
