@@ -20,6 +20,12 @@ app.get('/', (req, res) => {
     res.send('CONET Server is running correctly!');
 });
 
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/search', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'search.html'));
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);

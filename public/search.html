@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoNet - חיפוש מרחבי עבודה</title>
+    <!-- קישור לקובץ העיצוב החיצוני -->
+    <link rel="stylesheet" href="styleForSearch.css">
+</head>
+<body>
+
+<header>
+    <h1>CoNet - איתור מרחבי עבודה</h1>
+</header>
+
+<div class="main-container">
+    <!-- צד ימין: פילטרים ותוצאות -->
+    <div class="sidebar">
+        <div class="filters-section">
+            <div class="location-controls">
+                <button class="location-btn" onclick="getCurrentLocation()">📍 המיקום שלי</button>
+                <input type="number" id="radius" placeholder="רדיוס (ק&quot;מ)" value="10">
+                <button onclick="searchSpaces()">חפש</button>
+            </div>
+            <div>
+                <strong>סנן לפי שירותים:</strong>
+                <div class="facilities-list" id="facilities-container">
+                    Loading...
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-list" id="results-container">
+            <div class="empty-state">
+                אנא בצע חיפוש כדי לראות תוצאות
+            </div>
+        </div>
+    </div>
+
+    <!-- צד שמאל: מפה -->
+    <div id="map"></div>
+</div>
+
+<!-- קישור לקובץ הסקריפט החיצוני -->
+<script src="search.js"></script>
+
+<!-- טעינת המפה - החליפי את YOUR_GOOGLE_MAPS_API_KEY במפתח האמיתי של חשבון הפרויקט -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_tYAKzK5_6QXVDxDJkt9Cm8_SCwRhcww&callback=initMap&libraries=places&v=weekly" async defer></script>
+
+</body>
+</html>
