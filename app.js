@@ -23,13 +23,9 @@ app.get('/', (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/search', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'search.html'));
-});
-
-app.get('/events', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'events.html'));
-});
+const path = require('path');
+// הגדרת התיקייה public כתיקייה סטטית
+app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
