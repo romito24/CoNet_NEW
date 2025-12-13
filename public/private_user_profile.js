@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // בדיקה אם המשתמש מחובר
     if (!token) {
-        // במצב רגיל היינו שולחים ל-login, אבל בבדיקות כרגע נשאיר הודעה בקונסול
         console.warn("No token found. Please inject token via Developer Tools.");
         // window.location.href = 'login.html'; 
         return;
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // --- פונקציות ניווט ומערכת ---
 function logout() {
     localStorage.removeItem('token');
-    window.location.href = 'login.html'; // אפשר לשנות לדף אחר אם אין login.html כרגע
+    window.location.href = 'login.html';
 }
 
 function switchTab(tabId) {
@@ -65,7 +64,7 @@ async function loadUserDetails() {
     setText('detail-phone', user.phone_number || '-');
     setText('detail-type', translateUserType(user.user_type));
     
-    // אם יש תאריך הרשמה (לא תמיד חוזר, תלוי ב-SELECT, שמנו אופציונלי)
+    // אם יש תאריך הרשמה
     if (user.registration_date) {
         setText('detail-date', new Date(user.registration_date).toLocaleDateString('he-IL'));
     }
@@ -80,19 +79,24 @@ async function loadMyOrders() {
 
     const orders = await fetchData('/orders/my-orders');
     
-    if (!orders || orders.length === 0) {
+    // --- השינוי כאן: סינון הזמנות מבוטלות ---
+    const activeOrders = orders ? orders.filter(order => order.status !== 'canceled') : [];
+
+    if (activeOrders.length === 0) {
         container.innerHTML = `<div class="empty-state">
             <i class="fas fa-calendar-times" style="font-size: 40px; margin-bottom: 10px;"></i>
-            <p>עדיין לא ביצעת הזמנות למרחבים.</p>
+            <p>אין לך הזמנות פעילות כרגע.</p>
         </div>`;
         return;
     }
 
-    container.innerHTML = orders.map(order => {
+    container.innerHTML = activeOrders.map(order => {
         const dateStr = new Date(order.start_time).toLocaleDateString('he-IL');
         const timeStart = new Date(order.start_time).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
         const timeEnd = new Date(order.end_time).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
-        const canCancel = order.status !== 'canceled' && order.status !== 'declined';
+        
+        // כפתור ביטול מוצג רק אם ההזמנה לא נדחתה (מבוטלות כבר סוננו)
+        const canCancel = order.status !== 'declined';
 
         return `
         <div class="card">
@@ -104,7 +108,7 @@ async function loadMyOrders() {
             <span class="status-badge status-${order.status}">${translateStatus(order.status)}</span>
             
             ${canCancel ? 
-                `<button onclick="confirmAction('ביטול הזמנה', 'האם לבטל את ההזמנה?', () => cancelOrder(${order.order_id}))" class="btn-action btn-danger">
+                `<button onclick="confirmAction('ביטול הזמנה', 'האם לבטל את ההזמנה? היא תוסר מהרשימה.', () => cancelOrder(${order.order_id}))" class="btn-action btn-danger">
                     ביטול הזמנה
                 </button>` : ''
             }
@@ -121,7 +125,7 @@ async function cancelOrder(orderId) {
 
     if (res.ok) {
         closeModal();
-        loadMyOrders(); // ריענון
+        loadMyOrders(); // קריאה חוזרת לפונקציה תרענן את הרשימה (ותסנן את המבוטל)
     } else {
         alert('שגיאה בביטול ההזמנה');
     }
