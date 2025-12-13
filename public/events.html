@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>האירועים של CoNet</title>
+    <link rel="stylesheet" href="events.css">
+    <!-- שימוש בפונט כמו בדף החיפוש -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>האירועים של CoNet</h1>
+            <p>גלה אירועים, סדנאות ומפגשים בקהילות שלנו</p>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- סרגל חיפוש ופילטור --->
+        <div class="filters-bar">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="חפש לפי שם אירוע או קהילה...">
+            </div>
+            <div class="date-filter">
+                <label>מתאריך:</label>
+                <input type="date" id="date-input">
+            </div>
+            <button onclick="filterEvents()" class="filter-btn">סנן</button>
+            <button onclick="resetFilters()" class="reset-btn">נקה</button>
+        </div>
+
+        <!-- אזור טעינה -->
+        <div id="loading" class="loading">טוען אירועים...</div>
+
+        <!-- רשת כרטיסי האירועים -->
+        <div id="events-grid" class="events-grid">
+            <!-- הכרטיסים יוזרקו כאן ע"י JS -->
+        </div>
+        
+        <!-- הודעה כשאין תוצאות -->
+        <div id="no-results" class="no-results" style="display: none;">
+            לא נמצאו אירועים תואמים לחיפוש שלך.
+        </div>
+    </div>
+
+    <script src="events.js"></script>
+</body>
+</html>
