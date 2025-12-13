@@ -4,7 +4,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db'); 
 
-// --- הרשמה ---
+// ==========================================
+// הרשמה (POST /register)
+// ==========================================
 router.post('/register', async (req, res) => {
     const { first_name, last_name, email, password, phone_number, user_type } = req.body;
 
@@ -28,7 +30,6 @@ router.post('/register', async (req, res) => {
         const status = 'active'; // סטטוס דיפולטיבי
 
         // שמירה ב-DB
-        // שימי לב: הסדר של סימני השאלה (?) חייב להיות תואם לסדר במערך
         const sql = `
             INSERT INTO users 
             (first_name, last_name, email, password, phone_number, user_type, status, registration_date) 
@@ -54,7 +55,9 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// --- התחברות ---
+// ==========================================
+// התחברות (POST /login)
+// ==========================================
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -103,6 +106,37 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'שגיאה בשרת בעת ההתחברות' });
+    }
+});
+
+// ==========================================
+// קבלת פרטי המשתמש המחובר (GET /me) - חדש!
+// ==========================================
+router.get('/me', async (req, res) => {
+    // 1. שליפת הטוקן מה-Header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ message: 'לא התקבל טוקן' });
+
+    const token = authHeader.split(' ')[1]; // מוריד את המילה Bearer
+
+    try {
+        // 2. אימות הטוקן
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // 3. שליפת הפרטים מהדאטה בייס (ללא סיסמה)
+        const [users] = await db.execute(
+            'SELECT user_id, first_name, last_name, email, phone_number, user_type, registration_date FROM users WHERE user_id = ?', 
+            [decoded.user_id]
+        );
+        
+        if (users.length === 0) return res.status(404).json({ message: 'משתמש לא נמצא' });
+        
+        // 4. החזרת הפרטים
+        res.json(users[0]);
+
+    } catch (error) {
+        console.error("Error in /me:", error);
+        return res.status(401).json({ message: 'טוקן לא תקין או פג תוקף' });
     }
 });
 
