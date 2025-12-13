@@ -13,17 +13,16 @@ const eventRoutes = require('./routes/events');
 app.use(express.json());
 
 // --- הגדרת תיקיית הקבצים הסטטיים (CSS, JS, Images) ---
-// חשוב שזה יהיה למעלה כדי שהדפים יטענו את העיצובים שלהם
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- ניתובי API (מחזירים JSON - לצד שרת/פונקציונליות) ---
+// --- ניתובי API (מחזירים JSON) ---
 app.use('/api/auth', authRoutes);
 app.use('/api/spaces', spaceRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/communities', communityRoutes);
 app.use('/api/events', eventRoutes);
 
-// --- ניתובי UI (מחזירים דפי HTML - לצד לקוח) ---
+// --- ניתובי UI (מחזירים דפי HTML) ---
 
 // דף הבית
 app.get('/', (req, res) => {
@@ -35,9 +34,14 @@ app.get('/events', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'events.html'));
 });
 
-// דף החיפוש - הוספתי את זה עכשיו
+// דף החיפוש
 app.get('/search', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'search.html'));
+});
+
+// דף פרופיל אישי
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'private_user_profile.html'));
 });
 
 // הפעלת השרת
