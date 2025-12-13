@@ -76,14 +76,13 @@ function renderEvents(eventsToRender) {
 
 // 3. טיפול בלחיצה על הרשמה (הלוגיקה המורכבת)
 async function handleRegistration(eventId, eventName) {
-    // שליפת הטוקן (הנחה: הטוקן נשמר ב-localStorage בעת התחברות)
+    // שליפת הטוקן
     const token = localStorage.getItem('token'); 
 
     // תנאי 1: משתמש לא מחובר
     if (!token) {
-        // שמירת ה-URL הנוכחי או ה-ID כדי לחזור אליו אחרי התחברות (אופציונלי)
         alert('עליך להתחבר למערכת כדי להירשם לאירוע.');
-        window.location.href = 'login.html'; // הפניה לדף התחברות (טרם מומש)
+        // window.location.href = 'login.html'; // אופציונלי
         return;
     }
 
@@ -105,10 +104,11 @@ async function handleRegistration(eventId, eventName) {
             loadEvents(); // רענון הדף לעדכון מונה המשתתפים
         } 
         else if (response.status === 403) {
-            // תנאי 3: לא חבר בקהילה (הודעת שגיאה ספציפית מהשרת)
-            // ההודעה מהשרת היא: "על מנת שנוכל לאשר את הגעתך עליך להירשם לקהילה"
-            if (confirm(data.message + "\n\n על מנת שנוכל לאשר את הגעתך עליך להירשם לקהילה ")) {
-                window.location.href = 'join-community.html'; // דף שטרם מומש
+            // >>> התיקון כאן <<<
+            // במקום לשרשר את ההודעה שוב, אנחנו מציגים את הודעת השרת 
+            // ומוסיפים שאלה ברורה ("האם לעבור לדף ההרשמה?")
+            if (confirm(data.message + "\n\nהאם תרצה לעבור לדף ההרשמה לקהילה כעת?")) {
+                window.location.href = 'join-community.html'; 
             }
         } 
         else if (response.status === 409) {
