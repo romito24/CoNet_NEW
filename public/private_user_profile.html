@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>האזור האישי - CoNet</title>
+    
+    <link rel="stylesheet" href="private_user_profile.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">CoNet</div>
+        <div class="user-menu">
+            <span id="nav-username">שלום, אורח</span>
+            <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i> התנתק</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <header class="profile-header">
+            <h1>האזור האישי</h1>
+            <p>מרכז השליטה שלך לכל ההזמנות, האירועים והקהילות.</p>
+        </header>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button onclick="switchTab('my-orders')" class="tab-btn active" id="btn-my-orders">
+                    <i class="fas fa-calendar-check"></i> ההזמנות שלי
+                </button>
+                <button onclick="switchTab('my-events')" class="tab-btn" id="btn-my-events">
+                    <i class="fas fa-ticket-alt"></i> האירועים שלי
+                </button>
+                <button onclick="switchTab('my-communities')" class="tab-btn" id="btn-my-communities">
+                    <i class="fas fa-users"></i> הקהילות שלי
+                </button>
+                <button onclick="switchTab('personal-details')" class="tab-btn" id="btn-personal-details">
+                    <i class="fas fa-user-cog"></i> פרטים אישיים
+                </button>
+            </div>
+        </div>
+
+        <div id="my-orders" class="tab-content active-content">
+            <div id="orders-list" class="grid-container">
+                <div class="loading">טוען נתונים...</div>
+            </div>
+        </div>
+
+        <div id="my-events" class="tab-content">
+            <div id="events-list" class="grid-container">
+                <div class="loading">טוען נתונים...</div>
+            </div>
+        </div>
+
+        <div id="my-communities" class="tab-content">
+            <div id="communities-list" class="grid-container">
+                <div class="loading">טוען נתונים...</div>
+            </div>
+        </div>
+
+        <div id="personal-details" class="tab-content">
+            <div class="details-card-wrapper">
+                <div class="card details-card">
+                    <h2>הפרטים שלי</h2>
+                    <div class="detail-row">
+                        <span class="label">שם מלא:</span>
+                        <span class="value" id="detail-name">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">אימייל:</span>
+                        <span class="value" id="detail-email">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">טלפון:</span>
+                        <span class="value" id="detail-phone">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">סוג משתמש:</span>
+                        <span class="value" id="detail-type">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">חבר מזה:</span>
+                        <span class="value" id="detail-date">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">אישור פעולה</h3>
+            <p id="modalText">האם אתה בטוח?</p>
+            <div class="modal-actions">
+                <button onclick="closeModal()" class="btn-secondary">ביטול</button>
+                <button id="modalConfirmBtn" class="btn-danger">אישור</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="private_user_profile.js"></script>
+</body>
+</html>
