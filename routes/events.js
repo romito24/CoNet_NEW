@@ -4,7 +4,84 @@ const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 const { createOrderLogic } = require('./orders'); 
 
-// --- פונקציות עזר לזמנים ---
+// --- תוספת: ספריות למייל וליומן (כמו בקובץ orders) ---
+const nodemailer = require('nodemailer');
+const ics = require('ics');
+
+// --- תוספת: הגדרת הטרנספורטר למייל ---
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+});
+
+// --- תוספת: פונקציה לשליחת מייל אישור הרשמה לאירוע ---
+async function sendEventConfirmation(userEmail, eventDetails, spaceDetails) {
+    // פירוק התאריך והשעות למערך עבור ICS
+    // הנחה: eventDetails.event_date הוא אובייקט Date, והשעות הן מחרוזות 'HH:MM:SS'
+    const dateObj = new Date(eventDetails.event_date);
+    const [startH, startM] = eventDetails.start_hour.split(':').map(Number);
+    const [endH, endM] = eventDetails.finish_hour.split(':').map(Number);
+
+    const startArr = [
+        dateObj.getFullYear(),
+        dateObj.getMonth() + 1,
+        dateObj.getDate(),
+        startH,
+        startM
+    ];
+    
+    const endArr = [
+        dateObj.getFullYear(),
+        dateObj.getMonth() + 1,
+        dateObj.getDate(),
+        endH,
+        endM
+    ];
+
+    const eventIcs = {
+        start: startArr,
+        end: endArr,
+        title: `CoNet: נרשמת לאירוע - ${eventDetails.event_name}`,
+        description: `אישור הרשמה לאירוע ב-CoNet.\nשם האירוע: ${eventDetails.event_name}\nמיקום: ${spaceDetails.space_name}, ${spaceDetails.address}`,
+        location: `${spaceDetails.space_name}, ${spaceDetails.address}`,
+        status: 'CONFIRMED',
+        busyStatus: 'BUSY',
+        organizer: { name: 'CoNet Team', email: process.env.EMAIL_USER }
+    };
+
+    return new Promise((resolve, reject) => {
+        ics.createEvent(eventIcs, (error, value) => {
+            if (error) {
+                console.error('Error generating ICS for event:', error);
+                return resolve(false);
+            }
+
+            const mailOptions = {
+                from: `"CoNet Events" <${process.env.EMAIL_USER}>`, 
+                to: userEmail,
+                subject: `אישור הרשמה: ${eventDetails.event_name}`,
+                text: `היי,\n\nנרשמת בהצלחה לאירוע "${eventDetails.event_name}"!\nהאירוע יתקיים ב-${spaceDetails.space_name} (${spaceDetails.address}).\n\nמצורף קובץ זימון ליומן.\nנתראה שם!`,
+                icalEvent: {
+                    filename: 'event-invite.ics',
+                    method: 'request',
+                    content: value
+                }
+            };
+
+            transporter.sendMail(mailOptions, (err, info) => {
+                if (err) {
+                    console.error('Error sending event email:', err);
+                    resolve(false);
+                } else {
+                    console.log('Event confirmation email sent:', info.response);
+                    resolve(true);
+                }
+            });
+        });
+    });
+}
+
+// --- פונקציות עזר לזמנים (מהקובץ המקורי) ---
 function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     if (typeof timeStr !== 'string') return 0;
@@ -118,7 +195,7 @@ router.post('/create', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// 3. עריכת אירוע (PUT /:eventId) - חדש!
+// 3. עריכת אירוע (PUT /:eventId)
 // ==========================================
 router.put('/:eventId', verifyToken, async (req, res) => {
     const eventId = req.params.eventId;
@@ -138,7 +215,6 @@ router.put('/:eventId', verifyToken, async (req, res) => {
         }
 
         // 3. הכנת נתונים (שימוש בקיים אם לא נשלח חדש)
-        // המרת תאריך לפורמט YYYY-MM-DD
         let oldDate = currentEvent.event_date;
         if (oldDate instanceof Date) oldDate = oldDate.toISOString().split('T')[0];
         
@@ -260,22 +336,45 @@ router.post('/:eventId/register', verifyToken, async (req, res) => {
             [eventId, userId]
         );
 
+        let action = 'registered'; // לדעת אם לשלוח מייל
+
         if (existing.length > 0) {
             if (existing[0].status === 'registered') {
+                action = 'none';
                 return res.status(409).json({ message: "אתה כבר רשום לאירוע זה" });
             } else {
                 await db.query(
                     'UPDATE event_participants SET status = "registered", registration_date = NOW() WHERE event_id = ? AND user_id = ?',
                     [eventId, userId]
                 );
-                return res.json({ message: "ההרשמה חודשה בהצלחה!" });
+                // ההרשמה חודשה, אז נמשיך לשליחת מייל
             }
+        } else {
+            await db.query(
+                'INSERT INTO event_participants (event_id, user_id, status) VALUES (?, ?, "registered")',
+                [eventId, userId]
+            );
         }
 
-        await db.query(
-            'INSERT INTO event_participants (event_id, user_id, status) VALUES (?, ?, "registered")',
-            [eventId, userId]
-        );
+        // --- תוספת: שליחת מייל אישור ---
+        if (action !== 'none') {
+            try {
+                // 1. שליפת המייל של המשתמש
+                const [users] = await db.execute('SELECT email FROM users WHERE user_id = ?', [userId]);
+                
+                // 2. שליפת פרטי המיקום (מרחב)
+                const [spaces] = await db.execute('SELECT space_name, address FROM spaces WHERE space_id = ?', [event.space_id]);
+
+                if (users.length > 0 && users[0].email && spaces.length > 0) {
+                    // שליחת המייל (בלי לחכות לו שיעכב את התשובה ללקוח - אופציונלי, כאן עשיתי await כדי להבטיח שליחה)
+                    await sendEventConfirmation(users[0].email, event, spaces[0]);
+                }
+            } catch (mailError) {
+                console.error("Failed to send confirmation email:", mailError);
+                // לא מחזירים שגיאה למשתמש כי ההרשמה עצמה הצליחה
+            }
+        }
+        // --------------------------------
 
         res.status(201).json({ message: "נרשמת לאירוע בהצלחה!" });
 
