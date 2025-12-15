@@ -44,6 +44,11 @@ app.get('/profile', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'private_user_profile.html'));
 });
 
+// דף הוספת מרחב
+app.get('/add_space', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'add_space.html'));
+});
+
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
