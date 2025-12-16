@@ -4,48 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoNet - חיפוש מרחבי עבודה</title>
-    <!-- קישור לקובץ העיצוב החיצוני -->
-    <link rel="stylesheet" href="styleForSearch.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="search.css">
 </head>
 <body>
 
-<header>
-    <h1>CoNet - איתור מרחבי עבודה</h1>
-</header>
+<div class="app-container">
+    <aside class="sidebar">
+        <header class="sidebar-header">
+            <h1><i class="fa-solid fa-layer-group"></i> CoNet</h1>
+            <p>איתור מרחבי עבודה משותפים</p>
+        </header>
 
-<div class="main-container">
-    <!-- צד ימין: פילטרים ותוצאות -->
-    <div class="sidebar">
         <div class="filters-section">
-            <div class="location-controls">
-                <button class="location-btn" onclick="getCurrentLocation()">📍 המיקום שלי</button>
-                <input type="number" id="radius" placeholder="רדיוס (ק&quot;מ)" value="10">
-                <button onclick="searchSpaces()">חפש</button>
+            <div class="control-group">
+                <label class="input-label">המיקום שלי</label>
+                <button class="location-btn" onclick="getCurrentLocation()">
+                    <i class="fa-solid fa-location-crosshairs"></i> איתור מיקום נוכחי
+                </button>
             </div>
-            <div>
-                <strong>סנן לפי שירותים:</strong>
+
+            <div class="control-group">
+                <div class="slider-header">
+                    <label class="input-label">רדיוס חיפוש</label>
+                    <span id="radius-value">10 ק"מ</span>
+                </div>
+                <input type="range" id="radius" min="1" max="50" value="10" class="range-slider" oninput="updateRadiusLabel(this.value)">
+            </div>
+
+            <div class="control-group">
+                <label class="input-label">שירותים נדרשים</label>
                 <div class="facilities-list" id="facilities-container">
-                    Loading...
+                    <div style="font-size: 0.9rem; color: #666;">טוען שירותים...</div>
                 </div>
             </div>
+
+            <button class="search-btn" onclick="searchSpaces()">
+                <i class="fa-solid fa-magnifying-glass"></i> חפש מרחבים
+            </button>
         </div>
         
+        <div class="results-header">תוצאות חיפוש</div>
         <div class="results-list" id="results-container">
             <div class="empty-state">
-                אנא בצע חיפוש כדי לראות תוצאות
+                <i class="fa-regular fa-map"></i>
+                <p>אנא בצע חיפוש כדי לראות תוצאות</p>
             </div>
         </div>
-    </div>
+    </aside>
 
-    <!-- צד שמאל: מפה -->
-    <div id="map"></div>
+    <main id="map"></main>
 </div>
 
-<!-- קישור לקובץ הסקריפט החיצוני -->
 <script src="search.js"></script>
 
-<!-- טעינת המפה - החליפי את YOUR_GOOGLE_MAPS_API_KEY במפתח האמיתי של חשבון הפרויקט -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2pWQv1C-WebD3Y19f8jjzF79wgOBlRys&callback=initMap&libraries=places&v=weekly" async defer></script>
+
+<script>
+    // עדכון תצוגת הרדיוס בעת גרירת הסליידר
+    function updateRadiusLabel(val) {
+        document.getElementById('radius-value').innerText = val + ' ק"מ';
+    }
+</script>
 
 </body>
 </html>
