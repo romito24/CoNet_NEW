@@ -1,16 +1,16 @@
 :root {
-    --primary-color: #4f46e5; /* כחול-סגול מודרני */
-    --primary-hover: #4338ca;
+    --primary-color: #4a90e2; /* החזרנו את התכלת המקורי */
+    --primary-hover: #357abd;
     --bg-color: #f3f4f6;
     --sidebar-bg: #ffffff;
-    --text-main: #1f2937;
-    --text-secondary: #6b7280;
-    --border-color: #e5e7eb;
-    --accent-orange: #ea580c;
+    --text-main: #333;
+    --text-secondary: #666;
+    --border-color: #ddd;
+    --accent-orange: #e67e22;
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -25,7 +25,7 @@ body {
     overflow: hidden;
 }
 
-/* --- Sidebar Styles --- */
+/* --- Sidebar --- */
 .sidebar {
     width: 380px;
     background-color: var(--sidebar-bg);
@@ -39,6 +39,7 @@ body {
     padding: 1.5rem;
     background: var(--primary-color);
     color: white;
+    text-align: center;
 }
 
 .sidebar-header h1 {
@@ -46,13 +47,8 @@ body {
     font-size: 1.5rem;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-}
-
-.sidebar-header p {
-    margin: 5px 0 0 0;
-    opacity: 0.9;
-    font-size: 0.9rem;
 }
 
 .filters-section {
@@ -62,6 +58,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
+    position: relative; /* חשוב עבור ה-Dropdown */
 }
 
 .control-group {
@@ -79,19 +76,18 @@ body {
 /* --- Buttons --- */
 button {
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 10px 16px;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
     font-family: inherit;
-    font-weight: 500;
 }
 
 .location-btn {
-    background-color: #eef2ff;
+    background-color: #eef6ff;
     color: var(--primary-color);
-    border: 1px solid #c7d2fe;
+    border: 1px solid #cce0f5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -99,7 +95,7 @@ button {
 }
 
 .location-btn:hover {
-    background-color: #e0e7ff;
+    background-color: #dcebff;
 }
 
 .search-btn {
@@ -107,8 +103,6 @@ button {
     color: white;
     margin-top: 10px;
     padding: 12px;
-    font-size: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -117,7 +111,6 @@ button {
 
 .search-btn:hover {
     background-color: var(--primary-hover);
-    transform: translateY(-1px);
 }
 
 /* --- Range Slider --- */
@@ -131,9 +124,6 @@ button {
     font-size: 0.85rem;
     color: var(--primary-color);
     font-weight: bold;
-    background: #eef2ff;
-    padding: 2px 8px;
-    border-radius: 12px;
 }
 
 .range-slider {
@@ -142,39 +132,68 @@ button {
     accent-color: var(--primary-color);
 }
 
-/* --- Facilities Chips (כפתורי סינון מעוצבים) --- */
-.facilities-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+/* --- Multiselect Dropdown (חדש!) --- */
+.multiselect {
+    width: 100%;
+    position: relative;
 }
 
-.facility-checkbox input {
-    display: none; /* הסתרת התיבה הרגילה */
-}
-
-.facility-checkbox {
+.selectBox {
+    position: relative;
     cursor: pointer;
-    font-size: 0.85rem;
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: #f3f4f6;
-    color: var(--text-secondary);
-    border: 1px solid transparent;
-    transition: all 0.2s;
-    user-select: none;
-    display: inline-block;
 }
 
-.facility-checkbox:hover {
-    background: #e5e7eb;
+.selectBox select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    appearance: none; /* הסתרת החץ הדיפולטיבי */
+    background: white url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E') no-repeat left 10px center;
+    background-size: 12px;
 }
 
-/* כאשר התיבה מסומנת - ה-Label משנה צבע */
-.facility-checkbox:has(input:checked) {
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+.overSelect {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.checkboxes-dropdown {
+    display: none; /* מוסתר בהתחלה */
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 0 0 4px 4px;
+}
+
+.checkboxes-dropdown label {
+    display: block;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.checkboxes-dropdown label:hover {
+    background-color: #f0f8ff;
+}
+
+.checkboxes-dropdown input {
+    margin-left: 10px;
 }
 
 /* --- Results List --- */
@@ -194,29 +213,26 @@ button {
     background-color: #f9fafb;
 }
 
-/* --- Space Card --- */
 .space-card {
     background: white;
-    border-radius: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid transparent;
     transition: all 0.2s;
     cursor: pointer;
-    position: relative;
 }
 
 .space-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    border-color: #c7d2fe;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
 }
 
 .space-card h3 {
     margin: 5px 0;
     font-size: 1.1rem;
-    color: var(--text-main);
+    color: var(--primary-color);
 }
 
 .space-card .address {
@@ -237,11 +253,8 @@ button {
 }
 
 .distance-badge {
-    background: #fff7ed;
     color: var(--accent-orange);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 700;
+    font-weight: bold;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -256,9 +269,9 @@ button {
 
 .tag {
     font-size: 0.75rem;
-    background: #e0e7ff;
-    color: var(--primary-color);
-    padding: 2px 8px;
+    background: #eef2f7;
+    color: #555;
+    padding: 2px 6px;
     border-radius: 4px;
 }
 
@@ -276,13 +289,9 @@ button {
 }
 
 .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1rem;
-    color: #9ca3af;
     text-align: center;
+    padding: 3rem 1rem;
+    color: #888;
 }
 
 .empty-state i {
@@ -295,10 +304,9 @@ button {
 #map {
     flex: 1;
     height: 100%;
-    background-color: #e5e3df;
 }
 
-/* Responsive for Mobile */
+/* Responsive */
 @media (max-width: 768px) {
     .app-container {
         flex-direction: column-reverse;
@@ -306,7 +314,6 @@ button {
     .sidebar {
         width: 100%;
         height: 60%;
-        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
     }
     #map {
         height: 40%;

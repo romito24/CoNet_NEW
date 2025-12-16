@@ -33,10 +33,20 @@
             </div>
 
             <div class="control-group">
-                <label class="input-label">שירותים נדרשים</label>
-                <div class="facilities-list" id="facilities-container">
-                    <div style="font-size: 0.9rem; color: #666;">טוען שירותים...</div>
+                <label class="input-label">סינון לפי שירותים</label>
+                
+                <div class="multiselect">
+                    <div class="selectBox" onclick="toggleCheckboxes()">
+                        <select>
+                            <option>בחר שירותים...</option>
+                        </select>
+                        <div class="overSelect"></div>
+                    </div>
+                    <div id="checkboxes" class="checkboxes-dropdown">
+                        <div style="padding:10px; color:#999;">טוען...</div>
+                    </div>
                 </div>
+                <div id="selection-summary" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
             </div>
 
             <button class="search-btn" onclick="searchSpaces()">
@@ -57,14 +67,34 @@
 </div>
 
 <script src="search.js"></script>
-
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2pWQv1C-WebD3Y19f8jjzF79wgOBlRys&callback=initMap&libraries=places&v=weekly" async defer></script>
 
 <script>
-    // עדכון תצוגת הרדיוס בעת גרירת הסליידר
     function updateRadiusLabel(val) {
         document.getElementById('radius-value').innerText = val + ' ק"מ';
     }
+
+    // פונקציה לפתיחה/סגירה של ה-Dropdown
+    let expanded = false;
+    function toggleCheckboxes() {
+        const checkboxes = document.getElementById("checkboxes");
+        if (!expanded) {
+            checkboxes.style.display = "block";
+            expanded = true;
+        } else {
+            checkboxes.style.display = "none";
+            expanded = false;
+        }
+    }
+
+    // סגירת ה-Dropdown אם לוחצים מחוץ לו
+    document.addEventListener('click', function(e) {
+        const container = document.querySelector('.multiselect');
+        if (!container.contains(e.target) && expanded) {
+            document.getElementById("checkboxes").style.display = "none";
+            expanded = false;
+        }
+    });
 </script>
 
 </body>

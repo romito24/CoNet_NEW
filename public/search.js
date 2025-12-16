@@ -1,14 +1,12 @@
 let map;
 let markers = [];
 let userLocation = null;
+let userMarker = null; // משתנה גלובלי לשמירת סמן המשתמש
 let infoWindow;
 
-// נתיב יחסי לשרת ה-API
 const API_URL = '/api'; 
 
-// אתחול המפה
 function initMap() {
-    // ברירת מחדל: תל אביב
     const defaultLocation = { lat: 32.0853, lng: 34.7818 };
     
     try {
@@ -26,40 +24,54 @@ function initMap() {
     }
 
     loadFacilities();
-    searchSpaces(); // חיפוש ראשוני
+    searchSpaces();
 }
 
-// טעינת הפיצ'רים ויצירת כפתורי סינון (Chips)
+// טעינת שירותים לתוך Dropdown
 async function loadFacilities() {
     try {
         const response = await fetch(`${API_URL}/spaces/facilities`);
         if (!response.ok) throw new Error('Network response was not ok');
         const facilities = await response.json();
         
-        const container = document.getElementById('facilities-container');
+        const container = document.getElementById('checkboxes');
         container.innerHTML = '';
 
         facilities.forEach(f => {
             const label = document.createElement('label');
-            label.className = 'facility-checkbox';
-            // ה-Input מוחבא בתוך ה-Label, וה-CSS מעצב את זה ככפתור
+            // onclick="updateSelectionText()" כדי לעדכן טקסט בכל לחיצה
             label.innerHTML = `
-                <input type="checkbox" value="${f.facility_id}" class="facility-check">
+                <input type="checkbox" value="${f.facility_id}" class="facility-check" onchange="updateSelectionText()">
                 ${f.facility_name}
             `;
             container.appendChild(label);
         });
     } catch (error) {
         console.error('Error loading facilities:', error);
-        document.getElementById('facilities-container').innerHTML = '<span style="color:red">שגיאה בטעינת נתונים</span>';
+        document.getElementById('checkboxes').innerHTML = '<div style="padding:10px; color:red;">שגיאה בטעינה</div>';
     }
 }
 
-// בקשת מיקום מהמשתמש
+// עדכון טקסט "נבחרו X שירותים"
+function updateSelectionText() {
+    const checkedCount = document.querySelectorAll('.facility-check:checked').length;
+    const summaryDiv = document.getElementById('selection-summary');
+    const selectBoxText = document.querySelector('.selectBox select option');
+    
+    if (checkedCount > 0) {
+        selectBoxText.innerText = `נבחרו ${checkedCount} שירותים`;
+        summaryDiv.innerText = `(סנן לפי ${checkedCount} שירותים שנבחרו)`;
+    } else {
+        selectBoxText.innerText = 'בחר שירותים...';
+        summaryDiv.innerText = '';
+    }
+}
+
+// בקשת מיקום + תיקון הבאג של כפילות סמנים
 function getCurrentLocation() {
     const btn = document.querySelector('.location-btn');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מאתר...'; // אינדיקציה לטעינה
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מאתר...';
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -73,37 +85,43 @@ function getCurrentLocation() {
                     map.setCenter(userLocation);
                     map.setZoom(14);
                     
-                    new google.maps.Marker({
-                        position: userLocation,
-                        map: map,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 10,
-                            fillColor: "#4f46e5",
-                            fillOpacity: 1,
-                            strokeColor: "white",
-                            strokeWeight: 2,
-                        },
-                        title: "המיקום שלי"
-                    });
+                    // בדיקה: האם כבר יש סמן?
+                    if (userMarker) {
+                        // אם כן, רק נעדכן את המיקום שלו
+                        userMarker.setPosition(userLocation);
+                    } else {
+                        // אם לא, ניצור חדש
+                        userMarker = new google.maps.Marker({
+                            position: userLocation,
+                            map: map,
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 8,
+                                fillColor: "#4a90e2",
+                                fillOpacity: 1,
+                                strokeColor: "white",
+                                strokeWeight: 2,
+                            },
+                            title: "המיקום שלי"
+                        });
+                    }
                 }
                 
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> מיקום אותר';
                 setTimeout(() => btn.innerHTML = originalText, 2000);
-                searchSpaces(); // חיפוש אוטומטי
+                searchSpaces();
             },
             () => {
-                alert("לא ניתן לאתר את המיקום שלך. בדוק הרשאות דפדפן.");
+                alert("לא ניתן לאתר מיקום.");
                 btn.innerHTML = originalText;
             }
         );
     } else {
-        alert("הדפדפן שלך לא תומך באיתור מיקום.");
+        alert("הדפדפן לא תומך במיקום.");
         btn.innerHTML = originalText;
     }
 }
 
-// חיפוש מרחבים
 async function searchSpaces() {
     const checkedBoxes = document.querySelectorAll('.facility-check:checked');
     const selectedFacilities = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
@@ -119,7 +137,6 @@ async function searchSpaces() {
         payload.user_lng = userLocation.lng;
     }
 
-    // אינדיקציה לטעינה ברשימת התוצאות
     const listContainer = document.getElementById('results-container');
     listContainer.innerHTML = '<div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin"></i><p>מחפש...</p></div>';
 
@@ -139,15 +156,14 @@ async function searchSpaces() {
             listContainer.innerHTML = `
                 <div class="empty-state">
                     <i class="fa-solid fa-magnifying-glass-minus"></i>
-                    <p>לא נמצאו תוצאות התואמות את החיפוש</p>
+                    <p>לא נמצאו תוצאות</p>
                 </div>`;
-            // ניקוי המפה ממרקרים אם אין תוצאות
             clearMarkers();
         }
 
     } catch (error) {
         console.error('Search error:', error);
-        listContainer.innerHTML = `<div class="empty-state" style="color:red;"><i class="fa-solid fa-triangle-exclamation"></i><p>שגיאה בחיפוש מרחבים</p></div>`;
+        listContainer.innerHTML = `<div class="empty-state" style="color:red;">שגיאה בחיפוש</div>`;
     }
 }
 
@@ -156,7 +172,6 @@ function clearMarkers() {
     markers = [];
 }
 
-// הצגת התוצאות
 function renderResults(spaces) {
     const listContainer = document.getElementById('results-container');
     listContainer.innerHTML = '';
@@ -164,14 +179,10 @@ function renderResults(spaces) {
     clearMarkers();
 
     spaces.forEach(space => {
-        // יצירת כרטיס ברשימה
         const card = document.createElement('div');
         card.className = 'space-card';
         
-        // יצירת תגיות
         const tagsHtml = space.facilities ? space.facilities.map(f => `<span class="tag">#${f}</span>`).join('') : '';
-        
-        // אייקון ומרחק
         const distanceHtml = space.distance 
             ? `<span class="distance-badge"><i class="fa-solid fa-person-walking"></i> ${space.distance}</span>` 
             : '<span></span>';
@@ -184,27 +195,22 @@ function renderResults(spaces) {
             <h3>${space.space_name}</h3>
             <div class="address"><i class="fa-solid fa-map-pin"></i> ${space.address}</div>
             <div class="tags">${tagsHtml}</div>
-            <button class="book-btn" onclick="alert('מעבר לדף הזמנה עבור: ${space.space_name}')">
+            <button class="book-btn" onclick="alert('הזמנה עבור: ${space.space_name}')">
                 הזמן מקום
             </button>
         `;
 
-        // לחיצה על הכרטיס (לא על הכפתור) ממקדת את המפה
         card.onclick = (e) => {
             if(e.target.tagName !== 'BUTTON' && map) { 
                 map.setCenter({ lat: space.latitude, lng: space.longitude });
                 map.setZoom(16);
-                // אופציונלי: להקפיץ את המרקר המתאים
                 const marker = markers.find(m => m.getTitle() === space.space_name);
-                if (marker) {
-                    google.maps.event.trigger(marker, 'click');
-                }
+                if (marker) google.maps.event.trigger(marker, 'click');
             }
         };
 
         listContainer.appendChild(card);
 
-        // הוספה למפה
         if (map && space.latitude && space.longitude) {
             const marker = new google.maps.Marker({
                 position: { lat: space.latitude, lng: space.longitude },
@@ -216,7 +222,7 @@ function renderResults(spaces) {
             marker.addListener("click", () => {
                 const contentString = `
                     <div style="direction: rtl; text-align: right; font-family: sans-serif;">
-                        <h3 style="margin:0 0 5px; color:#4f46e5;">${space.space_name}</h3>
+                        <h3 style="margin:0 0 5px; color:#4a90e2;">${space.space_name}</h3>
                         <p style="margin:0; font-size:13px;">${space.address}</p>
                         <p style="margin:5px 0 0; font-weight:bold;">${space.distance || ''}</p>
                     </div>
@@ -224,7 +230,6 @@ function renderResults(spaces) {
                 infoWindow.setContent(contentString);
                 infoWindow.open(map, marker);
             });
-
             markers.push(marker);
         }
     });
