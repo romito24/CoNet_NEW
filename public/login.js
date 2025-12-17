@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // הגדרת כתובת ה-API. 
-    const API_BASE_URL = '/auth'; 
+    const API_BASE_URL = '/api/auth'; 
 
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
