@@ -49,6 +49,11 @@ app.get('/add_space', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'add_space.html'));
 });
 
+// דף התחברות והרשמה
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
