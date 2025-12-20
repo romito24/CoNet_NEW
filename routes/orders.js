@@ -106,8 +106,6 @@ const createOrderLogic = async (orderData) => {
     // 2. בדיקות לוגיות
     if (space.space_status === 'close') throw { status: 400, message: 'המרחב סגור כרגע להזמנות' };
     
-    // שינוי: הוסרה בדיקת space.capacity === 'full'
-
     if (requestedSeats > space.seats_available) throw { status: 400, message: `אין מספיק מקום במרחב (פנוי: ${space.seats_available})` };
 
     // 3. בדיקת שעות פתיחה
@@ -136,7 +134,6 @@ const createOrderLogic = async (orderData) => {
         const seatsLeft = space.seats_available - currentOccupancy;
         throw { status: 409, message: `אין מספיק מקום פנוי בשעות אלו. נותרו ${seatsLeft} מקומות.` };
     }
-
 
     // 6. יצירת ההזמנה ב-DB
     const insertSql = `
@@ -199,7 +196,6 @@ router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
 
         await db.execute("UPDATE orders SET status = 'canceled' WHERE order_id = ?", [orderId]);
         
-
         res.json({ message: 'ההזמנה בוטלה בהצלחה' });
     } catch (error) {
         console.error(error);
@@ -207,6 +203,7 @@ router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
     }
 });
 
+// Route: ההזמנות שלי
 router.get('/my-orders', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
     try {
@@ -215,6 +212,37 @@ router.get('/my-orders', verifyToken, async (req, res) => {
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: 'שגיאה בשליפת הזמנות' });
+    }
+});
+
+// =========================================================
+// לוח טיסות - הזמנות נכנסות למנהל מרחב (GET /incoming) - חדש!
+// =========================================================
+router.get('/incoming', verifyToken, async (req, res) => {
+    const managerId = req.user.user_id;
+
+    try {
+        // שאילתה: שליפת הזמנות למרחבים שאני המנהל שלהם, כולל פרטי המזמין
+        const sql = `
+            SELECT 
+                o.order_id, o.start_time, o.end_time, o.attendees_count, o.status,
+                s.space_name, s.address,
+                u.first_name, u.last_name, u.phone_number, u.email
+            FROM orders o
+            JOIN spaces s ON o.space_id = s.space_id
+            JOIN users u ON o.user_id = u.user_id
+            WHERE s.manager_id = ? 
+            AND o.status = 'approved'
+            AND o.end_time >= NOW() -- מציג רק הווה ועתיד
+            ORDER BY o.start_time ASC
+        `;
+        
+        const [incomingOrders] = await db.execute(sql, [managerId]);
+        res.json(incomingOrders);
+
+    } catch (error) {
+        console.error("Error fetching incoming orders:", error);
+        res.status(500).json({ message: 'שגיאה בשליפת הזמנות נכנסות' });
     }
 });
 
