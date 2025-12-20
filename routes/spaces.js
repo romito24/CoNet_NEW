@@ -199,4 +199,27 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
 });
 
+// ==================================================
+// מרחבים בניהולי (GET /my-managing) - חדש!
+// ==================================================
+router.get('/my-managing', verifyToken, async (req, res) => {
+    const userId = req.user.user_id;
+
+    try {
+        const sql = `
+            SELECT s.*, GROUP_CONCAT(DISTINCT f.facility_name SEPARATOR ', ') AS facilities_names
+            FROM spaces s
+            LEFT JOIN space_facilities sf ON s.space_id = sf.space_id
+            LEFT JOIN facilities f ON sf.facility_id = f.facility_id
+            WHERE s.manager_id = ?
+            GROUP BY s.space_id
+        `;
+        const [spaces] = await db.query(sql, [userId]);
+        res.json(spaces);
+    } catch (error) {
+        console.error("Error fetching managed spaces:", error);
+        res.status(500).json({ message: 'שגיאה בשליפת המרחבים בניהולך' });
+    }
+});
+
 module.exports = router;
