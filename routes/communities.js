@@ -4,6 +4,20 @@ const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 
 // ==========================================
+// קבלת כל הקהילות (ציבורי - ללא צורך בטוקן) - חדש!
+// ==========================================
+router.get('/all', async (req, res) => {
+    try {
+        // שולף את כל הקהילות ומסדר לפי א-ב
+        const [communities] = await db.query('SELECT * FROM communities ORDER BY community_name ASC');
+        res.json(communities);
+    } catch (error) {
+        console.error("Error fetching all communities:", error);
+        res.status(500).json({ message: "שגיאה בשליפת כל הקהילות" });
+    }
+});
+
+// ==========================================
 // יצירת קהילה חדשה (POST /)
 // ==========================================
 router.post('/', verifyToken, async (req, res) => {
