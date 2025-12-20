@@ -55,7 +55,7 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// עריכת קהילה (PUT /:id) - מתוקן!
+// עריכת קהילה (PUT /:id)
 // ==========================================
 router.put('/:id', verifyToken, async (req, res) => {
     const communityId = req.params.id;
