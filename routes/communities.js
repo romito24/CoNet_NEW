@@ -4,11 +4,10 @@ const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 
 // ==========================================
-// קבלת כל הקהילות (ציבורי - ללא צורך בטוקן) - חדש!
+// קבלת כל הקהילות (ציבורי - ללא צורך בטוקן)
 // ==========================================
 router.get('/all', async (req, res) => {
     try {
-        // שולף את כל הקהילות ומסדר לפי א-ב
         const [communities] = await db.query('SELECT * FROM communities ORDER BY community_name ASC');
         res.json(communities);
     } catch (error) {
@@ -29,7 +28,6 @@ router.post('/', verifyToken, async (req, res) => {
     }
 
     try {
-        // בדיקת הרשאות (רק מנהל קהילה יכול ליצור)
         const [users] = await db.query('SELECT user_type FROM users WHERE user_id = ?', [user_id]);
 
         if (users.length === 0) return res.status(404).json({ message: "משתמש לא נמצא" });
@@ -37,13 +35,11 @@ router.post('/', verifyToken, async (req, res) => {
             return res.status(403).json({ message: "אין לך הרשאה ליצור קהילה." });
         }
 
-        // בדיקת כפילות שם
         const [existingCommunity] = await db.query('SELECT community_id FROM communities WHERE community_name = ?', [community_name]);
         if (existingCommunity.length > 0) {
             return res.status(409).json({ message: "קהילה בשם זה כבר קיימת." });
         }
 
-        // יצירת הקהילה
         const insertQuery = `
             INSERT INTO communities (community_name, main_subject, image_url, establishment_date)
             VALUES (?, ?, ?, ?)
@@ -52,7 +48,6 @@ router.post('/', verifyToken, async (req, res) => {
         const [result] = await db.query(insertQuery, [community_name, main_subject, image_url, establishment_date]);
         const newCommunityId = result.insertId;
 
-        // הוספת המנהל שיצר כחבר ומנהל בקהילה בטבלת הקישור
         const linkQuery = `INSERT INTO community_users (community_id, user_id, role) VALUES (?, ?, 'manager')`;
         await db.query(linkQuery, [newCommunityId, user_id]);
 
@@ -77,28 +72,23 @@ router.put('/:id', verifyToken, async (req, res) => {
     const userId = req.user.user_id;
 
     try {
-        // 1. קודם כל: האם הקהילה קיימת בכלל?
         const [communityExists] = await db.query('SELECT community_id FROM communities WHERE community_id = ?', [communityId]);
         
         if (communityExists.length === 0) {
             return res.status(404).json({ message: "הקהילה לא נמצאה" });
         }
 
-        // 2. בדיקת הרשאות: האם המשתמש הוא מנהל של הקהילה הזו?
         const [roleCheck] = await db.query(
             'SELECT role FROM community_users WHERE community_id = ? AND user_id = ?', 
             [communityId, userId]
         );
 
-        // שליפת התפקיד (אם קיים)
         const userRole = roleCheck.length > 0 ? roleCheck[0].role : null;
 
-        // אם המשתמש הוא לא המנהל (גם אם הוא סתם חבר, וגם אם הוא בכלל לא בקהילה)
         if (userRole !== 'manager' && req.user.user_type !== 'admin') {
             return res.status(403).json({ message: "אין לך הרשאה לערוך את הקהילה (נדרש מנהל קהילה)" });
         }
 
-        // 3. המשך לעדכון...
         const allowedFields = ['community_name', 'main_subject', 'image_url', 'establishment_date'];
         let updateQuery = 'UPDATE communities SET ';
         const updateParams = [];
@@ -131,17 +121,19 @@ router.put('/:id', verifyToken, async (req, res) => {
 });
 
 // ==========================================
-// כל הקהילות שאני חבר בהן (GET /my-communities)
+// הקהילות שלי (רק אלו שאני חבר בהן, לא מנהל) - תוקן!
 // ==========================================
 router.get('/my-communities', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
 
     try {
+        // השינוי כאן: הוספנו AND cu.role != 'manager'
+        // זה מבטיח שקהילות שאני מנהל לא יופיעו ברשימה הזו
         const query = `
             SELECT c.*, cu.role as my_role 
             FROM communities c
             JOIN community_users cu ON c.community_id = cu.community_id
-            WHERE cu.user_id = ?
+            WHERE cu.user_id = ? AND cu.role != 'manager'
         `;
         const [communities] = await db.query(query, [user_id]);
         res.json(communities);
