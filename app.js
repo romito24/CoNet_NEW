@@ -39,10 +39,6 @@ app.get('/search', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'search.html'));
 });
 
-// דף פרופיל אישי
-app.get('/profile', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'private_user_profile.html'));
-});
 
 // דף הוספת מרחב
 app.get('/add_space', (req, res) => {
