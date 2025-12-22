@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoNet - הוספת מרחב חדש</title>
+    <link rel="stylesheet" href="add_space.css">
+    <!-- פונט אחיד -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <h1>ניהול מרחבים - הוספת מרחב חדש</h1>
+    </header>
+
+    <div class="main-container">
+        <form id="add-space-form" class="space-form">
+            <h2>פרטי המרחב</h2>
+            
+            <div class="form-group">
+                <label for="space_name">שם המרחב *</label>
+                <input type="text" id="space_name" required placeholder="למשל: WeWork Rothschild">
+            </div>
+
+            <!-- שדה כתובת חכם שמשלים אוטומטית מגוגל -->
+            <div class="form-group">
+                <label for="address">כתובת (התחל להקליד לבחירה אוטומטית) *</label>
+                <input type="text" id="address" required placeholder="הזן כתובת...">
+                <!-- שדות נסתרים לשמירת הקואורדינטות -->
+                <input type="hidden" id="latitude">
+                <input type="hidden" id="longitude">
+                <input type="hidden" id="google_place_id">
+            </div>
+
+            <div class="form-group">
+                <label for="description">תיאור המרחב</label>
+                <textarea id="description" rows="3" placeholder="תאר את המרחב, האווירה, למי הוא מתאים..."></textarea>
+            </div>
+
+            <div class="row">
+                <div class="form-group half">
+                    <label for="seats_available">מספר מקומות זמינים *</label>
+                    <input type="number" id="seats_available" required min="1">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group half">
+                    <label for="opening_hours">שעת פתיחה</label>
+                    <input type="time" id="opening_hours">
+                </div>
+                <div class="form-group half">
+                    <label for="closing_hours">שעת סגירה</label>
+                    <input type="time" id="closing_hours">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>שירותים ומתקנים (Facilities)</label>
+                <div id="facilities-container" class="facilities-grid">
+                    <!-- הצ'ק בוקסים ייטענו כאן דינמית -->
+                    טוען אפשרויות...
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">שמור והוסף למפה</button>
+                <button type="button" class="cancel-btn" onclick="window.history.back()">ביטול</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- סקריפט הלוגיקה -->
+    <script src="add_space.js"></script>
+
+    <!-- טעינת ספריית Places של גוגל - החליפי במפתח שלך -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2pWQv1C-WebD3Y19f8jjzF79wgOBlRys&libraries=places&callback=initAutocomplete" async defer></script>
+
+</body>
+</html>
