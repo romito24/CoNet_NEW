@@ -54,6 +54,11 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+// עמוד פרופיל הוליסטי
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'Holistic_profile.html'));
+});
+
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
