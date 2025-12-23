@@ -2,6 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
+const http = require('http'); 
+const { Server } = require("socket.io");
+const server = http.createServer(app);
+const io = new Server(server);
 
 // ייבוא הראוטרים של ה-API
 const authRoutes = require('./routes/auth');
@@ -65,8 +69,13 @@ app.get('/communities', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'communities.html'));
 });
 
+// צ'אט קהילה
+app.get('/chat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+});
+
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
