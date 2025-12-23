@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ece5dd; /* צבע רקע דמוי וואטסאפ */
+    background-color: #ece5dd; 
     display: flex;
     justify-content: center;
     height: 100vh;
@@ -18,7 +18,7 @@ body {
 }
 
 .chat-header {
-    background-color: #075e54; /* ירוק כהה */
+    background-color: #4a90e2; 
     color: white;
     padding: 15px;
     display: flex;
@@ -50,21 +50,21 @@ body {
 /* שורה שמכילה את ההודעה והאייקון */
 .message-row {
     display: flex;
-    align-items: flex-end; /* האייקון יהיה למטה ליד הבועה */
+    align-items: flex-end; 
     gap: 8px;
     max-width: 80%;
 }
 
 /* עיצוב עבורי (הודעות שלי) */
 .message-row.mine {
-    align-self: flex-start; /* הודעות שלי בצד ימין בעברית */
+    align-self: flex-start; 
     flex-direction: row; 
 }
 
 /* עיצוב עבור אחרים */
 .message-row.others {
-    align-self: flex-end; /* הודעות של אחרים בצד שמאל */
-    flex-direction: row-reverse; /* הופך כדי שהאייקון יהיה בצד הקיצוני */
+    align-self: flex-end; 
+    flex-direction: row-reverse; 
 }
 
 /* האייקון (עיגול עם אות ראשונה) */
@@ -140,7 +140,7 @@ body {
 }
 
 #send-btn {
-    background-color: #075e54;
+    background-color: #4a90e2;
     color: white;
     border: none;
     width: 40px;
