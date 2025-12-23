@@ -9,6 +9,7 @@ const spaceRoutes = require('./routes/spaces');
 const { router: orderRoutes } = require('./routes/orders');
 const communityRoutes = require('./routes/communities');
 const eventRoutes = require('./routes/events');
+const chatModule = require('./routes/chat');
 
 app.use(express.json());
 
@@ -21,6 +22,10 @@ app.use('/api/spaces', spaceRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/communities', communityRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/chat', chatModule.router);
+
+// --- הפעלת ה-Socket (חלק ה-Real Time) ---
+chatModule.initSocket(io);
 
 // --- ניתובי UI (מחזירים דפי HTML) ---
 

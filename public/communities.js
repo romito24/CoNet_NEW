@@ -56,9 +56,15 @@ function renderCommunities(communities) {
                 <div class="subject">נושא: ${comm.main_subject || 'כללי'}</div>
                 <div class="est-date">נוסדה ב: ${dateStr}</div>
                 
-                <button class="join-btn" onclick="handleJoin(${comm.community_id}, '${comm.community_name}')">
-                    הצטרפות לקהילה
-                </button>
+                <div class="card-actions">
+                    <button class="chat-btn" onclick="navigateToChat(${comm.community_id}, '${comm.community_name}')">
+                        💬 כניסה לצ'אט
+                    </button>
+
+                    <button class="join-btn" onclick="handleJoin(${comm.community_id}, '${comm.community_name}')">
+                        הצטרפות לקהילה
+                    </button>
+                </div>
             </div>
         `;
         grid.appendChild(card);
@@ -122,4 +128,19 @@ function filterCommunities() {
 function resetFilters() {
     document.getElementById('search-input').value = '';
     renderCommunities(allCommunities);
+}
+
+function navigateToChat(communityId, communityName) {
+    const token = localStorage.getItem('token');
+    
+    // בדיקה אם המשתמש מחובר
+    if (!token) {
+        if(confirm("עליך להתחבר כדי להיכנס לצ'אט. לעבור לדף התחברות?")) {
+            window.location.href = 'login.html';
+        }
+        return;
+    }
+
+    // הפניה לעמוד הצ'אט עם הפרמטרים של הקהילה
+    window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
 }

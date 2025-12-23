@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>צ'אט קהילה - CONET</title>
+    <link rel="stylesheet" href="css/chat.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="chat-wrapper">
+        <header class="chat-header">
+            <button onclick="window.history.back()" class="back-btn">חזרה לקהילות</button>
+            <h2 id="chat-title">טוען צ'אט...</h2>
+        </header>
+
+        <div id="messages-container" class="messages-container">
+            </div>
+
+        <div class="input-area">
+            <input type="text" id="message-input" placeholder="כתוב הודעה..." autocomplete="off">
+            <button id="send-btn">שלח</button>
+        </div>
+    </div>
+
+    <script src="js/chat.js"></script>
+</body>
+</html>
