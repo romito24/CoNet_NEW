@@ -55,6 +55,11 @@ app.get('/profile', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Holistic_profile.html'));
 });
 
+// דף הקהילות
+app.get('/communities', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'communities.html'));
+});
+
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

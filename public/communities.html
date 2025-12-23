@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הקהילות של CoNet</title>
+    <link rel="stylesheet" href="communities.css">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>הקהילות של CoNet</h1>
+            <p>מצאו את הקהילה המתאימה לכם, הצטרפו והתחילו לשתף פעולה</p>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- סרגל חיפוש (אופציונלי אך מומלץ) -->
+        <div class="filters-bar">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="חפש קהילה לפי שם או נושא...">
+            </div>
+            <button onclick="filterCommunities()" class="filter-btn">חפש</button>
+            <button onclick="resetFilters()" class="reset-btn">הצג הכל</button>
+        </div>
+
+        <!-- אזור טעינה -->
+        <div id="loading" class="loading">טוען קהילות...</div>
+
+        <!-- רשת כרטיסי הקהילות -->
+        <div id="communities-grid" class="communities-grid">
+            <!-- הכרטיסים יוזרקו כאן ע"י JS -->
+        </div>
+        
+        <!-- הודעה כשאין תוצאות -->
+        <div id="no-results" class="no-results" style="display: none;">
+            לא נמצאו קהילות תואמות לחיפוש שלך.
+        </div>
+    </div>
+
+    <script src="communities.js"></script>
+</body>
+</html>
