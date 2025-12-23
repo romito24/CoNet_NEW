@@ -1,4 +1,4 @@
-const API_URL = 'http://vmedu436.mtacloud.co.il:3000/api';
+const API_URL = '/api';
 
 let currentUser = null;
 let currentActionCallback = null;
