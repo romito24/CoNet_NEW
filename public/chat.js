@@ -3,29 +3,24 @@ const socket = io();
 // קבלת הפרמטרים מה-URL
 const urlParams = new URLSearchParams(window.location.search);
 const communityId = urlParams.get('communityId');
-const communityName = urlParams.get('name'); // אופציונלי: שם הקהילה לכותרת
+const communityName = urlParams.get('name');
 
-// אלמנטים ב-DOM
+// אלמנטים
 const messagesContainer = document.getElementById('messages-container');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const titleEl = document.getElementById('chat-title');
 
-// פענוח הטוקן כדי לדעת מי אני
+// פענוח טוקן
 function getUserFromToken() {
     const token = localStorage.getItem('token');
     if (!token) return null;
     try {
-        // פענוח החלק האמצעי של ה-JWT
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
         return JSON.parse(jsonPayload);
-    } catch (e) {
-        return null;
-    }
+    } catch (e) { return null; }
 }
 
 const currentUser = getUserFromToken();
@@ -35,68 +30,85 @@ if (!currentUser) {
     alert("אינך מחובר למערכת");
     window.location.href = '/login';
 } else if (communityId) {
-    
-    // עדכון כותרת
-    titleEl.innerText = communityName ? `צ'אט: ${communityName}` : `צ'אט קהילה ${communityId}`;
+    titleEl.innerText = communityName ? communityName : `צ'אט קהילה ${communityId}`;
 
-    // 1. חיבור לחדר
     socket.emit('join_community', communityId);
-
-    // 2. טעינת היסטוריה
     fetchHistory();
 
-    // 3. האזנה לכפתור שליחה
     sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
+    messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
 
-    // 4. האזנה להודעות חדשות בזמן אמת
     socket.on('receive_message', (data) => {
         appendMessage(data);
     });
 }
 
-// פונקציה לשליחת הודעה
 function sendMessage() {
     const text = messageInput.value.trim();
     if (!text) return;
 
     const messageData = {
         communityId: communityId,
-        userId: currentUser.user_id, // שימי לב: השדה בטוקן הוא user_id
-        userName: currentUser.first_name, 
-        message: text
+        userId: currentUser.user_id,
+        userName: currentUser.first_name, // ודאי שזה השדה הנכון בטוקן
+        message: text,
+        created_at: new Date().toISOString() // הוספנו את הזמן הנוכחי לשליחה המיידית
     };
 
     socket.emit('send_message', messageData);
     messageInput.value = '';
 }
 
-// פונקציה להוספת הודעה למסך
-function appendMessage(data) {
-    const div = document.createElement('div');
-    div.classList.add('message');
+// === פונקציית עזר לפרמוט זמן כמו בוואטסאפ ===
+function formatMessageTime(dateString) {
+    if (!dateString) return new Date().toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
     
-    // זיהוי אם זה אני או מישהו אחר
-    const isMine = (data.userId == currentUser.user_id) || (data.user_id == currentUser.user_id);
-    div.classList.add(isMine ? 'mine' : 'others');
+    const msgDate = new Date(dateString);
+    const now = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
 
-    // אם זה משתמש אחר, נציג את שמו
-    let nameHtml = '';
-    if (!isMine) {
-        // תמיכה גם בשדה מה-DB וגם משליחה בזמן אמת
-        const nameDisplay = data.user_name || data.userName || 'משתמש'; 
-        nameHtml = `<span class="sender-name">${nameDisplay}</span>`;
+    // האם זה היום?
+    if (msgDate.toDateString() === now.toDateString()) {
+        return msgDate.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
     }
+    // האם זה אתמול?
+    if (msgDate.toDateString() === yesterday.toDateString()) {
+        return 'אתמול';
+    }
+    // תאריך ישן יותר
+    return msgDate.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
 
-    // תמיכה גם בשדה message (socket) וגם message_text (db)
-    const content = data.message || data.message_text;
-
-    div.innerHTML = `${nameHtml}${content}`;
+// === פונקציה מעודכנת להצגת ההודעה ===
+function appendMessage(data) {
+    // זיהוי אם זה אני
+    const isMine = (data.userId == currentUser.user_id) || (data.user_id == currentUser.user_id);
     
-    messagesContainer.appendChild(div);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight; // גלילה למטה
+    // שליפת שם ותוכן (תמיכה גם במידע מה-DB וגם מ-Socket)
+    const name = data.user_name || data.userName || 'אורח';
+    const content = data.message || data.message_text;
+    const timeStr = formatMessageTime(data.created_at);
+    
+    // יצירת ראשי תיבות לאייקון (למשל "ישראל" -> "י")
+    const initial = name.charAt(0);
+
+    const rowDiv = document.createElement('div');
+    rowDiv.classList.add('message-row');
+    rowDiv.classList.add(isMine ? 'mine' : 'others');
+
+    // ה-HTML של ההודעה
+    rowDiv.innerHTML = `
+        <div class="user-avatar">${initial}</div>
+        <div class="message-bubble">
+            ${!isMine ? `<div class="sender-name">${name}</div>` : ''}
+            <div class="message-text">${content}</div>
+            <div class="message-time">${timeStr}</div>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(rowDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 async function fetchHistory() {

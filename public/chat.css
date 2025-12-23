@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ece5dd;
+    background-color: #ece5dd; /* צבע רקע דמוי וואטסאפ */
     display: flex;
     justify-content: center;
     height: 100vh;
@@ -10,68 +10,116 @@ body {
 .chat-wrapper {
     width: 100%;
     max-width: 600px;
-    background-color: #fff;
+    background-color: #e5ddd5;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    height: 100%;
 }
 
 .chat-header {
-    background-color: #4a90e2; /* צבע המותג שלך */
+    background-color: #075e54; /* ירוק כהה */
     color: white;
     padding: 15px;
     display: flex;
     align-items: center;
     gap: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    z-index: 10;
 }
 
 .back-btn {
     background: transparent;
-    border: 1px solid white;
+    border: none;
     color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
+    font-size: 16px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
 .messages-container {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background-color: #e5ddd5;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
 }
 
-.message {
-    max-width: 70%;
-    padding: 10px 15px;
+/* שורה שמכילה את ההודעה והאייקון */
+.message-row {
+    display: flex;
+    align-items: flex-end; /* האייקון יהיה למטה ליד הבועה */
+    gap: 8px;
+    max-width: 80%;
+}
+
+/* עיצוב עבורי (הודעות שלי) */
+.message-row.mine {
+    align-self: flex-start; /* הודעות שלי בצד ימין בעברית */
+    flex-direction: row; 
+}
+
+/* עיצוב עבור אחרים */
+.message-row.others {
+    align-self: flex-end; /* הודעות של אחרים בצד שמאל */
+    flex-direction: row-reverse; /* הופך כדי שהאייקון יהיה בצד הקיצוני */
+}
+
+/* האייקון (עיגול עם אות ראשונה) */
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.message-bubble {
+    padding: 8px 10px;
     border-radius: 8px;
     position: relative;
-    line-height: 1.4;
     font-size: 15px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
 }
 
-.message.mine {
-    background-color: #dcf8c6;
-    align-self: flex-start; /* הודעות שלי - ימין */
+.message-row.mine .message-bubble {
+    background-color: #dcf8c6; /* ירוק בהיר */
     border-top-right-radius: 0;
 }
 
-.message.others {
-    background-color: #fff;
-    align-self: flex-end; /* הודעות של אחרים - שמאל */
+.message-row.others .message-bubble {
+    background-color: #fff; /* לבן */
     border-top-left-radius: 0;
-    border: 1px solid #ddd;
 }
 
 .sender-name {
-    font-size: 12px;
-    color: #555;
+    font-size: 13px;
+    color: #e542a3; /* צבע בולט לשם השולח */
     font-weight: bold;
-    display: block;
     margin-bottom: 4px;
+}
+
+.message-text {
+    word-wrap: break-word;
+    margin-bottom: 5px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: #999;
+    align-self: flex-end; /* ממקם את השעה בצד שמאל למטה */
+    margin-top: 2px;
 }
 
 .input-area {
@@ -85,17 +133,22 @@ body {
 #message-input {
     flex: 1;
     padding: 12px;
-    border: 1px solid #ddd;
+    border: none;
     border-radius: 20px;
     outline: none;
+    font-size: 16px;
 }
 
 #send-btn {
-    background-color: #4a90e2;
+    background-color: #075e54;
     color: white;
     border: none;
-    padding: 10px 20px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
     font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
