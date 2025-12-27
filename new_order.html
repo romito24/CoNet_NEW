@@ -17,7 +17,7 @@
         rel="stylesheet"
     >
 
-    <!-- CSS קיים -->
+    <!-- CSS משותף -->
     <link rel="stylesheet" href="auth.css">
 </head>
 
@@ -29,16 +29,12 @@
     <div class="auth-card">
 
         <!-- שם המרחב (דינמי) -->
-        <h3 class="auth-heading" id="spaceName">
-            שם המרחב
-        </h3>
+        <h3 class="auth-heading" id="spaceName">שם המרחב</h3>
 
         <!-- כתובת (דינמית) -->
-        <p class="auth-subtext" id="spaceAddress">
-            כתובת המרחב
-        </p>
+        <p class="auth-subtext" id="spaceAddress">כתובת המרחב</p>
 
-        <form>
+        <form id="orderForm">
 
             <!-- תיאור קצר -->
             <div class="mb-3">
@@ -46,6 +42,7 @@
                 <input
                     type="text"
                     class="form-control"
+                    id="description"
                     placeholder="לדוגמה: מפגש עבודה לקהילה"
                 >
             </div>
@@ -56,6 +53,7 @@
                 <input
                     type="date"
                     class="form-control"
+                    id="startDate"
                     required
                 >
             </div>
@@ -66,6 +64,7 @@
                 <input
                     type="time"
                     class="form-control"
+                    id="startTime"
                     required
                 >
             </div>
@@ -76,6 +75,7 @@
                 <input
                     type="time"
                     class="form-control"
+                    id="endTime"
                     required
                 >
             </div>
@@ -93,11 +93,11 @@
 </div>
 
 <script>
-    // קריאה למשתנים מה-URL
+    // שליפת נתונים מה-URL
     const params = new URLSearchParams(window.location.search);
 
     const spaceName = params.get('space_name');
-    const address = params.get('address');
+    const address   = params.get('address');
 
     if (spaceName) {
         document.getElementById('spaceName').textContent = spaceName;
@@ -107,6 +107,8 @@
         document.getElementById('spaceAddress').textContent = address;
     }
 </script>
+
+<script src="new_order.js"></script>
 
 </body>
 </html>
