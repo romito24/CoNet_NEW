@@ -321,8 +321,13 @@ function createCommunityCard(c, isManagerMode) {
         <h3>${c.community_name}</h3>
         <div class="card-info"><i class="fas fa-tag"></i> ${c.main_subject || 'כללי'}</div>
         ${!isManagerMode ? `<div class="card-info"><i class="fas fa-id-badge"></i> תפקיד: <strong>${translateRole(c.my_role)}</strong></div>` : ''}
+        
+        <button onclick="navigateToChat(${c.community_id}, '${c.community_name}')" class="btn-action" style="background-color: #4a90e2; color: white; margin-top: 10px; width: 100%; cursor: pointer;">
+            <i class="fas fa-comments"></i> כניסה לצ'אט
+        </button>
+
         ${isManagerMode ? 
-            `<button onclick="openEditCommunityModal(${c.community_id}, '${c.community_name}', '${c.main_subject || ''}', '${c.image_url || ''}')" class="btn-action btn-edit"><i class="fas fa-edit"></i> ערוך פרטים</button>` 
+            `<button onclick="openEditCommunityModal(${c.community_id}, '${c.community_name}', '${c.main_subject || ''}', '${c.image_url || ''}')" class="btn-action btn-edit" style="margin-top: 5px;"><i class="fas fa-edit"></i> ערוך פרטים</button>` 
             : ''}
     </div>`;
 }
