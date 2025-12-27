@@ -179,14 +179,17 @@ function renderResults(spaces) {
     clearMarkers();
 
     spaces.forEach(space => {
+        // --- 1. יצירת הכרטיס ברשימה בצד ---
         const card = document.createElement('div');
         card.className = 'space-card';
         
         const tagsHtml = space.facilities ? space.facilities.map(f => `<span class="tag">#${f}</span>`).join('') : '';
+        
         const distanceHtml = space.distance 
             ? `<span class="distance-badge"><i class="fa-solid fa-person-walking"></i> ${space.distance}</span>` 
             : '<span></span>';
 
+        // ה-HTML נקי מעיצוב ישיר
         card.innerHTML = `
             <div class="card-meta">
                 ${distanceHtml}
@@ -195,22 +198,32 @@ function renderResults(spaces) {
             <h3>${space.space_name}</h3>
             <div class="address"><i class="fa-solid fa-map-pin"></i> ${space.address}</div>
             <div class="tags">${tagsHtml}</div>
-            <button class="book-btn" onclick="alert('הזמנה עבור: ${space.space_name}')">
-                הזמן מקום
-            </button>
+            
+            <div class="card-actions">
+                <button class="book-btn" onclick="navigateToOrder(${space.space_id})">
+                    הזמן מקום
+                </button>
+                <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${space.space_name.replace(/'/g, "\\'")}')">
+                    צור אירוע
+                </button>
+            </div>
         `;
 
+        // לחיצה על הכרטיס (שאינה על כפתור) מתמקדת במפה
         card.onclick = (e) => {
-            if(e.target.tagName !== 'BUTTON' && map) { 
-                map.setCenter({ lat: space.latitude, lng: space.longitude });
-                map.setZoom(16);
-                const marker = markers.find(m => m.getTitle() === space.space_name);
-                if (marker) google.maps.event.trigger(marker, 'click');
+            if(e.target.tagName !== 'BUTTON') { 
+                if(map) {
+                    map.setCenter({ lat: space.latitude, lng: space.longitude });
+                    map.setZoom(16);
+                    const marker = markers.find(m => m.getTitle() === space.space_name);
+                    if (marker) google.maps.event.trigger(marker, 'click');
+                }
             }
         };
 
         listContainer.appendChild(card);
 
+        // --- 2. יצירת הסמן במפה ---
         if (map && space.latitude && space.longitude) {
             const marker = new google.maps.Marker({
                 position: { lat: space.latitude, lng: space.longitude },
@@ -219,12 +232,27 @@ function renderResults(spaces) {
                 animation: google.maps.Animation.DROP
             });
 
+            const facilitiesStr = space.facilities ? space.facilities.join(', ') : 'ללא שירותים מיוחדים';
+
+            // HTML של הפופ-אפ - משתמש במחלקות CSS החדשות
             marker.addListener("click", () => {
                 const contentString = `
-                    <div style="direction: rtl; text-align: right; font-family: sans-serif;">
-                        <h3 style="margin:0 0 5px; color:#4a90e2;">${space.space_name}</h3>
-                        <p style="margin:0; font-size:13px;">${space.address}</p>
-                        <p style="margin:5px 0 0; font-weight:bold;">${space.distance || ''}</p>
+                    <div class="info-window-content">
+                        <h3 class="info-window-title">${space.space_name}</h3>
+                        <p class="info-window-address">${space.address}</p>
+                        
+                        <div class="info-window-facilities">
+                            <strong>שירותים:</strong> ${facilitiesStr}
+                        </div>
+
+                        <div class="info-window-actions">
+                            <button class="info-btn book" onclick="navigateToOrder(${space.space_id})">
+                                הזמן מקום
+                            </button>
+                            <button class="info-btn event" onclick="navigateToCreateEvent(${space.space_id}, '${space.space_name.replace(/'/g, "\\'")}')">
+                                צור אירוע
+                            </button>
+                        </div>
                     </div>
                 `;
                 infoWindow.setContent(contentString);
@@ -233,4 +261,12 @@ function renderResults(spaces) {
             markers.push(marker);
         }
     });
+
+function navigateToCreateEvent(spaceId, spaceName) {
+    window.location.href = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}`;
+}
+
+function navigateToOrder(spaceId) {
+    window.location.href = `new_order.html?spaceId=${spaceId}`;
+}
 }

@@ -319,3 +319,89 @@ button {
         height: 40%;
     }
 }
+/* --- Card Actions (כפתורים בכרטיס) --- */
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.card-actions button {
+    flex: 1; /* מחלק את רוחב הכפתורים שווה בשווה */
+}
+
+.event-btn {
+    background-color: #f39c12; /* כתום */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.event-btn:hover {
+    background-color: #e67e22; /* כתום כהה יותר */
+}
+
+/* --- Info Window (פופ-אפ במפה) --- */
+.info-window-content {
+    direction: rtl;
+    text-align: right;
+    font-family: 'Segoe UI', sans-serif;
+    min-width: 220px;
+}
+
+.info-window-title {
+    margin: 0 0 5px;
+    color: var(--primary-color);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.info-window-address {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+.info-window-facilities {
+    margin: 8px 0;
+    font-size: 12px;
+    color: #333;
+    background: #f9f9f9;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.info-window-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.info-btn {
+    flex: 1;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+
+.info-btn.book {
+    background-color: var(--primary-color);
+}
+.info-btn.book:hover {
+    background-color: var(--primary-hover);
+}
+
+.info-btn.event {
+    background-color: #f39c12;
+}
+.info-btn.event:hover {
+    background-color: #e67e22;
+}
