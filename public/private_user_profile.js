@@ -355,3 +355,8 @@ function closeModal(id) { document.getElementById(id).style.display = 'none'; cu
 function confirmAction(t, txt, cb) { document.getElementById('modalTitle').innerText=t; document.getElementById('modalText').innerText=txt; currentActionCallback=cb; document.getElementById('confirmModal').style.display='block'; }
 document.getElementById('modalConfirmBtn').onclick = () => { if(currentActionCallback) currentActionCallback(); };
 window.onclick = (e) => { if(e.target.classList.contains('modal')) e.target.style.display='none'; };
+
+// --- פונקציה למעבר לצ'אט (הוספה חדשה) ---
+function navigateToChat(communityId, communityName) {
+    window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
+}
