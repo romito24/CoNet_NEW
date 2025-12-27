@@ -99,5 +99,34 @@
   </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 1. שליפת הנתונים מהכתובת (URL)
+        const params = new URLSearchParams(window.location.search);
+        
+        const spaceId = params.get('spaceId');
+        const spaceName = params.get('spaceName');
+        const spaceAddress = params.get('spaceAddress');
+
+        // 2. הצגה מיידית של המידע
+        if (spaceName) {
+            // ודאי שיש לך אלמנט עם id="spaceName" בדף
+            const nameEl = document.getElementById('spaceName');
+            if (nameEl) nameEl.innerText = spaceName;
+        }
+        if (spaceAddress) {
+            // ודאי שיש לך אלמנט עם id="spaceAddress" בדף
+            const addrEl = document.getElementById('spaceAddress');
+            if (addrEl) addrEl.innerText = spaceAddress;
+        }
+
+        // 3. ודאי שיש ID
+        if (!spaceId) {
+            alert("לא נבחר מרחב לאירוע");
+            window.location.href = 'search.html';
+        }
+    });
+</script>
+
 </body>
 </html>
