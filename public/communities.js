@@ -55,11 +55,6 @@ function renderCommunities(communities) {
                 <h3>${comm.community_name}</h3>
                 <div class="subject">נושא: ${comm.main_subject || 'כללי'}</div>
                 <div class="est-date">נוסדה ב: ${dateStr}</div>
-                
-                <div class="card-actions">
-                    <button class="chat-btn" onclick="navigateToChat(${comm.community_id}, '${comm.community_name}')">
-                        💬 כניסה לצ'אט
-                    </button>
 
                     <button class="join-btn" onclick="handleJoin(${comm.community_id}, '${comm.community_name}')">
                         הצטרפות לקהילה
