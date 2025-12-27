@@ -33,62 +33,89 @@
 
       <form id="signupForm">
 
+        <!-- שם פרטי + משפחה -->
         <div class="row">
           <div class="col-6 mb-3">
             <label for="firstName">שם פרטי</label>
-            <input type="text"
-                   class="form-control"
-                   id="firstName"
-                   required>
+            <input
+              type="text"
+              class="form-control"
+              id="firstName"
+              required
+            >
           </div>
 
           <div class="col-6 mb-3">
             <label for="lastName">שם משפחה</label>
-            <input type="text"
-                   class="form-control"
-                   id="lastName"
-                   required>
-          </div>
-        </div>
-
-            <div class="mb-3">
-            <label for="userType">סוג משתמש</label>
-            <select
+            <input
+              type="text"
               class="form-control"
-              id="userType"
-              name="user_type"
+              id="lastName"
               required
             >
-              <option value="" disabled selected>בחרי סוג משתמש</option>
-              <option value="community_manager">מנהל קהילה</option>
-              <option value="space_manager">מנהל מרחב</option>
-              <option value="regular">משתמש פרטי</option>
-            </select>
           </div>
+        </div>
 
+        <!-- אימייל -->
         <div class="mb-3">
           <label for="signupEmail">אימייל</label>
-          <input type="email"
-                 class="form-control"
-                 id="signupEmail"
-                 required>
+          <input
+            type="email"
+            class="form-control"
+            id="signupEmail"
+            placeholder="name@example.com"
+            required
+          >
         </div>
 
+        <!-- סיסמה -->
         <div class="mb-3">
           <label for="signupPassword">סיסמה</label>
-          <input type="password"
-                 class="form-control"
-                 id="signupPassword"
-                 required>
+          <input
+            type="password"
+            class="form-control"
+            id="signupPassword"
+            placeholder="••••••"
+            required
+          >
         </div>
 
+        <!-- טלפון -->
+        <div class="mb-3">
+          <label for="signupPhone">טלפון</label>
+          <input
+            type="tel"
+            class="form-control"
+            id="signupPhone"
+            placeholder="05XXXXXXXX"
+            required
+          >
+        </div>
+
+        <!-- סוג משתמש -->
+        <div class="mb-4">
+          <label for="userType">סוג משתמש</label>
+          <select
+            class="form-control"
+            id="userType"
+            name="user_type"
+            required
+          >
+            <option value="" disabled selected>בחרי סוג משתמש</option>
+            <option value="community_manager">מנהל קהילה</option>
+            <option value="space_manager">מנהל מרחב</option>
+            <option value="regular">משתמש פרטי</option>
+          </select>
+        </div>
+
+        <!-- כפתור -->
         <button type="submit" class="auth-btn">
           יצירת חשבון חדש
         </button>
 
       </form>
 
-      <!-- link to login -->
+      <!-- מעבר להתחברות -->
       <p class="auth-switch">
         כבר יש לך חשבון?
         <a href="login.html">התחברות</a>
