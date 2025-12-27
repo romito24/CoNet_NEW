@@ -189,28 +189,29 @@ function renderResults(spaces) {
             ? `<span class="distance-badge"><i class="fa-solid fa-person-walking"></i> ${space.distance}</span>` 
             : '<span></span>';
         
+        // יצירת מחרוזות בטוחות לשימוש ב-onclick
         const safeName = space.space_name.replace(/'/g, "\\'");
         const safeAddress = space.address ? space.address.replace(/'/g, "\\'") : '';
 
         // ה-HTML המעודכן
-    card.innerHTML = `
-        <div class="card-meta">
-            ${distanceHtml}
-            <span><i class="fa-solid fa-chair"></i> ${space.seats_available} פנוי</span>
-        </div>
-        <h3>${space.space_name}</h3>
-        <div class="address"><i class="fa-solid fa-map-pin"></i> ${space.address}</div>
-        <div class="tags">${tagsHtml}</div>
-        
-        <div class="card-actions">
-            <button class="book-btn" onclick="navigateToOrder(${space.space_id}, '${safeName}', '${safeAddress}')">
-                הזמן מקום
-            </button>
-            <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${safeName}', '${safeAddress})">
-                צור אירוע
-            </button>
-        </div>
-    `;
+        card.innerHTML = `
+            <div class="card-meta">
+                ${distanceHtml}
+                <span><i class="fa-solid fa-chair"></i> ${space.seats_available} פנוי</span>
+            </div>
+            <h3>${space.space_name}</h3>
+            <div class="address"><i class="fa-solid fa-map-pin"></i> ${space.address}</div>
+            <div class="tags">${tagsHtml}</div>
+            
+            <div class="card-actions">
+                <button class="book-btn" onclick="navigateToOrder(${space.space_id}, '${safeName}', '${safeAddress}')">
+                    הזמן מקום
+                </button>
+                <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${safeName}', '${safeAddress}')">
+                    צור אירוע
+                </button>
+            </div>
+        `;
 
         // לחיצה על הכרטיס (שאינה על כפתור) מתמקדת במפה
         card.onclick = (e) => {
@@ -237,7 +238,7 @@ function renderResults(spaces) {
 
             const facilitiesStr = space.facilities ? space.facilities.join(', ') : 'ללא שירותים מיוחדים';
 
-            // HTML של הפופ-אפ - משתמש במחלקות CSS החדשות
+            // HTML של הפופ-אפ
             marker.addListener("click", () => {
                 const contentString = `
                     <div class="info-window-content">
@@ -249,10 +250,10 @@ function renderResults(spaces) {
                         </div>
 
                         <div class="info-window-actions">
-                            <button class="info-btn book" onclick="navigateToOrder(${space.space_id})">
+                            <button class="info-btn book" onclick="navigateToOrder(${space.space_id}, '${safeName}', '${safeAddress}')">
                                 הזמן מקום
                             </button>
-                            <button class="info-btn event" onclick="navigateToCreateEvent(${space.space_id}, '${space.space_name.replace(/'/g, "\\'")}')">
+                            <button class="info-btn event" onclick="navigateToCreateEvent(${space.space_id}, '${safeName}', '${safeAddress}')">
                                 צור אירוע
                             </button>
                         </div>
@@ -264,16 +265,21 @@ function renderResults(spaces) {
             markers.push(marker);
         }
     });
+} // סגירת הפונקציה renderResults
 
-
+// ==========================================
+// פונקציות ניווט גלובליות
+// ==========================================
 
 window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
-    const url = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(spaceAddress)}`;
+    // בדיקה למניעת undefined בכתובת
+    const addr = spaceAddress || '';
+    const url = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;
+};
 
 window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
-    const url = `new_order.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(spaceAddress)}`;
-    window.location.href = url;}
-}
-
-}
+    const addr = spaceAddress || '';
+    const url = `new_order.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
+    window.location.href = url;
+};
