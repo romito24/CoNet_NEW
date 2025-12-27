@@ -262,11 +262,13 @@ function renderResults(spaces) {
         }
     });
 
-function navigateToCreateEvent(spaceId, spaceName) {
-    window.location.href = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}`;
-}
 
-function navigateToOrder(spaceId) {
+
+window.navigateToCreateEvent = function(spaceId, spaceName) {
+    window.location.href = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}`;
+};
+
+window.navigateToOrder = function(spaceId) {
     window.location.href = `new_order.html?spaceId=${spaceId}`;
-}
+};
 }
