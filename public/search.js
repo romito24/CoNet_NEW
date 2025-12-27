@@ -273,6 +273,7 @@ window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
 
 window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
     const url = `new_order.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(spaceAddress)}`;
-    window.location.href = url;
-};
+    window.location.href = url;}
+}
+
 }
