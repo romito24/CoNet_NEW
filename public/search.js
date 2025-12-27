@@ -206,7 +206,7 @@ function renderResults(spaces) {
             <button class="book-btn" onclick="navigateToOrder(${space.space_id}, '${safeName}', '${safeAddress}')">
                 הזמן מקום
             </button>
-            <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${safeName}')">
+            <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${safeName}', '${safeAddress})">
                 צור אירוע
             </button>
         </div>
