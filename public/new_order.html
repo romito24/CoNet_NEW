@@ -93,19 +93,31 @@
 </div>
 
 <script>
-    // שליפת נתונים מה-URL
-    const params = new URLSearchParams(window.location.search);
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 1. שליפת הנתונים מהכתובת (URL)
+        const params = new URLSearchParams(window.location.search);
+        
+        const spaceId = params.get('spaceId');
+        const spaceName = params.get('spaceName');
+        const spaceAddress = params.get('spaceAddress');
 
-    const spaceName = params.get('space_name');
-    const address   = params.get('address');
+        // 2. הצגה מיידית של המידע (אם קיים ב-URL)
+        if (spaceName) {
+            document.getElementById('spaceName').innerText = spaceName;
+        }
+        if (spaceAddress) {
+            document.getElementById('spaceAddress').innerText = spaceAddress;
+        }
 
-    if (spaceName) {
-        document.getElementById('spaceName').textContent = spaceName;
-    }
+        // 3. בדיקה אם יש ID (לצורך שליחת הטופס בהמשך)
+        if (!spaceId) {
+            alert("לא נבחר מרחב להזמנה");
+            window.location.href = 'search.html';
+        }
 
-    if (address) {
-        document.getElementById('spaceAddress').textContent = address;
-    }
+        // אופציונלי: כאן את יכולה להוסיף קריאה לשרת אם את רוצה פרטים נוספים
+        // אבל בשביל השם והכתובת - מה שעשינו למעלה מספיק.
+    });
 </script>
 
 <script src="new_order.js"></script>
