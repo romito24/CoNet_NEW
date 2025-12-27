@@ -54,9 +54,14 @@ app.get('/add_space', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'add_space.html'));
 });
 
-// דף התחברות והרשמה
+// דף התחברות 
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// דף הרשמה 
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'signup.html'));
 });
 
 // עמוד פרופיל הוליסטי
