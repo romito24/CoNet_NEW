@@ -188,26 +188,29 @@ function renderResults(spaces) {
         const distanceHtml = space.distance 
             ? `<span class="distance-badge"><i class="fa-solid fa-person-walking"></i> ${space.distance}</span>` 
             : '<span></span>';
+        
+        const safeName = space.space_name.replace(/'/g, "\\'");
+        const safeAddress = space.address ? space.address.replace(/'/g, "\\'") : '';
 
-        // ה-HTML נקי מעיצוב ישיר
-        card.innerHTML = `
-            <div class="card-meta">
-                ${distanceHtml}
-                <span><i class="fa-solid fa-chair"></i> ${space.seats_available} פנוי</span>
-            </div>
-            <h3>${space.space_name}</h3>
-            <div class="address"><i class="fa-solid fa-map-pin"></i> ${space.address}</div>
-            <div class="tags">${tagsHtml}</div>
-            
-            <div class="card-actions">
-                <button class="book-btn" onclick="navigateToOrder(${space.space_id})">
-                    הזמן מקום
-                </button>
-                <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${space.space_name.replace(/'/g, "\\'")}')">
-                    צור אירוע
-                </button>
-            </div>
-        `;
+        // ה-HTML המעודכן
+    card.innerHTML = `
+        <div class="card-meta">
+            ${distanceHtml}
+            <span><i class="fa-solid fa-chair"></i> ${space.seats_available} פנוי</span>
+        </div>
+        <h3>${space.space_name}</h3>
+        <div class="address"><i class="fa-solid fa-map-pin"></i> ${space.address}</div>
+        <div class="tags">${tagsHtml}</div>
+        
+        <div class="card-actions">
+            <button class="book-btn" onclick="navigateToOrder(${space.space_id}, '${safeName}', '${safeAddress}')">
+                הזמן מקום
+            </button>
+            <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${safeName}')">
+                צור אירוע
+            </button>
+        </div>
+    `;
 
         // לחיצה על הכרטיס (שאינה על כפתור) מתמקדת במפה
         card.onclick = (e) => {
