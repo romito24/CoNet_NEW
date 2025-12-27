@@ -271,7 +271,8 @@ window.navigateToCreateEvent = function(spaceId, spaceName) {
     window.location.href = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}`;
 };
 
-window.navigateToOrder = function(spaceId) {
-    window.location.href = `new_order.html?spaceId=${spaceId}`;
+window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
+    const url = `new_order.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(spaceAddress)}`;
+    window.location.href = url;
 };
 }
