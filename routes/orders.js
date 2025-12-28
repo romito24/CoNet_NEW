@@ -171,9 +171,15 @@ const createOrderLogic = async (orderData) => {
 // ==========================================
 router.post('/create', verifyToken, async (req, res) => {
     try {
+        const userIdFromToken = req.user.id || req.user.user_id;
+        if (!userIdFromToken) {
+            console.error("User ID missing in token payload. User object:", req.user);
+            return res.status(401).json({ message: 'שגיאת הזדהות: לא ניתן לזהות את המשתמש' });
+        }
+    
         const result = await createOrderLogic({
             ...req.body,
-            user_id: req.user.id
+            user_id: userIdFromToken 
         });
         res.status(201).json(result);
     } catch (error) {
