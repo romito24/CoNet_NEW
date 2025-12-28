@@ -173,7 +173,7 @@ router.post('/create', verifyToken, async (req, res) => {
     try {
         const result = await createOrderLogic({
             ...req.body,
-            user_id: req.user.user_id
+            user_id: req.user.id
         });
         res.status(201).json(result);
     } catch (error) {
