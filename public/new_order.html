@@ -36,20 +36,9 @@
 
         <form id="orderForm">
 
-            <!-- תיאור קצר -->
+            <!-- תאריך  -->
             <div class="mb-3">
-                <label>תיאור קצר להזמנה</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="description"
-                    placeholder="לדוגמה: מפגש עבודה לקהילה"
-                >
-            </div>
-
-            <!-- תאריך התחלה -->
-            <div class="mb-3">
-                <label>תאריך התחלה</label>
+                <label>תאריך</label>
                 <input
                     type="date"
                     class="form-control"
@@ -80,6 +69,10 @@
                 >
             </div>
 
+            <div class="mb-4">
+        <label>מספר משתתפים</label>
+                <input type="number" class="form-control" id="attendeesCount" min="1" value="1" required>
+            </div>
             <!-- כפתור -->
             <button type="submit" class="auth-btn">
                 שליחת בקשת הזמנה
