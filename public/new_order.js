@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const params = new URLSearchParams(window.location.search);
-        const spaceId = params.get('space_id');
+        const spaceId = params.get('spaceId');
 
         if (!spaceId) {
             alert('שגיאה: לא נמצא מזהה מרחב');
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    space_id: spaceId,
+                    spaceId: spaceId,
                     start_time: startDateTime,
                     end_time: endDateTime,
                     attendees_count: 1
