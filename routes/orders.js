@@ -141,7 +141,7 @@ const createOrderLogic = async (orderData) => {
         VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     const [insertResult] = await db.execute(insertSql, [
-        user_id, space_id, event_id || null, start, end, 'approved', requestedSeats
+        user_id, space_id, event_id !== undefined ? event_id : null, start, end, 'approved', requestedSeats
     ]);
 
     // 7. שליחת מייל
