@@ -178,8 +178,12 @@ router.post('/create', verifyToken, async (req, res) => {
         }
     
         const result = await createOrderLogic({
-            ...req.body,
-            user_id: userIdFromToken 
+            user_id: userIdFromToken,
+            space_id: req.body.space_id || req.body.spaceId,
+            event_id: req.body.event_id || null,
+            start_time: req.body.start_time,
+            end_time: req.body.end_time,
+            attendees_count: req.body.attendees_count || 1 
         });
         res.status(201).json(result);
     } catch (error) {
