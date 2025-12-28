@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const startDate = document.getElementById('startDate').value;
         const startTime = document.getElementById('startTime').value;
         const endTime   = document.getElementById('endTime').value;
+        const attendees = document.getElementById('attendeesCount').value;
 
         if (!startDate || !startTime || !endTime) {
             alert('נא למלא את כל השדות');
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     spaceId: spaceId,
                     start_time: startDateTime,
                     end_time: endDateTime,
-                    attendees_count: 1
+                    attendees_count: parseInt(attendees) || 1
                 })
             });
 
