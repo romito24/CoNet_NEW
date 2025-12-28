@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     space_Id: spaceId,
                     start_time: startDateTime,
                     end_time: endDateTime,
-                    attendees_count: parseInt(attendees) || 1
+                    attendees_count: parseInt(attendees) || 1,
+                    event_id: null
                 })
             });
 
