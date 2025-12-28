@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    spaceId: spaceId,
+                    space_Id: spaceId,
                     start_time: startDateTime,
                     end_time: endDateTime,
                     attendees_count: parseInt(attendees) || 1
