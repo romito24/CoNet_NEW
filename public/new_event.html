@@ -102,40 +102,6 @@
   </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        // 1. שליפת הנתונים מהכתובת (URL)
-        const params = new URLSearchParams(window.location.search);
-        
-        const spaceId = params.get('spaceId');
-        const spaceName = params.get('spaceName');
-        const spaceAddress = params.get('spaceAddress');
-
-        // 2. הצגה מיידית של המידע
-        if (spaceName) {
-            const nameEl = document.getElementById('spaceName');
-            if (nameEl) nameEl.innerText = spaceName;
-        } else {
-            document.getElementById('spaceName').innerText = "לא נבחר מרחב";
-        }
-
-        if (spaceAddress) {
-            const addrEl = document.getElementById('spaceAddress');
-            if (addrEl) addrEl.innerText = spaceAddress;
-        } else {
-            document.getElementById('spaceAddress').innerText = "";
-        }
-
-        // 3. מילוי השדה הנסתר והגנה
-        if (spaceId) {
-            document.getElementById('spaceId').value = spaceId;
-        } else {
-            alert("לא נבחר מרחב לאירוע. חוזר לחיפוש...");
-            window.location.href = 'search.html';
-        }
-    });
-</script>
-
 <script src="new_event.js"></script>
 
 </body>
