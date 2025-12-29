@@ -308,7 +308,7 @@ window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
 
     // 2. אם מחובר - המשך כרגיל
     const addr = spaceAddress || '';
-    const url = `new_order.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
+    const url = `new_order?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;
 };
 
@@ -317,7 +317,7 @@ window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
     // 1. בדיקת התחברות בסיסית (האם קיים טוקן והוא בתוקף)
     if (!checkAuth()) {
         alert("עליך להתחבר למערכת כדי ליצור אירוע.");
-        window.location.href = 'login.html';
+        window.location.href = 'login';
         return;
     }
 
@@ -342,6 +342,6 @@ window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
 
     // 3. אם הכל תקין (מחובר + מנהל קהילה) - מעבר לדף היצירה
     const addr = spaceAddress || '';
-    const url = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
+    const url = `new_event?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;
 };
