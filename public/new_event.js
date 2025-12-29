@@ -169,7 +169,7 @@ async function handleEventSubmit(e) {
             
             setTimeout(() => {
                  alert('✅ האירוע נוצר בהצלחה!');
-                 window.location.href = 'Holistic_profile.html'; 
+                 window.location.href = 'profile'; 
             }, 100); // דילאיי ממש קצר כדי שהמשתמש יראה שהכפתור השתנה
             
         } else {
