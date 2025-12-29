@@ -64,7 +64,7 @@ async function loadManagedCommunities() {
 
     try {
         // שים לב: וודאי שיש לך את ה-Route הזה בשרת שמחזיר קהילות בניהול המשתמש
-        const response = await fetch('/api/communities/manager', { 
+        const response = await fetch('/api/communities/my-managing', { 
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
