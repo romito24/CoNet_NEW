@@ -265,21 +265,83 @@ function renderResults(spaces) {
             markers.push(marker);
         }
     });
-} // סגירת הפונקציה renderResults
+} 
 
 // ==========================================
-// פונקציות ניווט גלובליות
+// פונקציות ניווט ואימות
 // ==========================================
 
-window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
-    // בדיקה למניעת undefined בכתובת
+// פונקציית עזר לבדיקת תקינות הטוקן
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+
+    try {
+        // פיענוח ה-Payload 
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        
+        // בדיקת תוקף 
+        const now = Math.floor(Date.now() / 1000);
+        
+        if (payload.exp && payload.exp < now) {
+            // הטוקן פג תוקף
+            localStorage.removeItem('token'); // ניקוי טוקן ישן
+            return false;
+        }
+        
+        return true;
+    } catch (e) {
+        console.error("Invalid token format", e);
+        return false;
+    }
+}
+
+
+// יצירת הזמנה עם אימות
+window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
+    // 1. בדיקת התחברות לפני המעבר
+    if (!checkAuth()) {
+        alert("עליך להתחבר למערכת כדי להזמין מקום.");
+        window.location.href = 'login';
+        return;
+    }
+
+    // 2. אם מחובר - המשך כרגיל
     const addr = spaceAddress || '';
-    const url = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
+    const url = `new_order.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;
 };
 
-window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
+// יצירת אירוע עם אימות ובדיקת הרשאות
+window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
+    // 1. בדיקת התחברות בסיסית (האם קיים טוקן והוא בתוקף)
+    if (!checkAuth()) {
+        alert("עליך להתחבר למערכת כדי ליצור אירוע.");
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // 2. בדיקת הרשאות (Role Check) - התוספת שביקשת
+    const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            // פענוח ה-Payload כדי לבדוק את סוג המשתמש
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            
+            // בדיקה: האם המשתמש הוא מנהל קהילה?
+            if (payload.user_type !== 'community_manager') {
+                alert("אין לך הרשאה ליצור אירועים.\nפעולה זו מותרת למנהלי קהילות בלבד.");
+                return; // עוצר כאן ולא עובר לדף הבא
+            }
+        } catch (e) {
+            console.error("Error parsing token for role check", e);
+            // במקרה של שגיאה בפענוח, נחמיר ונמנע מעבר
+            return;
+        }
+    }
+
+    // 3. אם הכל תקין (מחובר + מנהל קהילה) - מעבר לדף היצירה
     const addr = spaceAddress || '';
-    const url = `new_order.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
+    const url = `new_event.html?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;
 };

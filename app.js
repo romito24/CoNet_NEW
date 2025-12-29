@@ -84,6 +84,11 @@ app.get('/new_order', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'new_order.html'));
 });
 
+// דף יצירת אירוע
+app.get('/new_event', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'new_event.html'));
+});
+
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
