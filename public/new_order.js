@@ -6,11 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     orderForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        // 1. תפיסת הכפתור, שמירת הטקסט המקורי והפעלת מצב טעינה
+        const submitBtn = orderForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+
+        // שינוי לאייקון טעינה ונעילת הכפתור
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> שולח בקשה...';
+        submitBtn.disabled = true;
+
+        // 2. איסוף נתונים
         const params = new URLSearchParams(window.location.search);
-        const spaceId = params.get('spaceId');
+        // שימוש ב-get גם לאותיות קטנות וגם לגדולות ליתר ביטחון
+        const spaceId = params.get('spaceId') || params.get('space_id');
 
         if (!spaceId) {
             alert('שגיאה: לא נמצא מזהה מרחב');
+            resetButton(submitBtn, originalBtnText); // שחרור הכפתור
             return;
         }
 
@@ -21,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!startDate || !startTime || !endTime) {
             alert('נא למלא את כל השדות');
+            resetButton(submitBtn, originalBtnText); // שחרור הכפתור
             return;
         }
 
@@ -30,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token');
         if (!token) {
             alert('יש להתחבר לפני יצירת הזמנה');
+            window.location.href = 'login.html'; // הפניה ללוגין אם אין טוקן
             return;
         }
 
@@ -53,15 +66,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 alert(data.message || 'שגיאה ביצירת ההזמנה');
+                resetButton(submitBtn, originalBtnText); // שחרור הכפתור במקרה של כישלון
                 return;
             }
 
-            alert('✅ בקשת ההזמנה נשלחה בהצלחה');
-            console.log('Order created:', data);
+            // 3. הצלחה - שינוי ויזואלי והפניה
+            submitBtn.innerHTML = '✅ ההזמנה בוצעה!';
+            submitBtn.classList.remove('btn-primary'); // (אופציונלי) הסרת צבע כחול
+            submitBtn.classList.add('btn-success');    // (אופציונלי) הוספת צבע ירוק
+
+            setTimeout(() => {
+                alert('✅ בקשת ההזמנה נשלחה בהצלחה');
+                console.log('Order created:', data);
+                // מעבר לדף הפרופיל
+                window.location.href = 'profile';
+            }, 100);
 
         } catch (error) {
             console.error(error);
             alert('שגיאה בחיבור לשרת');
+            resetButton(submitBtn, originalBtnText); // שחרור הכפתור במקרה של שגיאת רשת
         }
     });
 });
+
+// פונקציית עזר להחזרת הכפתור למצב רגיל
+function resetButton(btn, originalText) {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    // אם שינינו צבעים, אפשר להחזיר גם אותם כאן (לא חובה)
+}
