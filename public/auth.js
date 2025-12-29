@@ -37,8 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user));
 
-            // מעבר לדף הבית
-            window.location.href = "/home.html";
+            // שליפת לינק לחזרה לאחר לוגין
+            const returnUrl = localStorage.getItem('returnUrl');
+
+            if (returnUrl) {
+                // אם יש כתובת שמורה לחזרה - ננקה אותה ונעבור אליה
+                localStorage.removeItem('returnUrl');
+                window.location.href = returnUrl;
+            } else {
+                // אחרת - נלך לדף הבית הרגיל
+                window.location.href = 'Holistic_profile.html';
+            }
 
         } catch (error) {
             console.error("Login Error:", error);
