@@ -110,8 +110,15 @@ async function handleEventSubmit(e) {
         return;
     }
 
+    // 1. תפיסת הכפתור ושינוי המראה שלו (הוספת חיווי טעינה)
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML; // שומרים את הטקסט המקורי ("יצירת אירוע")
+
+    // משנים ל"טוען..." ומוסיפים ספינר של בוטסטראפ, ונועלים את הכפתור
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> מעבד נתונים...';
+    submitBtn.disabled = true; 
+
     // איסוף הנתונים
-    // שימי לב: spaceId נלקח מהשדה הנסתר שמילאנו בחלק הראשון
     const spaceId = document.getElementById('spaceId').value;
     const communityId = document.getElementById('communityId').value;
     const eventName = document.getElementById('eventName').value;
@@ -123,14 +130,15 @@ async function handleEventSubmit(e) {
     // ולידציה
     if (!spaceId) {
         alert('שגיאה: חסר מזהה מרחב');
+        resetButton(submitBtn, originalBtnText); // החזרת הכפתור למצב רגיל
         return;
     }
     if (!communityId) {
         alert('חובה לבחור קהילה עבור האירוע');
+        resetButton(submitBtn, originalBtnText);
         return;
     }
 
-    // בניית האובייקט לשליחה (מותאם למה שהשרת מצפה ב-POST /create)
     const payload = {
         event_name: eventName,
         event_date: eventDate,
@@ -154,15 +162,30 @@ async function handleEventSubmit(e) {
         const data = await response.json();
 
         if (response.ok) {
-            alert('✅ האירוע נוצר בהצלחה!');
-            // הפניה לדף הפרופיל או לאירועים שלי
-            window.location.href = 'Holistic_profile.html'; 
+            // אם הצליח - משנים לירוק או הודעה חיובית רגע לפני המעבר
+            submitBtn.innerHTML = '✅ נוצר בהצלחה!';
+            submitBtn.classList.remove('btn-primary'); // או המחלקה המקורית שלך
+            submitBtn.classList.add('btn-success');
+            
+            setTimeout(() => {
+                 alert('✅ האירוע נוצר בהצלחה!');
+                 window.location.href = 'Holistic_profile.html'; 
+            }, 100); // דילאיי ממש קצר כדי שהמשתמש יראה שהכפתור השתנה
+            
         } else {
             alert(`שגיאה ביצירת האירוע: ${data.message || 'נסה שנית מאוחר יותר'}`);
+            resetButton(submitBtn, originalBtnText); // החזרת הכפתור למצב רגיל במקרה שגיאה
         }
 
     } catch (error) {
         console.error('Error creating event:', error);
         alert('שגיאה בתקשורת עם השרת');
+        resetButton(submitBtn, originalBtnText); // החזרת הכפתור למצב רגיל במקרה שגיאה
     }
+}
+
+// פונקציית עזר להחזרת הכפתור לקדמותו (למקרה של שגיאה)
+function resetButton(btn, originalText) {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
 }
