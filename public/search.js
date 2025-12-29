@@ -302,6 +302,7 @@ window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
     // 1. בדיקת התחברות לפני המעבר
     if (!checkAuth()) {
         alert("עליך להתחבר למערכת כדי להזמין מקום.");
+        localStorage.setItem('returnUrl', window.location.href);
         window.location.href = 'login';
         return;
     }
@@ -317,6 +318,7 @@ window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
     // 1. בדיקת התחברות בסיסית (האם קיים טוקן והוא בתוקף)
     if (!checkAuth()) {
         alert("עליך להתחבר למערכת כדי ליצור אירוע.");
+        localStorage.setItem('returnUrl', window.location.href);
         window.location.href = 'login';
         return;
     }
