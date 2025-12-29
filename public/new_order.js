@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.classList.add('btn-success');    // (אופציונלי) הוספת צבע ירוק
 
             setTimeout(() => {
-                alert('✅ בקשת ההזמנה נשלחה בהצלחה');
+                alert('✅ ההזמנה בוצעה בהצלחה');
                 console.log('Order created:', data);
                 // מעבר לדף הפרופיל
                 window.location.href = 'profile';
