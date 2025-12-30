@@ -6,108 +6,114 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
     
-    // כפתורי הטאבים (למעבר אוטומטי אחרי הרשמה)
+    // כפתורי הטאבים (קיימים רק אם יש טאבים)
     const loginTabBtn = document.getElementById("login-tab-btn");
     const signupTabBtn = document.getElementById("signup-tab-btn");
 
     // ==========================================
     // לוגיקה להתחברות (Login)
     // ==========================================
-    loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    if (loginForm) {
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        const email = document.getElementById("loginEmail").value;
-        const password = document.getElementById("loginPassword").value;
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password })
-            });
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (!response.ok) {
-                showPopup(data.message, true); // הצגת שגיאה
-                return;
+                if (!response.ok) {
+                    showPopup(data.message, true);
+                    return;
+                }
+
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+                const returnUrl = localStorage.getItem('returnUrl');
+
+                if (returnUrl) {
+                    localStorage.removeItem('returnUrl');
+                    window.location.href = returnUrl;
+                } else {
+                    window.location.href = 'Holistic_profile.html';
+                }
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                showPopup("שגיאת תקשורת בחיבור לשרת.", true);
             }
-
-            // שמירת הטוקן ופרטי המשתמש בדפדפן
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
-
-            // שליפת לינק לחזרה לאחר לוגין
-            const returnUrl = localStorage.getItem('returnUrl');
-
-            if (returnUrl) {
-                // אם יש כתובת שמורה לחזרה - ננקה אותה ונעבור אליה
-                localStorage.removeItem('returnUrl');
-                window.location.href = returnUrl;
-            } else {
-                // אחרת - נלך לדף הבית הרגיל
-                window.location.href = 'Holistic_profile.html';
-            }
-
-        } catch (error) {
-            console.error("Login Error:", error);
-            showPopup("שגיאת תקשורת בחיבור לשרת.", true);
-        }
-    });
+        });
+    }
 
     // ==========================================
     // לוגיקה להרשמה (Signup)
     // ==========================================
-    signupForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    if (signupForm) {
+        signupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        // איסוף הנתונים מהטופס
-        // שימי לב: המפתחות (Keys) חייבים להתאים למה שכתוב ב-auth.js
-        const payload = {
-            first_name: document.getElementById("firstName").value,
-            last_name: document.getElementById("lastName").value,
-            email: document.getElementById("signupEmail").value,
-            password: document.getElementById("signupPassword").value,
-            phone_number: document.getElementById("signupPhone").value,
-            user_type: "regular" // ברירת מחדל
-        };
+            const payload = {
+                first_name: document.getElementById("firstName").value,
+                last_name: document.getElementById("lastName").value,
+                email: document.getElementById("signupEmail").value,
+                password: document.getElementById("signupPassword").value,
+                phone_number: document.getElementById("signupPhone").value,
+                user_type: "regular"
+            };
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const response = await fetch(`${API_BASE_URL}/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (!response.ok) {
-                // אם המייל כבר קיים או שיש שגיאה אחרת
-                showPopup(data.message, true);
-                return;
+                if (!response.ok) {
+                    showPopup(data.message, true);
+                    return;
+                }
+
+                alert("ההרשמה בוצעה בהצלחה! אנא התחברי.");
+                signupForm.reset();
+
+                // אם יש טאבים – נחזור להתחברות
+                if (loginTabBtn) {
+                    const loginTab = new bootstrap.Tab(loginTabBtn);
+                    loginTab.show();
+                } else {
+                    // אחרת – מעבר רגיל לדף התחברות
+                    window.location.href = "login.html";
+                }
+
+            } catch (error) {
+                console.error("Signup Error:", error);
+                showPopup("שגיאה בעת ההרשמה. נסי שוב מאוחר יותר.", true);
             }
-
-            // הרשמה הצליחה!
-            alert("ההרשמה בוצעה בהצלחה! אנא התחברי.");
-            
-            // איפוס הטופס
-            signupForm.reset();
-            
-            // מעבר לטאב התחברות
-            const loginTab = new bootstrap.Tab(loginTabBtn);
-            loginTab.show();
-
-        } catch (error) {
-            console.error("Signup Error:", error);
-            showPopup("שגיאה בעת ההרשמה. נסי שוב מאוחר יותר.", true);
-        }
-    });
+        });
+    }
 
     // ==========================================
     // פונקציה להצגת הודעות (Error/Info Popup)
     // ==========================================
     function showPopup(message, isError = false) {
         const modalEl = document.getElementById("errorModal");
+
+        // אם אין modal בדף – ניפול חזרה ל-alert (בטוח)
+        if (!modalEl) {
+            alert(message);
+            return;
+        }
+
         const msgEl = document.getElementById("errorModalMessage");
         const actionBtn = document.getElementById("modalActionBtn");
         const titleEl = modalEl.querySelector("h5");
@@ -115,17 +121,11 @@ document.addEventListener("DOMContentLoaded", () => {
         msgEl.textContent = message;
 
         if (isError) {
-            titleEl.style.color = "#d9534f"; // אדום
+            titleEl.style.color = "#d9534f";
             titleEl.textContent = "שגיאה";
-            
-            // אם זו שגיאת התחברות ספציפית, אפשר להציע מעבר להרשמה
-            if (message.includes("לא נמצא") || message.includes("שגויים")) {
-                actionBtn.textContent = "נסה שוב";
-            } else {
-                actionBtn.textContent = "סגור";
-            }
+            actionBtn.textContent = "סגור";
         } else {
-            titleEl.style.color = "#5cb85c"; // ירוק
+            titleEl.style.color = "#5cb85c";
             titleEl.textContent = "הצלחה";
             actionBtn.textContent = "אישור";
         }
