@@ -3,79 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoNet - הוספת מרחב חדש</title>
-    <link rel="stylesheet" href="add_space.css">
-    <!-- פונט אחיד -->
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>CoNet | הוספת מרחב חדש</title>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS גלובלי -->
+    <link rel="stylesheet" href="auth.css">
 </head>
 <body>
 
-    <header>
-        <h1>ניהול מרחבים - הוספת מרחב חדש</h1>
-    </header>
+<!-- =========================
+     TOP NAVBAR
+========================= -->
+<header class="conet-navbar">
+    <div class="conet-navbar-inner">
 
-    <div class="main-container">
-        <form id="add-space-form" class="space-form">
-            <h2>פרטי המרחב</h2>
-            
-            <div class="form-group">
-                <label for="space_name">שם המרחב *</label>
-                <input type="text" id="space_name" required placeholder="למשל: WeWork Rothschild">
-            </div>
+        <!-- לוגו -->
+        <div class="conet-logo">
+            <img src="conetnew_logo.jpg" alt="CoNet">
+        </div>
 
-            <!-- שדה כתובת חכם שמשלים אוטומטית מגוגל -->
-            <div class="form-group">
-                <label for="address">כתובת (התחל להקליד לבחירה אוטומטית) *</label>
-                <input type="text" id="address" required placeholder="הזן כתובת...">
-                <!-- שדות נסתרים לשמירת הקואורדינטות -->
-                <input type="hidden" id="latitude">
-                <input type="hidden" id="longitude">
-                <input type="hidden" id="google_place_id">
-            </div>
+        <!-- תפריט -->
+        <nav class="conet-nav-links">
+            <a href="Holistic_profile.html">הפרופיל שלי</a>
+            <a href="communities.html">הקהילות של CoNet</a>
+            <a href="spaces.html">המרחבים של CoNet</a>
+            <a href="events.html">האירועים של CoNet</a>
+        </nav>
 
-            <div class="form-group">
-                <label for="description">תיאור המרחב</label>
-                <textarea id="description" rows="3" placeholder="תאר את המרחב, האווירה, למי הוא מתאים..."></textarea>
-            </div>
+        <!-- משתמש -->
+        <div class="conet-user">
+            <span class="conet-greeting">שלום, אורח</span>
 
-            <div class="row">
-                <div class="form-group half">
-                    <label for="seats_available">מספר מקומות זמינים *</label>
-                    <input type="number" id="seats_available" required min="1">
-                </div>
-            </div>
+            <!-- התחברות -->
+            <button
+                class="conet-logout-btn"
+                onclick="window.location.href='login.html'">
+                התחברות
+            </button>
 
-            <div class="row">
-                <div class="form-group half">
-                    <label for="opening_hours">שעת פתיחה</label>
-                    <input type="time" id="opening_hours">
-                </div>
-                <div class="form-group half">
-                    <label for="closing_hours">שעת סגירה</label>
-                    <input type="time" id="closing_hours">
-                </div>
-            </div>
+            <!-- התנתקות -->
+            <button
+                class="conet-logout-btn"
+                onclick="logoutUser()">
+                התנתק
+            </button>
+        </div>
 
-            <div class="form-group">
-                <label>שירותים ומתקנים</label>
-                <div id="facilities-container" class="facilities-grid">
-                    <!-- הצ'ק בוקסים ייטענו כאן דינמית -->
-                    טוען אפשרויות...
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="submit-btn">שמור והוסף למפה</button>
-                <button type="button" class="cancel-btn" onclick="window.history.back()">ביטול</button>
-            </div>
-        </form>
     </div>
+</header>
 
-    <!-- סקריפט הלוגיקה -->
-    <script src="add_space.js"></script>
+<!-- =========================
+     PAGE CONTENT
+========================= -->
+<div class="auth-wrapper">
 
-    <!-- טעינת ספריית Places של גוגל - החליפי במפתח שלך -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2pWQv1C-WebD3Y19f8jjzF79wgOBlRys&libraries=places&callback=initAutocomplete" async defer></script>
+    <div class="auth-container">
+
+        <div class="auth-card">
+
+            <h2 class="auth-heading">הוספת מרחב חדש</h2>
+            <p class="auth-subtext">מילוי פרטי המרחב לצורך הצגה במפה</p>
+
+            <form id="add-space-form" class="form-inner">
+
+                <div>
+                    <label for="space_name">שם המרחב *</label>
+                    <input
+                        type="text"
+                        id="space_name"
+                        class="form-control"
+                        placeholder="למשל: WeWork Rothschild"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="address">כתובת *</label>
+                    <input
+                        type="text"
+                        id="address"
+                        class="form-control"
+                        placeholder="התחל להקליד כתובת..."
+                        required
+                    >
+                    <input type="hidden" id="latitude">
+                    <input type="hidden" id="longitude">
+                    <input type="hidden" id="google_place_id">
+                </div>
+
+                <div>
+                    <label for="description">תיאור המרחב</label>
+                    <textarea
+                        id="description"
+                        class="form-control"
+                        rows="3"
+                        placeholder="תאר את המרחב, האווירה ולמי הוא מתאים"
+                        style="border-radius: 20px;"
+                    ></textarea>
+                </div>
+
+                <div>
+                    <label for="seats_available">מספר מקומות זמינים *</label>
+                    <input
+                        type="number"
+                        id="seats_available"
+                        class="form-control"
+                        min="1"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="opening_hours">שעת פתיחה</label>
+                    <input type="time" id="opening_hours" class="form-control">
+                </div>
+
+                <div>
+                    <label for="closing_hours">שעת סגירה</label>
+                    <input type="time" id="closing_hours" class="form-control">
+                </div>
+
+                <div>
+                    <label>שירותים ומתקנים</label>
+                    <div id="facilities-container" style="font-size: 0.85rem; color:#6b7280;">
+                        טוען אפשרויות...
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    שמור והוסף למפה
+                </button>
+
+                <div class="auth-switch">
+                    <a href="javascript:history.back()">ביטול</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="add_space.js"></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2pWQv1C-WebD3Y19f8jjzF79wgOBlRys&libraries=places&callback=initAutocomplete"
+    async
+    defer>
+</script>
 
 </body>
 </html>
