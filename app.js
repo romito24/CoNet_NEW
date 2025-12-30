@@ -89,6 +89,11 @@ app.get('/new_event', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'new_event.html'));
 });
 
+// דף הוספת קהילה
+app.get('/add_community', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'new_community.html'));
+});
+
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
