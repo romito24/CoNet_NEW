@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        await loadUserDetails(); // זה קריטי - כאן נקבע איזה טאבים להציג
+        await loadUserDetails(); 
         switchTab('my-orders');
     } catch (error) {
         console.error("Auth failed", error);
@@ -29,7 +29,6 @@ async function loadUserDetails() {
     currentUser = user;
     document.getElementById('nav-username').innerText = `שלום, ${user.first_name}`;
 
-    // מילוי פרטים אישיים
     setText('detail-name', `${user.first_name} ${user.last_name}`);
     setText('detail-email', user.email);
     setText('detail-phone', user.phone_number || '-');
@@ -38,7 +37,6 @@ async function loadUserDetails() {
         setText('detail-date', new Date(user.registration_date).toLocaleDateString('he-IL'));
     }
 
-    // --- לוגיקה להצגת טאבים לפי הרשאה ---
     if (user.user_type === 'community_manager') {
         document.getElementById('btn-managed-communities').style.display = 'flex';
     }
@@ -47,7 +45,6 @@ async function loadUserDetails() {
         document.getElementById('btn-incoming-orders').style.display = 'flex';
     }
     if (user.user_type === 'admin') {
-        // אדמין רואה הכל (לצורך הדגמה)
         document.getElementById('btn-managed-communities').style.display = 'flex';
         document.getElementById('btn-managed-spaces').style.display = 'flex';
         document.getElementById('btn-incoming-orders').style.display = 'flex';
@@ -62,12 +59,10 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active-content'));
     document.getElementById(tabId).classList.add('active-content');
 
-    // טעינת מידע לפי דרישה
     if (tabId === 'my-orders') loadMyOrders();
     if (tabId === 'my-events') loadMyEvents();
     if (tabId === 'my-communities') loadMyCommunities();
     
-    // טעינת מידע לטאבים של מנהלים
     if (tabId === 'managed-communities') loadManagedCommunities();
     if (tabId === 'managed-spaces') loadManagedSpaces();
     if (tabId === 'incoming-orders') loadIncomingOrders();
@@ -79,7 +74,7 @@ function logout() {
 }
 
 // ==========================================
-// 1. נתונים בסיסיים (לכולם)
+// 1. נתונים בסיסיים
 // ==========================================
 async function loadMyOrders() {
     const container = document.getElementById('orders-list');
@@ -123,14 +118,12 @@ async function loadManagedCommunities() {
     const container = document.getElementById('managed-communities-list');
     container.innerHTML = '<div class="loading">טוען קהילות בניהולך...</div>';
     
-    // קריאה לנתיב החדש שיצרנו/וידאנו ב-Backend
     const communities = await fetchData('/communities/my-managing');
     
     if (!communities || communities.length === 0) {
         container.innerHTML = `<div class="empty-state"><p>אינך מנהל קהילות כרגע.</p></div>`;
         return;
     }
-    // הפרמטר true אומר: תוסיף כפתור עריכה
     container.innerHTML = communities.map(c => createCommunityCard(c, true)).join('');
 }
 
@@ -159,7 +152,7 @@ async function saveCommunityChanges() {
     if (res.ok) {
         alert('הקהילה עודכנה בהצלחה');
         closeModal('editCommunityModal');
-        loadManagedCommunities(); // ריענון
+        loadManagedCommunities();
     } else {
         alert('שגיאה בעדכון הקהילה');
     }
@@ -172,7 +165,6 @@ async function loadManagedSpaces() {
     const container = document.getElementById('managed-spaces-list');
     container.innerHTML = '<div class="loading">טוען מרחבים בניהולך...</div>';
     
-    // קריאה לנתיב החדש שיצרנו ב-Backend
     const spaces = await fetchData('/spaces/my-managing');
 
     if (!spaces || spaces.length === 0) {
@@ -225,12 +217,11 @@ async function saveSpaceChanges() {
     }
 }
 
-// --- לוח טיסות (Incoming Orders) ---
+// --- לוח טיסות ---
 async function loadIncomingOrders() {
     const container = document.getElementById('flight-board-list');
     container.innerHTML = '<div class="loading">טוען לוח הזמנות...</div>';
 
-    // קריאה לנתיב החדש שיצרנו ב-Backend
     const orders = await fetchData('/orders/incoming');
 
     if (!orders || orders.length === 0) {
@@ -252,7 +243,7 @@ async function loadIncomingOrders() {
             badgeText = 'היום';
             badgeClass = 'badge-today';
         } else if (orderDate === tomorrow) {
-            statusClass = 'future'; // צהוב גם למחר
+            statusClass = 'future';
             badgeText = 'מחר';
         } else {
             badgeText = new Date(order.start_time).toLocaleDateString('he-IL');
@@ -279,7 +270,7 @@ async function loadIncomingOrders() {
 }
 
 // ==========================================
-// Helpers & Generators
+// Helpers
 // ==========================================
 function createOrderCard(order) {
     const dateStr = new Date(order.start_time).toLocaleDateString('he-IL');
@@ -332,7 +323,6 @@ function createCommunityCard(c, isManagerMode) {
     </div>`;
 }
 
-// --- Utils ---
 async function fetchData(endpoint) {
     try {
         const res = await fetch(`${API_URL}${endpoint}`, { headers: getHeaders() });
@@ -355,13 +345,11 @@ async function cancelEventRegistration(id) {
     if((await fetch(`${API_URL}/events/${id}/cancel`, {method:'PATCH', headers:getHeaders()})).ok) { closeModal('confirmModal'); loadMyEvents(); }
 }
 
-// Modal Handling
 function closeModal(id) { document.getElementById(id).style.display = 'none'; currentActionCallback = null; }
 function confirmAction(t, txt, cb) { document.getElementById('modalTitle').innerText=t; document.getElementById('modalText').innerText=txt; currentActionCallback=cb; document.getElementById('confirmModal').style.display='block'; }
 document.getElementById('modalConfirmBtn').onclick = () => { if(currentActionCallback) currentActionCallback(); };
 window.onclick = (e) => { if(e.target.classList.contains('modal')) e.target.style.display='none'; };
 
-// --- פונקציה למעבר לצ'אט (הוספה חדשה) ---
 function navigateToChat(communityId, communityName) {
     window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
 }
