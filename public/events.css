@@ -1,147 +1,187 @@
+/* =================================================
+   EVENTS – CoNet FINAL CSS (NO BODY BACKGROUND)
+================================================= */
+
 :root {
-    --primary-color: #4a90e2;
-    --primary-hover: #357abd;
-    --secondary-color: #f5f5f5;
-    --text-color: #333;
+    --primary-blue: #2C80FF;
+    --primary-hover: #2563eb;
     --card-bg: #ffffff;
-    --shadow: 0 4px 6px rgba(0,0,0,0.1);
+    --text-main: #1f2937;
+    --text-secondary: #6b7280;
+    --border-soft: #d1d9e6;
+    --accent-green: #22c55e;
+    --accent-gray: #9ca3af;
 }
-
+/* =========================
+   PAGE BASE
+========================= */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-    color: var(--text-color);
+    direction: rtl;
+    color: var(--text-main);
+
+    /* 🔥 זה התיקון הקריטי */
+    min-height: 100vh;
 }
 
-header {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 2rem 1rem;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-header h1 {
-    margin: 0;
-    font-size: 2.5rem;
-}
-
+/* =========================
+   MAIN CONTAINER
+========================= */
 .main-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 32px 20px 80px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
-/* --- Filters Bar ---- */
+/* =========================
+   FILTERS BAR
+========================= */
 .filters-bar {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: var(--shadow);
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: 24px;
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.06),
+        0 30px 60px rgba(79,163,247,0.12);
+
     display: flex;
-    gap: 15px;
+    gap: 12px;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
+/* Search */
 .search-box {
-    flex: 1;
-    min-width: 250px;
+    flex: 1 1 320px;
+    max-width: 420px;
 }
 
 .search-box input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
+    padding: 12px 18px;
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    font-size: 0.95rem;
 }
 
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(44,128,255,0.15);
+}
+
+/* Date filter */
 .date-filter {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-main);
 }
 
 .date-filter input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--border-soft);
 }
 
-button {
-    padding: 10px 20px;
+/* =========================
+   BUTTONS – CoNet STYLE
+========================= */
+.filters-bar button,
+.card-actions button {
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-size: 0.9rem;
     font-weight: 600;
-    transition: background 0.3s;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.filters-bar button:hover,
+.card-actions button:hover {
+    box-shadow: 0 0 0 3px rgba(44,128,255,0.25);
+}
+
+.filters-bar button:active,
+.card-actions button:active {
+    transform: scale(0.97);
 }
 
 .filter-btn {
-    background-color: var(--primary-color);
+    background: var(--primary-blue);
     color: white;
 }
 
 .filter-btn:hover {
-    background-color: var(--primary-hover);
+    background: var(--primary-hover);
 }
 
 .reset-btn {
-    background-color: #e0e0e0;
-    color: #333;
+    background: white;
+    border: 1.5px solid var(--border-soft);
+    color: var(--text-main);
 }
 
 .reset-btn:hover {
-    background-color: #d0d0d0;
+    background: rgba(44,128,255,0.08);
 }
 
-/* --- Events Grid --- */
+/* =========================
+   EVENTS GRID
+========================= */
 .events-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+    gap: 28px;
 }
 
+/* =========================
+   EVENT CARD
+========================= */
 .event-card {
     background: var(--card-bg);
-    border-radius: 12px;
+    border-radius: 22px;
     overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
 }
 
 .event-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
+/* Image */
 .card-image {
-    height: 160px;
-    background-color: #eee;
+    height: 170px;
+    background-color: #e5ecfb;
     background-size: cover;
     background-position: center;
     position: relative;
 }
 
-/* תגית קהילה על התמונה */
+/* Community badge */
 .community-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
+    top: 12px;
+    right: 12px;
+    background: rgba(44,128,255,0.9);
     color: white;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
+/* Content */
 .card-content {
     padding: 20px;
     flex: 1;
@@ -150,58 +190,77 @@ button {
 }
 
 .card-content h3 {
-    margin: 0 0 10px 0;
-    color: var(--primary-color);
-    font-size: 1.4rem;
+    margin: 0 0 10px;
+    color: var(--primary-blue);
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
+/* Info rows */
 .info-row {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
-    color: #555;
-    font-size: 14px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
 }
 
+/* Participants */
 .participants-count {
     margin-top: auto;
-    padding-top: 15px;
-    font-size: 13px;
-    color: #777;
-    border-top: 1px solid #eee;
+    padding-top: 14px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    border-top: 1px solid #eef2ff;
+}
+
+/* =========================
+   CARD ACTIONS
+========================= */
+.card-actions {
+    padding: 0 20px 20px;
 }
 
 .register-btn {
     width: 100%;
-    margin-top: 15px;
     padding: 12px;
-    background-color: #2ecc71;
+    background: var(--accent-green);
     color: white;
-    font-size: 16px;
-    border-radius: 6px;
+    border-radius: 999px;
+    font-weight: 600;
 }
 
 .register-btn:hover {
-    background-color: #27ae60;
+    background: #16a34a;
 }
 
 .register-btn.full {
-    background-color: #95a5a6;
+    background: var(--accent-gray);
     cursor: not-allowed;
 }
 
-.loading, .no-results {
+/* =========================
+   STATES
+========================= */
+.loading,
+.no-results {
     text-align: center;
-    font-size: 1.2rem;
-    color: #666;
-    padding: 40px;
-    width: 100%;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-top: 50px;
 }
 
+/* =========================
+   MOBILE
+========================= */
 @media (max-width: 768px) {
     .filters-bar {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .filters-bar button {
+        width: 100%;
     }
 }
