@@ -4,19 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoNet - חיפוש מרחבי עבודה</title>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Global CSS (banner + forms) -->
+    <link rel="stylesheet" href="auth.css">
+
+    <!-- Page specific CSS -->
     <link rel="stylesheet" href="search.css">
 </head>
+
 <body>
 
+<!-- =========================
+     TOP NAVBAR (GLOBAL)
+========================= -->
+<header class="conet-navbar">
+    <div class="conet-navbar-inner">
+
+        <!-- LOGO -->
+        <div class="conet-logo">
+            <img src="conetnew_logo.jpg" alt="CoNet">
+        </div>
+
+        <!-- NAV -->
+        <nav class="conet-nav-links">
+            <a href="profile.html">הפרופיל שלי</a>
+            <a href="communities.html">הקהילות של CoNet</a>
+            <a href="search.html" class="active">המרחבים של CoNet</a>
+            <a href="events.html">האירועים של CoNet</a>
+        </nav>
+
+        <!-- USER AREA -->
+        <div class="conet-user">
+            <span class="conet-greeting" id="userGreeting">שלום, אורח</span>
+
+            <button
+                id="loginBtn"
+                class="conet-logout-btn"
+                onclick="window.location.href='login.html'">
+                התחברות
+            </button>
+
+            <button
+                id="logoutBtn"
+                class="conet-logout-btn"
+                onclick="logoutUser()">
+                התנתק
+            </button>
+        </div>
+
+    </div>
+</header>
+
+<!-- =========================
+     PAGE CONTENT
+========================= -->
 <div class="app-container">
+
+    <!-- SIDEBAR -->
     <aside class="sidebar">
+
         <header class="sidebar-header">
             <h1><i class="fa-solid fa-layer-group"></i> CoNet</h1>
             <p>איתור מרחבי עבודה משותפים</p>
         </header>
 
         <div class="filters-section">
+
             <div class="control-group">
                 <label class="input-label">המיקום שלי</label>
                 <button class="location-btn" onclick="getCurrentLocation()">
@@ -29,12 +88,20 @@
                     <label class="input-label">רדיוס חיפוש</label>
                     <span id="radius-value">10 ק"מ</span>
                 </div>
-                <input type="range" id="radius" min="1" max="50" value="10" class="range-slider" oninput="updateRadiusLabel(this.value)">
+                <input
+                    type="range"
+                    id="radius"
+                    min="1"
+                    max="50"
+                    value="10"
+                    class="range-slider"
+                    oninput="updateRadiusLabel(this.value)"
+                >
             </div>
 
             <div class="control-group">
                 <label class="input-label">סינון לפי שירותים</label>
-                
+
                 <div class="multiselect">
                     <div class="selectBox" onclick="toggleCheckboxes()">
                         <select>
@@ -42,31 +109,44 @@
                         </select>
                         <div class="overSelect"></div>
                     </div>
+
                     <div id="checkboxes" class="checkboxes-dropdown">
                         <div style="padding:10px; color:#999;">טוען...</div>
                     </div>
                 </div>
-                <div id="selection-summary" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
+
+                <div
+                    id="selection-summary"
+                    style="font-size: 12px; color: #666; margin-top: 5px;">
+                </div>
             </div>
 
             <button class="search-btn" onclick="searchSpaces()">
                 <i class="fa-solid fa-magnifying-glass"></i> חפש מרחבים
             </button>
         </div>
-        
+
         <div class="results-header">תוצאות חיפוש</div>
+
         <div class="results-list" id="results-container">
             <div class="empty-state">
                 <i class="fa-regular fa-map"></i>
                 <p>אנא בצע חיפוש כדי לראות תוצאות</p>
             </div>
         </div>
+
     </aside>
 
+    <!-- MAP -->
     <main id="map"></main>
+
 </div>
 
+<!-- =========================
+     SCRIPTS – KEEP AS IS
+========================= -->
 <script src="search.js"></script>
+
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2pWQv1C-WebD3Y19f8jjzF79wgOBlRys&callback=initMap&libraries=places&v=weekly" async defer></script>
 
 <script>
@@ -74,20 +154,13 @@
         document.getElementById('radius-value').innerText = val + ' ק"מ';
     }
 
-    // פונקציה לפתיחה/סגירה של ה-Dropdown
     let expanded = false;
     function toggleCheckboxes() {
         const checkboxes = document.getElementById("checkboxes");
-        if (!expanded) {
-            checkboxes.style.display = "block";
-            expanded = true;
-        } else {
-            checkboxes.style.display = "none";
-            expanded = false;
-        }
+        checkboxes.style.display = expanded ? "none" : "block";
+        expanded = !expanded;
     }
 
-    // סגירת ה-Dropdown אם לוחצים מחוץ לו
     document.addEventListener('click', function(e) {
         const container = document.querySelector('.multiselect');
         if (!container.contains(e.target) && expanded) {
