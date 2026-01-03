@@ -1,3 +1,6 @@
+// שורת בדיקה
+console.log("✅ Holistic Profile JS Loaded Successfully");
+
 const API_URL = '/api';
 
 let currentUser = null;
@@ -5,10 +8,12 @@ let currentActionCallback = null;
 
 // --- אתחול ---
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log("🚀 DOM Content Loaded");
+    
     const token = localStorage.getItem('token');
     if (!token) {
-        console.warn("No token found.");
-        // window.location.href = 'login.html';
+        console.warn("⚠️ No token found via localStorage. Redirecting to login.");
+        window.location.href = 'login.html';
         return;
     }
 
@@ -16,18 +21,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadUserDetails(); 
         switchTab('my-orders');
     } catch (error) {
-        console.error("Auth failed", error);
-        logout();
+        console.error("❌ Auth failed in initialization:", error);
+        // logout(); // אופציונלי
     }
 });
 
-// --- Auth & User Details ---
+// --- טעינת פרטי משתמש ---
 async function loadUserDetails() {
-    const user = await fetchData('/auth/me');
-    if (!user) return;
+    let user = null;
+
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        try {
+            user = JSON.parse(storedUser);
+            console.log("👤 User loaded from LocalStorage:", user);
+        } catch (e) {
+            console.error("⚠️ Error parsing user from storage", e);
+        }
+    }
+
+    if (!user) {
+        console.log("🌐 User not in storage, fetching from server...");
+        user = await fetchData('/auth/me');
+    }
+
+    if (!user) {
+        throw new Error("Could not load user details (User object is null)");
+    }
 
     currentUser = user;
-    document.getElementById('nav-username').innerText = `שלום, ${user.first_name}`;
+
+    const navName = document.getElementById('nav-username');
+    if (navName) navName.innerText = `שלום, ${user.first_name}`;
 
     setText('detail-name', `${user.first_name} ${user.last_name}`);
     setText('detail-email', user.email);
@@ -37,48 +62,59 @@ async function loadUserDetails() {
         setText('detail-date', new Date(user.registration_date).toLocaleDateString('he-IL'));
     }
 
+    console.log("🔑 User Type:", user.user_type);
+    
     if (user.user_type === 'community_manager') {
-        document.getElementById('btn-managed-communities').style.display = 'flex';
+        showElement('btn-managed-communities');
     }
     if (user.user_type === 'space_manager') {
-        document.getElementById('btn-managed-spaces').style.display = 'flex';
-        document.getElementById('btn-incoming-orders').style.display = 'flex';
+        showElement('btn-managed-spaces');
+        showElement('btn-incoming-orders');
     }
     if (user.user_type === 'admin') {
-        document.getElementById('btn-managed-communities').style.display = 'flex';
-        document.getElementById('btn-managed-spaces').style.display = 'flex';
-        document.getElementById('btn-incoming-orders').style.display = 'flex';
+        showElement('btn-managed-communities');
+        showElement('btn-managed-spaces');
+        showElement('btn-incoming-orders');
     }
 }
 
 // --- Navigation ---
 function switchTab(tabId) {
+    console.log("Tab switched to:", tabId);
+    
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`btn-${tabId}`).classList.add('active');
-
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active-content'));
-    document.getElementById(tabId).classList.add('active-content');
+
+    const btn = document.getElementById(`btn-${tabId}`);
+    const content = document.getElementById(tabId);
+    
+    if (btn) btn.classList.add('active');
+    if (content) content.classList.add('active-content');
 
     if (tabId === 'my-orders') loadMyOrders();
     if (tabId === 'my-events') loadMyEvents();
     if (tabId === 'my-communities') loadMyCommunities();
-    
     if (tabId === 'managed-communities') loadManagedCommunities();
     if (tabId === 'managed-spaces') loadManagedSpaces();
     if (tabId === 'incoming-orders') loadIncomingOrders();
 }
 
 function logout() {
+    console.log("👋 Logging out...");
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     window.location.href = 'login.html';
 }
 
 // ==========================================
-// 1. נתונים בסיסיים
+// פונקציות טעינת נתונים
 // ==========================================
+
 async function loadMyOrders() {
     const container = document.getElementById('orders-list');
+    if(!container) return;
     container.innerHTML = '<div class="loading">טוען הזמנות...</div>';
+    
     const orders = await fetchData('/orders/my-orders');
     const activeOrders = orders ? orders.filter(order => order.status !== 'canceled') : [];
 
@@ -91,7 +127,9 @@ async function loadMyOrders() {
 
 async function loadMyEvents() {
     const container = document.getElementById('events-list');
+    if(!container) return;
     container.innerHTML = '<div class="loading">טוען אירועים...</div>';
+    
     const events = await fetchData('/events/my-events');
     if (!events || events.length === 0) {
         container.innerHTML = `<div class="empty-state"><i class="fas fa-ticket-alt" style="font-size:40px; margin-bottom:10px;"></i><p>לא נרשמת לאירועים.</p></div>`;
@@ -102,7 +140,9 @@ async function loadMyEvents() {
 
 async function loadMyCommunities() {
     const container = document.getElementById('communities-list');
+    if(!container) return;
     container.innerHTML = '<div class="loading">טוען קהילות...</div>';
+    
     const communities = await fetchData('/communities/my-communities');
     if (!communities || communities.length === 0) {
         container.innerHTML = `<div class="empty-state"><i class="fas fa-users-slash" style="font-size:40px; margin-bottom:10px;"></i><p>אינך חבר בקהילות.</p></div>`;
@@ -111,67 +151,49 @@ async function loadMyCommunities() {
     container.innerHTML = communities.map(c => createCommunityCard(c, false)).join('');
 }
 
-// ==========================================
-// 2. פונקציות למנהלי קהילה
-// ==========================================
+// --- מנהלים ---
+
 async function loadManagedCommunities() {
     const container = document.getElementById('managed-communities-list');
+    if(!container) return;
+    
+    // הכפתור החדש ליצירת קהילה
+    const createBtnHtml = `
+        <div style="width: 100%; text-align: left; margin-bottom: 20px;">
+            <button onclick="window.location.href='new_community.html'" class="btn-primary" style="padding: 10px 20px; border-radius: 5px; cursor: pointer; background-color: #28a745; color: white; border: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-plus"></i> יצירת קהילה חדשה
+            </button>
+        </div>
+    `;
+
     container.innerHTML = '<div class="loading">טוען קהילות בניהולך...</div>';
     
     const communities = await fetchData('/communities/my-managing');
     
+    // אם אין קהילות
     if (!communities || communities.length === 0) {
-        container.innerHTML = `<div class="empty-state"><p>אינך מנהל קהילות כרגע.</p></div>`;
+        container.innerHTML = `
+            ${createBtnHtml}
+            <div class="empty-state"><p>אינך מנהל קהילות כרגע. זה הזמן ליצור אחת!</p></div>
+        `;
         return;
     }
-    container.innerHTML = communities.map(c => createCommunityCard(c, true)).join('');
+
+    // אם יש קהילות
+    const listHtml = communities.map(c => createCommunityCard(c, true)).join('');
+    container.innerHTML = createBtnHtml + listHtml;
 }
 
-function openEditCommunityModal(id, name, subject, image) {
-    document.getElementById('edit-community-id').value = id;
-    document.getElementById('edit-community-name').value = name;
-    document.getElementById('edit-community-subject').value = subject;
-    document.getElementById('edit-community-image').value = image || '';
-    document.getElementById('editCommunityModal').style.display = 'block';
-}
-
-async function saveCommunityChanges() {
-    const id = document.getElementById('edit-community-id').value;
-    const body = {
-        community_name: document.getElementById('edit-community-name').value,
-        main_subject: document.getElementById('edit-community-subject').value,
-        image_url: document.getElementById('edit-community-image').value
-    };
-
-    const res = await fetch(`${API_URL}/communities/${id}`, {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify(body)
-    });
-
-    if (res.ok) {
-        alert('הקהילה עודכנה בהצלחה');
-        closeModal('editCommunityModal');
-        loadManagedCommunities();
-    } else {
-        alert('שגיאה בעדכון הקהילה');
-    }
-}
-
-// ==========================================
-// 3. פונקציות למנהלי מרחב
-// ==========================================
 async function loadManagedSpaces() {
     const container = document.getElementById('managed-spaces-list');
+    if(!container) return;
     container.innerHTML = '<div class="loading">טוען מרחבים בניהולך...</div>';
     
     const spaces = await fetchData('/spaces/my-managing');
-
     if (!spaces || spaces.length === 0) {
         container.innerHTML = `<div class="empty-state"><p>אינך מנהל מרחבים כרגע.</p></div>`;
         return;
     }
-
     container.innerHTML = spaces.map(s => `
         <div class="card">
             <h3>${s.space_name}</h3>
@@ -184,51 +206,17 @@ async function loadManagedSpaces() {
     `).join('');
 }
 
-function openEditSpaceModal(id, name, address, seats, desc) {
-    document.getElementById('edit-space-id').value = id;
-    document.getElementById('edit-space-name').value = name;
-    document.getElementById('edit-space-address').value = address;
-    document.getElementById('edit-space-seats').value = seats;
-    document.getElementById('edit-space-desc').value = desc;
-    document.getElementById('editSpaceModal').style.display = 'block';
-}
-
-async function saveSpaceChanges() {
-    const id = document.getElementById('edit-space-id').value;
-    const body = {
-        space_name: document.getElementById('edit-space-name').value,
-        address: document.getElementById('edit-space-address').value,
-        seats_available: document.getElementById('edit-space-seats').value,
-        description: document.getElementById('edit-space-desc').value
-    };
-
-    const res = await fetch(`${API_URL}/spaces/${id}`, {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify(body)
-    });
-
-    if (res.ok) {
-        alert('המרחב עודכן בהצלחה');
-        closeModal('editSpaceModal');
-        loadManagedSpaces();
-    } else {
-        alert('שגיאה בעדכון המרחב');
-    }
-}
-
-// --- לוח טיסות ---
 async function loadIncomingOrders() {
     const container = document.getElementById('flight-board-list');
+    if(!container) return;
     container.innerHTML = '<div class="loading">טוען לוח הזמנות...</div>';
 
     const orders = await fetchData('/orders/incoming');
-
     if (!orders || orders.length === 0) {
         container.innerHTML = `<div class="empty-state"><i class="fas fa-plane-slash" style="font-size:40px;"></i><p>אין הזמנות נכנסות בקרוב.</p></div>`;
         return;
     }
-
+    
     const today = new Date().setHours(0,0,0,0);
     const tomorrow = new Date(today + 86400000).setHours(0,0,0,0);
 
@@ -272,6 +260,7 @@ async function loadIncomingOrders() {
 // ==========================================
 // Helpers
 // ==========================================
+
 function createOrderCard(order) {
     const dateStr = new Date(order.start_time).toLocaleDateString('he-IL');
     const timeStart = new Date(order.start_time).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
@@ -325,30 +314,136 @@ function createCommunityCard(c, isManagerMode) {
 
 async function fetchData(endpoint) {
     try {
+        console.log(`📡 Fetching: ${endpoint}`);
         const res = await fetch(`${API_URL}${endpoint}`, { headers: getHeaders() });
-        if (res.status === 401) { console.error("Token invalid"); return null; }
+        if (res.status === 401) { 
+            console.error("Token invalid or expired"); 
+            return null; 
+        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return await res.json();
-    } catch (err) { console.error(err); return null; }
+    } catch (err) { 
+        console.error(err); 
+        return null; 
+    }
 }
 
-function getHeaders() { return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }; }
-function setText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
-function translateUserType(type) { const m={regular:'משתמש פרטי', community_manager:'מנהל קהילה', space_manager:'מנהל מרחב', admin:'אדמין'}; return m[type]||type; }
+function getHeaders() { 
+    return { 
+        'Content-Type': 'application/json', 
+        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+    }; 
+}
+
+function setText(id, text) { 
+    const el = document.getElementById(id); 
+    if (el) el.innerText = text; 
+}
+
+function showElement(id) {
+    const el = document.getElementById(id);
+    if(el) el.style.display = 'flex';
+}
+
+function translateUserType(type) { 
+    const m={regular:'משתמש פרטי', community_manager:'מנהל קהילה', space_manager:'מנהל מרחב', admin:'אדמין'}; 
+    return m[type]||type; 
+}
 function translateRole(role) { return role==='manager'?'מנהל':'חבר'; }
 function translateStatus(s) { const m={approved:'מאושר', pending:'ממתין', canceled:'בוטל', declined:'נדחה', registered:'רשום'}; return m[s]||s; }
 
+// --- Actions ---
+
 async function cancelOrder(id) { 
-    if((await fetch(`${API_URL}/orders/${id}/cancel`, {method:'PATCH', headers:getHeaders()})).ok) { closeModal('confirmModal'); loadMyOrders(); } 
+    if((await fetch(`${API_URL}/orders/${id}/cancel`, {method:'PATCH', headers:getHeaders()})).ok) { 
+        closeModal('confirmModal'); 
+        loadMyOrders(); 
+    } 
 }
 async function cancelEventRegistration(id) {
-    if((await fetch(`${API_URL}/events/${id}/cancel`, {method:'PATCH', headers:getHeaders()})).ok) { closeModal('confirmModal'); loadMyEvents(); }
+    if((await fetch(`${API_URL}/events/${id}/cancel`, {method:'PATCH', headers:getHeaders()})).ok) { 
+        closeModal('confirmModal'); 
+        loadMyEvents(); 
+    } 
 }
 
 function closeModal(id) { document.getElementById(id).style.display = 'none'; currentActionCallback = null; }
-function confirmAction(t, txt, cb) { document.getElementById('modalTitle').innerText=t; document.getElementById('modalText').innerText=txt; currentActionCallback=cb; document.getElementById('confirmModal').style.display='block'; }
-document.getElementById('modalConfirmBtn').onclick = () => { if(currentActionCallback) currentActionCallback(); };
+function confirmAction(t, txt, cb) { 
+    document.getElementById('modalTitle').innerText=t; 
+    document.getElementById('modalText').innerText=txt; 
+    currentActionCallback=cb; 
+    document.getElementById('confirmModal').style.display='block'; 
+}
+const confirmBtn = document.getElementById('modalConfirmBtn');
+if(confirmBtn) {
+    confirmBtn.onclick = () => { if(currentActionCallback) currentActionCallback(); };
+}
+
 window.onclick = (e) => { if(e.target.classList.contains('modal')) e.target.style.display='none'; };
+
+function openEditCommunityModal(id, name, subject, image) {
+    document.getElementById('edit-community-id').value = id;
+    document.getElementById('edit-community-name').value = name;
+    document.getElementById('edit-community-subject').value = subject;
+    document.getElementById('edit-community-image').value = image || '';
+    document.getElementById('editCommunityModal').style.display = 'block';
+}
+
+async function saveCommunityChanges() {
+    const id = document.getElementById('edit-community-id').value;
+    const body = {
+        community_name: document.getElementById('edit-community-name').value,
+        main_subject: document.getElementById('edit-community-subject').value,
+        image_url: document.getElementById('edit-community-image').value
+    };
+
+    const res = await fetch(`${API_URL}/communities/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+        alert('הקהילה עודכנה בהצלחה');
+        closeModal('editCommunityModal');
+        loadManagedCommunities();
+    } else {
+        alert('שגיאה בעדכון הקהילה');
+    }
+}
+
+function openEditSpaceModal(id, name, address, seats, desc) {
+    document.getElementById('edit-space-id').value = id;
+    document.getElementById('edit-space-name').value = name;
+    document.getElementById('edit-space-address').value = address;
+    document.getElementById('edit-space-seats').value = seats;
+    document.getElementById('edit-space-desc').value = desc;
+    document.getElementById('editSpaceModal').style.display = 'block';
+}
+
+async function saveSpaceChanges() {
+    const id = document.getElementById('edit-space-id').value;
+    const body = {
+        space_name: document.getElementById('edit-space-name').value,
+        address: document.getElementById('edit-space-address').value,
+        seats_available: document.getElementById('edit-space-seats').value,
+        description: document.getElementById('edit-space-desc').value
+    };
+
+    const res = await fetch(`${API_URL}/spaces/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+        alert('המרחב עודכן בהצלחה');
+        closeModal('editSpaceModal');
+        loadManagedSpaces();
+    } else {
+        alert('שגיאה בעדכון המרחב');
+    }
+}
 
 function navigateToChat(communityId, communityName) {
     window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
