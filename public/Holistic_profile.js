@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         switchTab('my-orders');
     } catch (error) {
         console.error("❌ Auth failed in initialization:", error);
-        // logout(); // אופציונלי
     }
 });
 
@@ -157,7 +156,6 @@ async function loadManagedCommunities() {
     const container = document.getElementById('managed-communities-list');
     if(!container) return;
     
-    // הכפתור החדש ליצירת קהילה
     const createBtnHtml = `
         <div style="width: 100%; text-align: left; margin-bottom: 20px;">
             <button onclick="window.location.href='new_community.html'" class="btn-primary" style="padding: 10px 20px; border-radius: 5px; cursor: pointer; background-color: #28a745; color: white; border: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
@@ -170,31 +168,47 @@ async function loadManagedCommunities() {
     
     const communities = await fetchData('/communities/my-managing');
     
-    // אם אין קהילות
     if (!communities || communities.length === 0) {
         container.innerHTML = `
             ${createBtnHtml}
-            <div class="empty-state"><p>אינך מנהל קהילות כרגע. זה הזמן ליצור אחת!</p></div>
+            <div class="empty-state"><p>אינך מנהל קהילות כרגע.</p></div>
         `;
         return;
     }
 
-    // אם יש קהילות
     const listHtml = communities.map(c => createCommunityCard(c, true)).join('');
     container.innerHTML = createBtnHtml + listHtml;
 }
 
+// --- הפונקציה שעודכנה עבור המרחבים ---
 async function loadManagedSpaces() {
     const container = document.getElementById('managed-spaces-list');
     if(!container) return;
+
+    // כפתור יצירת מרחב חדש
+    const createBtnHtml = `
+        <div style="width: 100%; text-align: left; margin-bottom: 20px;">
+            <button onclick="window.location.href='add_space.html'" class="btn-primary" style="padding: 10px 20px; border-radius: 5px; cursor: pointer; background-color: #28a745; color: white; border: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-plus"></i> יצירת מרחב חדש
+            </button>
+        </div>
+    `;
+
     container.innerHTML = '<div class="loading">טוען מרחבים בניהולך...</div>';
     
     const spaces = await fetchData('/spaces/my-managing');
+    
+    // אם אין מרחבים
     if (!spaces || spaces.length === 0) {
-        container.innerHTML = `<div class="empty-state"><p>אינך מנהל מרחבים כרגע.</p></div>`;
+        container.innerHTML = `
+            ${createBtnHtml}
+            <div class="empty-state"><p>אינך מנהל מרחבים כרגע. זה הזמן להוסיף את המרחב הראשון שלך!</p></div>
+        `;
         return;
     }
-    container.innerHTML = spaces.map(s => `
+
+    // אם יש מרחבים
+    const listHtml = spaces.map(s => `
         <div class="card">
             <h3>${s.space_name}</h3>
             <div class="card-info"><i class="fas fa-map-marker-alt"></i> ${s.address}</div>
@@ -204,6 +218,8 @@ async function loadManagedSpaces() {
             </button>
         </div>
     `).join('');
+
+    container.innerHTML = createBtnHtml + listHtml;
 }
 
 async function loadIncomingOrders() {
