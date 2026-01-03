@@ -5,26 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoNet | הוספת מרחב חדש</title>
 
-    <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- CSS גלובלי -->
     <link rel="stylesheet" href="auth.css">
 </head>
 <body>
 
-<!-- =========================
-     TOP NAVBAR
-========================= -->
 <header class="conet-navbar">
     <div class="conet-navbar-inner">
 
-        <!-- לוגו -->
         <div class="conet-logo">
             <img src="conetnew_logo.jpg" alt="CoNet">
         </div>
 
-        <!-- תפריט -->
         <nav class="conet-nav-links">
             <a href="Holistic_profile.html">הפרופיל שלי</a>
             <a href="communities.html">הקהילות של CoNet</a>
@@ -32,31 +25,14 @@
             <a href="events.html">האירועים של CoNet</a>
         </nav>
 
-        <!-- משתמש -->
         <div class="conet-user">
-            <span class="conet-greeting">שלום, אורח</span>
-
-            <!-- התחברות -->
-            <button
-                class="conet-logout-btn"
-                onclick="window.location.href='login.html'">
-                התחברות
-            </button>
-
-            <!-- התנתקות -->
-            <button
-                class="conet-logout-btn"
-                onclick="logoutUser()">
-                התנתק
-            </button>
+            <span class="conet-greeting" id="nav-username">שלום, מנהל</span>
+            <button class="conet-logout-btn" onclick="window.location.href='login.html'">התנתק</button>
         </div>
 
     </div>
 </header>
 
-<!-- =========================
-     PAGE CONTENT
-========================= -->
 <div class="auth-wrapper">
 
     <div class="auth-container">
@@ -68,7 +44,7 @@
 
             <form id="add-space-form" class="form-inner">
 
-                <div>
+                <div class="mb-3">
                     <label for="space_name">שם המרחב *</label>
                     <input
                         type="text"
@@ -79,7 +55,7 @@
                     >
                 </div>
 
-                <div>
+                <div class="mb-3">
                     <label for="address">כתובת *</label>
                     <input
                         type="text"
@@ -93,7 +69,7 @@
                     <input type="hidden" id="google_place_id">
                 </div>
 
-                <div>
+                <div class="mb-3">
                     <label for="description">תיאור המרחב</label>
                     <textarea
                         id="description"
@@ -104,7 +80,7 @@
                     ></textarea>
                 </div>
 
-                <div>
+                <div class="mb-3">
                     <label for="seats_available">מספר מקומות זמינים *</label>
                     <input
                         type="number"
@@ -115,19 +91,19 @@
                     >
                 </div>
 
-                <div>
+                <div class="mb-3">
                     <label for="opening_hours">שעת פתיחה</label>
                     <input type="time" id="opening_hours" class="form-control">
                 </div>
 
-                <div>
+                <div class="mb-3">
                     <label for="closing_hours">שעת סגירה</label>
                     <input type="time" id="closing_hours" class="form-control">
                 </div>
 
-                <div>
+                <div class="mb-3">
                     <label>שירותים ומתקנים</label>
-                    <div id="facilities-container" style="font-size: 0.85rem; color:#6b7280;">
+                    <div id="facilities-container" style="font-size: 0.85rem; color:#6b7280; display: flex; flex-wrap: wrap; gap: 10px;">
                         טוען אפשרויות...
                     </div>
                 </div>
@@ -137,7 +113,7 @@
                 </button>
 
                 <div class="auth-switch">
-                    <a href="javascript:history.back()">ביטול</a>
+                    <a href="Holistic_profile.html">ביטול וחזרה לפרופיל</a>
                 </div>
 
             </form>
