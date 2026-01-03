@@ -5,7 +5,7 @@
     <title>הזמנת מרחב | CoNet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Bootstrap (forms בלבד) -->
+    <!-- Bootstrap (forms only) -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -17,84 +17,135 @@
         rel="stylesheet"
     >
 
-    <!-- CSS משותף -->
+    <!-- Global Design -->
     <link rel="stylesheet" href="auth.css">
 </head>
 
 <body>
 
-<div class="auth-wrapper">
-  <div class="auth-container">
+<!-- =========================
+     TOP NAVBAR (GLOBAL)
+========================= -->
+<header class="conet-navbar">
+    <div class="conet-navbar-inner">
 
-    <div class="auth-card">
+        <!-- LOGO -->
+        <div class="conet-logo">
+            <img src="conetnew_logo.jpg" alt="CoNet">
+        </div>
 
-        <!-- שם המרחב (דינמי) -->
-        <h3 class="auth-heading" id="spaceName">שם המרחב</h3>
+        <!-- NAV -->
+        <nav class="conet-nav-links">
+            <a href="profile.html">הפרופיל שלי</a>
+            <a href="communities.html">הקהילות של CoNet</a>
+            <a href="search.html" class="active">המרחבים של CoNet</a>
+            <a href="events.html">האירועים של CoNet</a>
+        </nav>
 
-        <!-- כתובת (דינמית) -->
-        <p class="auth-subtext" id="spaceAddress">כתובת המרחב</p>
+        <!-- USER AREA -->
+        <div class="conet-user">
+            <span class="conet-greeting" id="userGreeting">שלום</span>
 
-        <form id="orderForm">
-
-            <!-- תאריך  -->
-            <div class="mb-3">
-                <label>תאריך</label>
-                <input
-                    type="date"
-                    class="form-control"
-                    id="startDate"
-                    required
-                >
-            </div>
-
-            <!-- שעת התחלה -->
-            <div class="mb-3">
-                <label>שעת התחלה</label>
-                <input
-                    type="time"
-                    class="form-control"
-                    id="startTime"
-                    required
-                >
-            </div>
-
-            <!-- שעת סיום -->
-            <div class="mb-4">
-                <label>שעת סיום</label>
-                <input
-                    type="time"
-                    class="form-control"
-                    id="endTime"
-                    required
-                >
-            </div>
-
-            <div class="mb-4">
-        <label>מספר משתתפים</label>
-                <input type="number" class="form-control" id="attendeesCount" min="1" value="1" required>
-            </div>
-            <!-- כפתור -->
-            <button type="submit" class="auth-btn">
-                שליחת בקשת הזמנה
+            <button
+                id="logoutBtn"
+                class="conet-logout-btn"
+                onclick="logoutUser()">
+                התנתק
             </button>
-
-        </form>
+        </div>
 
     </div>
+</header>
 
-  </div>
+<!-- =========================
+     PAGE CONTENT
+========================= -->
+<div class="auth-wrapper">
+    <div class="auth-container">
+
+        <div class="auth-card">
+
+            <!-- שם המרחב (דינמי) -->
+            <h3 class="auth-heading" id="spaceName">
+                שם המרחב
+            </h3>
+
+            <!-- כתובת (דינמית) -->
+            <p class="auth-subtext" id="spaceAddress">
+                כתובת המרחב
+            </p>
+
+            <form id="orderForm">
+
+                <!-- תאריך -->
+                <div class="mb-3">
+                    <label>תאריך</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="startDate"
+                        required
+                    >
+                </div>
+
+                <!-- שעת התחלה -->
+                <div class="mb-3">
+                    <label>שעת התחלה</label>
+                    <input
+                        type="time"
+                        class="form-control"
+                        id="startTime"
+                        required
+                    >
+                </div>
+
+                <!-- שעת סיום -->
+                <div class="mb-4">
+                    <label>שעת סיום</label>
+                    <input
+                        type="time"
+                        class="form-control"
+                        id="endTime"
+                        required
+                    >
+                </div>
+
+                <!-- מספר משתתפים -->
+                <div class="mb-4">
+                    <label>מספר משתתפים</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="attendeesCount"
+                        min="1"
+                        value="1"
+                        required
+                    >
+                </div>
+
+                <!-- כפתור -->
+                <button type="submit" class="auth-btn">
+                    שליחת בקשת הזמנה
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
 </div>
 
+<!-- =========================
+     LOGIC (UNCHANGED)
+========================= -->
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        // 1. שליפת הנתונים מהכתובת (URL)
         const params = new URLSearchParams(window.location.search);
-        
+
         const spaceId = params.get('spaceId');
         const spaceName = params.get('spaceName');
         const spaceAddress = params.get('spaceAddress');
 
-        // 2. הצגה מיידית של המידע (אם קיים ב-URL)
         if (spaceName) {
             document.getElementById('spaceName').innerText = spaceName;
         }
@@ -102,14 +153,10 @@
             document.getElementById('spaceAddress').innerText = spaceAddress;
         }
 
-        // 3. בדיקה אם יש ID (לצורך שליחת הטופס בהמשך)
         if (!spaceId) {
             alert("לא נבחר מרחב להזמנה");
             window.location.href = 'search.html';
         }
-
-        // אופציונלי: כאן את יכולה להוסיף קריאה לשרת אם את רוצה פרטים נוספים
-        // אבל בשביל השם והכתובת - מה שעשינו למעלה מספיק.
     });
 </script>
 
