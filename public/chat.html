@@ -1,95 +1,103 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>צ'אט קהילה | CoNet</title>
+/* =========================
+   CHAT – CoNet FINAL STYLE
+========================= */
 
-    <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+body {
+    margin: 0;
+    background: linear-gradient(180deg, #eaf2ff 0%, #f6f9ff 100%);
+    direction: rtl;
+}
 
-    <!-- Global CSS (banner + layout) -->
-    <link rel="stylesheet" href="auth.css">
+/* עוטף כללי מתחת לבאנר */
+.chat-wrapper {
+    max-width: 1100px;
+    height: calc(100vh - 120px); /* מתחת לבאנר */
+    margin: 40px auto;
+    background: #ffffff;
+    border-radius: 24px;
 
-    <!-- Chat page CSS -->
-    <link rel="stylesheet" href="chat.css">
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.06),
+        0 30px 60px rgba(79,163,247,0.12);
 
-    <!-- Socket.io -->
-    <script src="/socket.io/socket.io.js"></script>
-</head>
-<body>
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 
-<!-- =========================
-     TOP NAVBAR (GLOBAL)
-========================= -->
-<header class="conet-navbar">
-    <div class="conet-navbar-inner">
+/* =========================
+   HEADER
+========================= */
+.chat-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fbff;
+}
 
-        <!-- LOGO -->
-        <div class="conet-logo">
-            <img src="conetnew_logo.jpg" alt="CoNet">
-        </div>
+.chat-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1f2937;
+}
 
-        <!-- NAV -->
-        <nav class="conet-nav-links">
-            <a href="profile.html">הפרופיל שלי</a>
-            <a href="communities.html">הקהילות של CoNet</a>
-            <a href="search.html">המרחבים של CoNet</a>
-            <a href="events.html">האירועים של CoNet</a>
-        </nav>
+/* =========================
+   MESSAGES
+========================= */
+.messages-container {
+    flex: 1;
+    padding: 20px 24px;
+    overflow-y: auto;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
 
-        <!-- USER AREA -->
-        <div class="conet-user">
-            <span class="conet-greeting" id="userGreeting">שלום, אורח</span>
+/* =========================
+   INPUT AREA
+========================= */
+.input-area {
+    display: flex;
+    gap: 12px;
+    padding: 18px 24px;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+}
 
-            <button
-                id="loginBtn"
-                class="conet-logout-btn"
-                onclick="window.location.href='login.html'">
-                התחברות
-            </button>
+#message-input {
+    flex: 1;
+    padding: 14px 18px;
+    border-radius: 999px;
+    border: 1px solid #d1d9e6;
+    font-size: 0.95rem;
+}
 
-            <button
-                id="logoutBtn"
-                class="conet-logout-btn"
-                onclick="logoutUser()">
-                התנתק
-            </button>
-        </div>
+#message-input:focus {
+    outline: none;
+    border-color: #2C80FF;
+    box-shadow: 0 0 0 4px rgba(44,128,255,0.15);
+}
 
-    </div>
-</header>
+#send-btn {
+    padding: 0 28px;
+    border-radius: 999px;
+    border: none;
+    background: #2C80FF;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-<!-- =========================
-     CHAT PAGE CONTENT
-========================= -->
-<div class="chat-wrapper">
+#send-btn:hover {
+    background: #2563eb;
+}
 
-    <header class="chat-header">
-        <h2 id="chat-title">טוען צ'אט...</h2>
-    </header>
-
-    <div id="messages-container" class="messages-container">
-        <!-- הודעות נטענות ע"י chat.js -->
-    </div>
-
-    <div class="input-area">
-        <input
-            type="text"
-            id="message-input"
-            placeholder="כתוב הודעה..."
-            autocomplete="off"
-        >
-        <button id="send-btn">שלח</button>
-    </div>
-
-</div>
-
-<!-- =========================
-     JS FILES
-========================= -->
-<script src="chat.js"></script>
-<script src="navbar-auth.js"></script>
-
-</body>
-</html>
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+    .chat-wrapper {
+        height: calc(100vh - 140px);
+        margin: 20px 12px;
+        border-radius: 18px;
+    }
+`
