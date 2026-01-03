@@ -202,15 +202,6 @@ function renderResults(spaces) {
             <h3>${space.space_name}</h3>
             <div class="address"><i class="fa-solid fa-map-pin"></i> ${space.address}</div>
             <div class="tags">${tagsHtml}</div>
-            
-            <div class="card-actions">
-                <button class="book-btn" onclick="navigateToOrder(${space.space_id}, '${safeName}', '${safeAddress}')">
-                    הזמן מקום
-                </button>
-                <button class="event-btn" onclick="navigateToCreateEvent(${space.space_id}, '${safeName}', '${safeAddress}')">
-                    צור אירוע
-                </button>
-            </div>
         `;
 
         // לחיצה על הכרטיס (שאינה על כפתור) מתמקדת במפה
