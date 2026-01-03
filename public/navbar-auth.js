@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
+    if (!greetingEl) return;
+
     // אין התחברות
     if (!token) {
         greetingEl.textContent = "שלום, אורח";
@@ -14,7 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
+        const payload = parseJwt(token);
+        if (!payload) throw new Error("Invalid token");
+
         const now = Math.floor(Date.now() / 1000);
 
         // טוקן שפג תוקף
