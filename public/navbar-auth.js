@@ -5,9 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    if (!greetingEl) return;
-
-    // אין התחברות
+    // אין טוקן – אורח
     if (!token) {
         greetingEl.textContent = "שלום, אורח";
         loginBtn.style.display = "inline-flex";
@@ -16,32 +14,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-        const payload = parseJwt(token);
-        if (!payload) throw new Error("Invalid token");
+        const payload = JSON.parse(atob(token.split(".")[1]));
 
-        const now = Math.floor(Date.now() / 1000);
-
-        // טוקן שפג תוקף
-        if (payload.exp && payload.exp < now) {
-            localStorage.removeItem("token");
-            greetingEl.textContent = "שלום, אורח";
-            loginBtn.style.display = "inline-flex";
-            logoutBtn.style.display = "none";
-            return;
-        }
-
-        // משתמש מחובר
+        // משתמש מחובר (קריאה בלבד!)
         greetingEl.textContent = `שלום, ${payload.first_name || "משתמש"}`;
         loginBtn.style.display = "none";
         logoutBtn.style.display = "inline-flex";
 
     } catch (e) {
-        console.error("Invalid token format", e);
-        localStorage.removeItem("token");
+        console.error("Token parse failed", e);
+
+        // לא מוחקים טוקן – רק מציגים אורח
+        greetingEl.textContent = "שלום, אורח";
+        loginBtn.style.display = "inline-flex";
+        logoutBtn.style.display = "none";
     }
 });
 
-// התנתקות
+// התנתקות – רק בלחיצה
 function logoutUser() {
     localStorage.removeItem("token");
     window.location.href = "login.html";
