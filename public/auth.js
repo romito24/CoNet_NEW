@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     localStorage.removeItem('returnUrl');
                     window.location.href = returnUrl;
                 } else {
-                    window.location.href = 'Holistic_profile.html';
+                    window.location.href = 'profile';
                 }
 
             } catch (error) {
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     loginTab.show();
                 } else {
                     // אחרת – מעבר רגיל לדף התחברות
-                    window.location.href = "login.html";
+                    window.location.href = "login";
                 }
 
             } catch (error) {
