@@ -66,19 +66,46 @@ function renderCommunities(communities) {
     });
 }
 
-// 3. לוגיקת הצטרפות
-async function handleJoin(communityId, communityName) {
-    const token = localStorage.getItem('token'); 
+// ==========================================
+//  פונקציית עזר לבדיקת תוקף הטוקן
+// ==========================================
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    if (!token) return false; // אין טוקן בכלל
 
-    // תנאי 1: משתמש לא מחובר
-    if (!token) {
+    try {
+        // פיענוח ה-Payload של הטוקן (החלק האמצעי)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000); // הזמן הנוכחי בשניות
+        
+        // בדיקה: האם זמן התפוגה (exp) עבר?
+        if (payload.exp && payload.exp < now) {
+            localStorage.removeItem('token'); // הטוקן פג תוקף - נמחק אותו
+            return false;
+        }
+        return true; // הטוקן תקין ובתוקף
+    } catch (e) {
+        console.error("Invalid token format", e);
+        return false; // הטוקן שבור
+    }
+}
+
+// 3. לוגיקת הצטרפות
+    async function handleJoin(communityId, communityName) {
+    
+    // שינוי: שימוש בבדיקה החכמה במקום רק בדיקת קיום טוקן
+    if (!checkAuth()) {
         if(confirm("עליך להתחבר למערכת כדי להצטרף לקהילה. לעבור לדף התחברות?")) {
+            // בונוס: שמירת הכתובת הנוכחית כדי לחזור לפה אחרי הלוגין
+            localStorage.setItem('returnUrl', window.location.href);
             window.location.href = 'login.html'; 
         }
         return;
     }
 
-    // תנאי 2: שליחת בקשת הצטרפות
+    // אם עברנו את הבדיקה, הטוקן בטוח קיים ותקין
+    const token = localStorage.getItem('token'); 
+
     try {
         const response = await fetch(`${API_URL}/communities/join`, {
             method: 'POST',
