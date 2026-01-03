@@ -35,7 +35,7 @@ chatModule.initSocket(io);
 
 // דף הבית
 app.get('/', (req, res) => {
-    res.send('CONET Server is running correctly!');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // דף האירועים
