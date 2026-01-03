@@ -125,17 +125,3 @@ function resetFilters() {
     renderCommunities(allCommunities);
 }
 
-function navigateToChat(communityId, communityName) {
-    const token = localStorage.getItem('token');
-    
-    // בדיקה אם המשתמש מחובר
-    if (!token) {
-        if(confirm("עליך להתחבר כדי להיכנס לצ'אט. לעבור לדף התחברות?")) {
-            window.location.href = 'login.html';
-        }
-        return;
-    }
-
-    // הפניה לעמוד הצ'אט עם הפרמטרים של הקהילה
-    window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
-}
