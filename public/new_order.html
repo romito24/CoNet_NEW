@@ -44,7 +44,9 @@
 
         <!-- USER AREA -->
         <div class="conet-user">
-            <span class="conet-greeting" id="userGreeting">שלום</span>
+            <span class="conet-greeting" id="userGreeting">
+                שלום, אורח
+            </span>
 
             <button
                 id="logoutBtn"
@@ -136,10 +138,10 @@
 </div>
 
 <!-- =========================
-     LOGIC (UNCHANGED)
+     PAGE LOGIC (UNCHANGED)
 ========================= -->
 <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
         const spaceId = params.get('spaceId');
@@ -160,8 +162,11 @@
     });
 </script>
 
-<script src="new_order.js"></script>
+<!-- Global navbar auth logic -->
 <script src="navbar-auth.js"></script>
+
+<!-- Page-specific logic -->
+<script src="new_order.js"></script>
 
 </body>
 </html>
