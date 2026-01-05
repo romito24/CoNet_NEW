@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 email: document.getElementById("signupEmail").value,
                 password: document.getElementById("signupPassword").value,
                 phone_number: document.getElementById("signupPhone").value,
-                user_type: "regular"
+                user_type: document.getElementById("userType").value,
             };
 
             try {
