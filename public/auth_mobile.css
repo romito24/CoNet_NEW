@@ -1,0 +1,140 @@
+
+/* =================================================
+   FINAL MOBILE NAV (RTL-SAFE) – PRODUCTION READY
+   Logo RIGHT, User LEFT, Nav buttons centered (2 rows)
+   Desktop untouched
+================================================= */
+
+@media (max-width: 768px) {
+
+  :root {
+    --mobile-nav-h: 176px;
+  }
+
+  /* ===== GLOBAL OFFSET FOR FIXED NAV ===== */
+  body {
+    padding-top: var(--mobile-nav-h) !important;
+  }
+
+  /* ===== NAVBAR ===== */
+  .conet-navbar {
+    height: var(--mobile-nav-h) !important;
+    padding: 10px 0 20px !important; /* ⬅️ buffer bottom – critical */
+  }
+
+  .conet-navbar .conet-navbar-inner {
+    height: 100% !important;
+    padding: 0 16px !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
+    row-gap: 10px !important;
+
+    align-items: center !important;
+  }
+
+  /* ===== TOP ROW (RTL) ===== */
+  html[dir="rtl"] .conet-logo {
+    grid-column: 1 / 2 !important;      /* RIGHT */
+    grid-row: 1 / 2 !important;
+    justify-self: start !important;
+  }
+
+  html[dir="rtl"] .conet-user {
+    grid-column: 2 / 3 !important;      /* LEFT */
+    grid-row: 1 / 2 !important;
+    justify-self: end !important;
+
+    display: flex !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* ===== LOGO ===== */
+  .conet-logo img {
+    height: 64px !important;
+    width: auto !important;
+  }
+
+  /* ===== USER AREA ===== */
+  .conet-user button,
+  .conet-user .conet-logout-btn {
+    font-size: 0.78rem !important;
+    padding: 6px 12px !important;
+    line-height: 1 !important;
+  }
+
+  /* ===== NAV BUTTONS ===== */
+  .conet-nav-links {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 / 3 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+
+    align-content: center !important;   /* ⬅️ keeps block vertically centered */
+
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
+
+    padding-bottom: 6px !important;     /* ⬅️ visual breathing room */
+  }
+
+  .conet-nav-links a {
+    width: 100% !important;
+
+    height: 32px !important;
+    padding: 6px 8px !important;
+
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+  }
+
+  /* ===== SINGLE LAST BUTTON (3 buttons case) ===== */
+  .conet-nav-links a:nth-child(odd):last-child {
+    grid-column: 1 / -1 !important;
+    justify-self: center !important;
+    max-width: 180px !important;
+  }
+
+  /* ===== AUTH PAGES FIX (LOGIN + SIGNUP) ===== */
+  .auth-wrapper {
+    min-height: auto !important;
+    padding-top: 16px !important;
+    padding-bottom: 32px !important;
+  }
+}
+
+/* ===== VERY SMALL DEVICES ===== */
+@media (max-width: 480px) {
+
+  :root {
+    --mobile-nav-h: 168px;
+  }
+
+  body {
+    padding-top: var(--mobile-nav-h) !important;
+  }
+
+  .conet-navbar {
+    height: var(--mobile-nav-h) !important;
+  }
+
+  .conet-logo img {
+    height: 72px !important;
+  }
+
+  .conet-nav-links {
+    max-width: 320px !important;
+  }
+
+  .conet-nav-links a {
+    height: 30px !important;
+    font-size: 0.76rem !important;
+    padding: 5px 8px !important;
+  }
+}
