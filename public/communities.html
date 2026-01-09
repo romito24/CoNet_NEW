@@ -30,8 +30,21 @@
         </nav>
 
         <div class="conet-user">
-            <span class="conet-greeting">שלום, אורח</span>
-            <button onclick="location.href='login.html'">התחברות</button>
+            <span class="conet-greeting" id="userGreeting">שלום, אורח</span>
+        
+            <button
+                id="loginBtn"
+                class="conet-logout-btn"
+                onclick="window.location.href='login.html'">
+                התחברות
+            </button>
+        
+            <button
+                id="logoutBtn"
+                class="conet-logout-btn"
+                onclick="logoutUser()">
+                התנתק
+            </button>
         </div>
 
     </div>
