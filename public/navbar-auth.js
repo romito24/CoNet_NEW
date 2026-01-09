@@ -1,3 +1,23 @@
+// ==========================================
+// UTF-8 SAFE JWT PARSER (fixes mobile Hebrew)
+// ==========================================
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        console.error("JWT parse failed", e);
+        return null;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem("token");
 
@@ -13,18 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
+    const payload = parseJwt(token);
 
-        // משתמש מחובר (קריאה בלבד!)
+    if (payload) {
         greetingEl.textContent = `שלום, ${payload.first_name || "משתמש"}`;
         loginBtn.style.display = "none";
         logoutBtn.style.display = "inline-flex";
-
-    } catch (e) {
-        console.error("Token parse failed", e);
-
-        // לא מוחקים טוקן – רק מציגים אורח
+    } else {
+        // טוקן פגום / לא קריא
         greetingEl.textContent = "שלום, אורח";
         loginBtn.style.display = "inline-flex";
         logoutBtn.style.display = "none";
