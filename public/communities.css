@@ -18,8 +18,6 @@ body {
     margin: 0;
     direction: rtl;
     color: var(--text-main);
-
-    /* 🔥 זה התיקון הקריטי */
     min-height: 100vh;
 }
 
@@ -32,8 +30,6 @@ body {
     margin: 0 auto;
     padding: 32px 16px 80px;
     box-sizing: border-box;
-
-    /* מכריח גובה מסך מתחת לבאנר */
     min-height: calc(100vh - 80px);
 }
 
@@ -78,7 +74,7 @@ body {
 }
 
 /* =========================
-   BUTTONS
+   BUTTONS (BASE)
 ========================= */
 .filters-bar button,
 .card-actions button {
@@ -88,8 +84,17 @@ body {
     font-weight: 600;
     cursor: pointer;
     border: none;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 
+.filters-bar button:active,
+.card-actions button:active {
+    transform: scale(0.97);
+}
+
+/* =========================
+   FILTER BUTTONS
+========================= */
 .filter-btn {
     background: var(--primary-blue);
     color: white;
@@ -142,22 +147,48 @@ body {
     font-size: 1.2rem;
 }
 
+/* =========================
+   CARD ACTIONS
+========================= */
 .card-actions {
     padding: 0 20px 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
+/* =================================================
+   ⭐ JOIN COMMUNITY BUTTON – FIXED & POLISHED ⭐
+   Matches auth.css buttons exactly
+================================================= */
 .join-btn {
+    width: 100%;
     background: var(--primary-blue);
-    color: white;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 999px;
+
+    padding: 14px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    line-height: 1;
+
+    transition:
+        box-shadow 0.15s ease,
+        transform 0.1s ease,
+        background 0.15s ease;
 }
 
-.chat-btn {
-    background: white;
-    border: 1.5px solid var(--primary-blue);
-    color: var(--primary-blue);
+.join-btn:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(44,128,255,0.25);
+}
+
+.join-btn:active {
+    transform: scale(0.97);
 }
 
 /* =========================
