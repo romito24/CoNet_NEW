@@ -40,7 +40,7 @@ body {
         180deg,
         #eaf2ff 0%,
         #f6f9ff 100%
-    ); /* כחול בהיר כמו בשאר המערכת */
+    );
     display: flex;
     flex-direction: column;
     box-shadow: 4px 0 20px rgba(0,0,0,0.06);
@@ -248,4 +248,53 @@ button:active {
     #map {
         height: 40%;
     }
+}
+
+/* =================================================
+   GOOGLE MAP INFO WINDOW – FINAL CoNet FIX
+   ✔ Scoped ONLY to popup buttons
+================================================= */
+
+.info-window-content {
+    font-family: 'Poppins', sans-serif;
+    color: #1f2937;
+    max-width: 260px;
+}
+
+.info-window-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.info-window-actions .info-btn {
+    flex: 1;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    line-height: 1;
+    white-space: nowrap;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.info-window-actions .info-btn.book {
+    background: #2C80FF;
+    color: #ffffff;
+}
+
+.info-window-actions .info-btn.event {
+    background: rgba(44,128,255,0.08);
+    color: #2C80FF;
+    border: 1.4px solid rgba(44,128,255,0.25);
+}
+
+.info-window-actions .info-btn:hover {
+    box-shadow: 0 0 0 3px rgba(44,128,255,0.25);
+}
+
+.info-window-actions .info-btn:active {
+    transform: scale(0.97);
 }
