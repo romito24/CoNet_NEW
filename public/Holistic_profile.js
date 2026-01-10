@@ -211,16 +211,24 @@ async function loadManagedSpaces() {
     }
 
     // אם יש מרחבים
-    const listHtml = spaces.map(s => `
+    const listHtml = spaces.map(s => {
+        const safeName = s.space_name.replace(/'/g, "\\'");
+        const safeAddress = s.address ? s.address.replace(/'/g, "\\'") : '';
+        const safeDesc = s.description 
+            ? s.description.replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "") 
+            : '';
+
+        return `
         <div class="card">
             <h3>${s.space_name}</h3>
             <div class="card-info"><i class="fas fa-map-marker-alt"></i> ${s.address}</div>
             <div class="card-info"><i class="fas fa-chair"></i> ${s.seats_available} מקומות</div>
-            <button onclick="openEditSpaceModal(${s.space_id}, '${s.space_name}', '${s.address}', ${s.seats_available}, '${s.description || ''}')" class="btn-secondary">
+            <button onclick="openEditSpaceModal(${s.space_id}, '${safeName}', '${safeAddress}', ${s.seats_available}, '${safeDesc}')" class="btn-secondary">
                 <i class="fas fa-edit"></i> ערוך פרטים
             </button>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     container.innerHTML = createBtnHtml + listHtml;
 }
