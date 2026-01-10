@@ -1,7 +1,8 @@
 /* =================================================
    HOLISTIC PROFILE – CoNet FINAL (CSS ONLY)
-   ✔ Unified spacing for ALL tabs
-   ✔ No background override (auth.css stays in control)
+   ✔ Clean, centered, professional
+   ✔ NO functional changes
+   ✔ auth.css background untouched
 ================================================= */
 
 :root {
@@ -27,11 +28,10 @@ body {
    MAIN CONTAINER
 ========================= */
 .main-container {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 32px 16px 80px;
+    padding: 32px 24px 80px;
     box-sizing: border-box;
-    min-height: calc(100vh - 80px);
 }
 
 /* =========================
@@ -39,7 +39,7 @@ body {
 ========================= */
 .profile-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 36px;
 }
 
 .profile-header h1 {
@@ -49,7 +49,7 @@ body {
 }
 
 .profile-header p {
-    margin-top: 6px;
+    margin-top: 8px;
     font-size: 0.95rem;
     color: var(--text-secondary);
 }
@@ -60,15 +60,15 @@ body {
 .tabs-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
 }
 
 .tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 6px;
-    background: #ffffff;
+    padding: 8px;
+    background: #fff;
     border-radius: 999px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
 }
@@ -76,7 +76,7 @@ body {
 .tab-btn {
     border: none;
     background: transparent;
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 999px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -89,7 +89,7 @@ body {
 
 .tab-btn.active {
     background: var(--primary-blue);
-    color: white;
+    color: #fff;
 }
 
 .tab-btn:hover:not(.active) {
@@ -108,7 +108,7 @@ body {
 }
 
 /* =========================
-   ACTION BAR (Top right buttons)
+   ACTION BAR (Top buttons)
 ========================= */
 #my-orders > div:first-child,
 #my-communities > div:first-child,
@@ -116,15 +116,18 @@ body {
 #managed-spaces > div:first-child {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
+/* =========================
+   PRIMARY BUTTON (New order / Create community)
+========================= */
 .auth-btn {
     background: var(--primary-blue);
-    color: white;
+    color: #fff;
     border: none;
     border-radius: 999px;
-    padding: 12px 28px;
+    padding: 12px 30px;
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
@@ -139,52 +142,51 @@ body {
 ========================= */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 0 4px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    justify-items: center;
 }
 
 /* =========================
-   CARD (Orders / Events / Communities)
+   CARD – unified size
 ========================= */
 .card {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 18px 18px 20px;
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    border-radius: 22px;
+    padding: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-    border: 1px solid transparent;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 14px 32px rgba(0,0,0,0.08);
-    border-color: var(--primary-blue);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.08);
 }
 
 .card h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
+    margin: 0 0 10px;
     font-size: 1.1rem;
     color: var(--primary-blue);
 }
 
-.card-info,
-.card p {
+.card p,
+.card-info {
     font-size: 0.85rem;
     color: var(--text-secondary);
     margin-bottom: 6px;
 }
 
 /* =========================
-   CARD ACTIONS
+   CARD ACTIONS (Buttons)
 ========================= */
 .card-actions,
 .card .actions {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 10px;
+    margin-top: 16px;
 }
 
 .card-actions button,
@@ -197,17 +199,17 @@ body {
     cursor: pointer;
 }
 
-/* Primary action */
+/* Primary */
 .btn-primary {
     background: var(--primary-blue);
-    color: white;
+    color: #fff;
 }
 
 .btn-primary:hover {
     background: var(--primary-hover);
 }
 
-/* Cancel / Danger */
+/* Danger */
 .btn-danger {
     background: #fff;
     color: var(--danger-red);
@@ -216,7 +218,7 @@ body {
 
 .btn-danger:hover {
     background: var(--danger-red);
-    color: white;
+    color: #fff;
 }
 
 /* Secondary */
@@ -226,7 +228,7 @@ body {
 }
 
 /* =========================
-   FLIGHT BOARD (Incoming Orders)
+   FLIGHT BOARD
 ========================= */
 .flight-board-container {
     max-width: 640px;
@@ -234,10 +236,10 @@ body {
 }
 
 .flight-card {
-    background: white;
-    border-radius: 18px;
+    background: #fff;
+    border-radius: 20px;
     padding: 18px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
 }
 
@@ -250,7 +252,7 @@ body {
 }
 
 .details-card {
-    max-width: 500px;
+    max-width: 520px;
     width: 100%;
 }
 
@@ -263,12 +265,23 @@ body {
 }
 
 /* =========================
-   MODALS
+   MODALS – overlay, not page flow
 ========================= */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9999;
+}
+
 .modal-content {
-    border-radius: 18px;
+    background: #fff;
+    border-radius: 20px;
     padding: 24px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    max-width: 420px;
+    margin: 10vh auto;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
 }
 
 /* =========================
@@ -280,16 +293,16 @@ body {
         font-size: 1.6rem;
     }
 
-    .tabs {
-        justify-content: center;
-    }
-
     .grid-container {
-        gap: 16px;
+        gap: 18px;
     }
 
     .auth-btn {
         width: 100%;
         text-align: center;
+    }
+
+    .card {
+        max-width: 100%;
     }
 }
