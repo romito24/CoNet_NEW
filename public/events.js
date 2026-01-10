@@ -65,7 +65,7 @@ function renderEvents(eventsToRender) {
                     ${event.max_participants ? `/ ${event.max_participants}` : ''}
                 </div>
 
-                <button class="register-btn" onclick="handleRegistration(${event.event_id}, '${event.event_name}')">
+                <button class="register-btn" onclick="handleRegistration(this, ${event.event_id}, '${event.event_name}')">
                     הרשמה לאירוע
                 </button>
             </div>
@@ -82,9 +82,15 @@ async function handleRegistration(eventId, eventName) {
     // תנאי 1: משתמש לא מחובר
     if (!token) {
         alert('עליך להתחבר למערכת כדי להירשם לאירוע.');
-        // window.location.href = 'login.html'; // אופציונלי
+        window.location.href = 'login';
         return;
     }
+
+    // מצב טעינה של כפתור הרשמה
+    const originalText = btnElement.innerHTML; 
+    btnElement.innerHTML = 'מבצע הרשמה...'; 
+    btnElement.disabled = true; 
+    btnElement.style.opacity = '0.7'; 
 
     // תנאי 2: משתמש מחובר - ניסיון הרשמה מול השרת
     try {
@@ -100,29 +106,41 @@ async function handleRegistration(eventId, eventName) {
 
         if (response.ok) {
             // הצלחה (201)
-            alert(`נרשמת בהצלחה לאירוע "${eventName}"! נשלח אליך אישור במייל.`);
-            loadEvents(); // רענון הדף לעדכון מונה המשתתפים
-        } 
+            btnElement.innerHTML = '✅ נרשמת!';
+            btnElement.style.backgroundColor = 'var(--accent-green)';
+
+        setTimeout(() => {
+                alert(`נרשמת בהצלחה לאירוע "${eventName}"! נשלח אליך אישור במייל.`);
+                loadEvents(); // רענון הדף
+            }, 100);
+        }
         else if (response.status === 403) {
-            // >>> התיקון כאן <<<
-            // במקום לשרשר את ההודעה שוב, אנחנו מציגים את הודעת השרת 
-            // ומוסיפים שאלה ברורה ("האם לעבור לדף ההרשמה?")
+            resetButton(btnElement, originalText);
             if (confirm(data.message + "\n\nהאם תרצה לעבור לדף ההרשמה לקהילה כעת?")) {
                 window.location.href = 'join-community.html'; 
             }
         } 
         else if (response.status === 409) {
             // אירוע מלא או כבר רשום
+            resetButton(btnElement, originalText);
             alert(data.message);
         } 
         else {
+            resetButton(btnElement, originalText);
             alert('שגיאה: ' + data.message);
         }
 
     } catch (error) {
         console.error('Registration error:', error);
+        resetButton(btnElement, originalText);
         alert('אירעה שגיאה בתקשורת עם השרת.');
     }
+}
+
+function resetButton(btn, originalText) {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    btn.style.opacity = '1';
 }
 
 // 4. פונקציות פילטור
