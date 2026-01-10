@@ -5,24 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>האזור האישי | CoNet</title>
 
-    <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- Global -->
     <link rel="stylesheet" href="auth.css">
-
-    <!-- Profile -->
     <link rel="stylesheet" href="Holistic_profile.css">
+    <link rel="stylesheet" href="auth_mobile.css">
 </head>
 
 <body>
 
-<!-- =========================
-     NAVBAR
-========================= -->
 <header class="conet-navbar">
     <div class="conet-navbar-inner">
 
@@ -33,6 +25,7 @@
         </div>
 
         <nav class="conet-nav-links">
+            <a href="Holistic_profile.html" class="active">הפרופיל שלי</a>
             <a href="communities.html">הקהילות של CoNet</a>
             <a href="search.html">המרחבים של CoNet</a>
             <a href="events.html">האירועים של CoNet</a>
@@ -46,9 +39,6 @@
     </div>
 </header>
 
-<!-- =========================
-     PAGE
-========================= -->
 <div class="main-container">
 
     <header class="profile-header">
@@ -56,44 +46,41 @@
         <p>מרכז השליטה שלך לכל ההזמנות, האירועים והקהילות</p>
     </header>
 
-    <!-- TABS -->
     <div class="tabs-container">
         <div class="tabs">
 
-            <button onclick="switchTab('my-orders')" class="tab-btn active" id="btn-my-orders">
+            <button onclick="switchTab('my-orders')" class="tab-btn active">
                 <i class="fas fa-calendar-check"></i> ההזמנות שלי
             </button>
 
-            <button onclick="switchTab('my-events')" class="tab-btn" id="btn-my-events">
+            <button onclick="switchTab('my-events')" class="tab-btn">
                 <i class="fas fa-ticket-alt"></i> האירועים שלי
             </button>
 
-            <button onclick="switchTab('my-communities')" class="tab-btn" id="btn-my-communities">
+            <button onclick="switchTab('my-communities')" class="tab-btn">
                 <i class="fas fa-users"></i> הקהילות שלי
             </button>
 
-            <button onclick="switchTab('managed-communities')" class="tab-btn" id="btn-managed-communities" style="display:none;">
+            <button onclick="switchTab('managed-communities')" class="tab-btn" style="display:none;">
                 <i class="fas fa-crown"></i> קהילות בניהולי
             </button>
 
-            <button onclick="switchTab('managed-spaces')" class="tab-btn" id="btn-managed-spaces" style="display:none;">
+            <button onclick="switchTab('managed-spaces')" class="tab-btn" style="display:none;">
                 <i class="fas fa-building"></i> מרחבים בניהולי
             </button>
 
-            <button onclick="switchTab('incoming-orders')" class="tab-btn" id="btn-incoming-orders" style="display:none;">
+            <button onclick="switchTab('incoming-orders')" class="tab-btn" style="display:none;">
                 <i class="fas fa-plane-arrival"></i> הזמנות למרחבים בניהולי
             </button>
 
-            <button onclick="switchTab('personal-details')" class="tab-btn" id="btn-personal-details">
+            <button onclick="switchTab('personal-details')" class="tab-btn">
                 <i class="fas fa-user-cog"></i> פרטים אישיים
             </button>
 
         </div>
     </div>
 
-    <!-- =========================
-         MY ORDERS
-    ========================= -->
+    <!-- ================= MY ORDERS ================= -->
     <div id="my-orders" class="tab-content active-content">
 
         <div>
@@ -102,51 +89,35 @@
             </button>
         </div>
 
-        <div id="orders-list" class="grid-container">
-            <div class="loading">טוען נתונים...</div>
-        </div>
+        <div id="orders-list" class="grid-container"></div>
     </div>
 
-    <!-- EVENTS -->
+    <!-- ================= EVENTS ================= -->
     <div id="my-events" class="tab-content">
         <div id="events-list" class="grid-container"></div>
     </div>
 
-    <!-- MY COMMUNITIES -->
+    <!-- ================= COMMUNITIES ================= -->
     <div id="my-communities" class="tab-content">
         <div id="communities-list" class="grid-container"></div>
     </div>
 
-    <!-- MANAGED COMMUNITIES -->
+    <!-- ================= MANAGED COMMUNITIES ================= -->
     <div id="managed-communities" class="tab-content">
-
-        <div>
-            <button class="auth-btn" onclick="openCreateCommunity()">
-                <i class="fas fa-plus"></i> יצירת קהילה חדשה
-            </button>
-        </div>
-
         <div id="managed-communities-list" class="grid-container"></div>
     </div>
 
-    <!-- MANAGED SPACES -->
+    <!-- ================= MANAGED SPACES ================= -->
     <div id="managed-spaces" class="tab-content">
-
-        <div>
-            <button class="auth-btn" onclick="openCreateSpace()">
-                <i class="fas fa-plus"></i> הוספת מרחב חדש
-            </button>
-        </div>
-
         <div id="managed-spaces-list" class="grid-container"></div>
     </div>
 
-    <!-- INCOMING ORDERS -->
+    <!-- ================= INCOMING ORDERS ================= -->
     <div id="incoming-orders" class="tab-content">
         <div id="flight-board-list" class="flight-board-container"></div>
     </div>
 
-    <!-- PERSONAL DETAILS -->
+    <!-- ================= PERSONAL DETAILS ================= -->
     <div id="personal-details" class="tab-content">
         <div class="details-card-wrapper">
             <div class="card details-card">
@@ -162,6 +133,82 @@
     </div>
 
 </div>
+
+<!-- ================= MODALS ================= -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">אישור פעולה</h3>
+        <p id="modalText">האם אתה בטוח?</p>
+
+        <div class="modal-actions">
+            <button onclick="closeModal('confirmModal')" class="btn-secondary">ביטול</button>
+            <button id="modalConfirmBtn" class="btn-danger">אישור</button>
+        </div>
+    </div>
+</div>
+
+<div id="editCommunityModal" class="modal">
+    <div class="modal-content modal-form">
+        <h3>עריכת פרטי קהילה</h3>
+
+        <input type="hidden" id="edit-community-id">
+
+        <div class="form-group">
+            <label>שם הקהילה</label>
+            <input type="text" id="edit-community-name">
+        </div>
+
+        <div class="form-group">
+            <label>נושא ראשי</label>
+            <input type="text" id="edit-community-subject">
+        </div>
+
+        <div class="form-group">
+            <label>קישור לתמונה</label>
+            <input type="text" id="edit-community-image">
+        </div>
+
+        <div class="modal-actions">
+            <button onclick="closeModal('editCommunityModal')" class="btn-secondary">ביטול</button>
+            <button onclick="saveCommunityChanges()" class="btn-primary">שמור שינויים</button>
+        </div>
+    </div>
+</div>
+
+<div id="editSpaceModal" class="modal">
+    <div class="modal-content modal-form">
+        <h3>עריכת פרטי מרחב</h3>
+
+        <input type="hidden" id="edit-space-id">
+
+        <div class="form-group">
+            <label>שם המרחב</label>
+            <input type="text" id="edit-space-name">
+        </div>
+
+        <div class="form-group">
+            <label>כתובת</label>
+            <input type="text" id="edit-space-address">
+        </div>
+
+        <div class="form-group">
+            <label>מספר מקומות</label>
+            <input type="number" id="edit-space-seats">
+        </div>
+
+        <div class="form-group">
+            <label>תיאור</label>
+            <textarea id="edit-space-desc" rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+            <button onclick="closeModal('editSpaceModal')" class="btn-secondary">ביטול</button>
+            <button onclick="saveSpaceChanges()" class="btn-primary">שמור שינויים</button>
+        </div>
+    </div>
+</div>
+
+<script src="Holistic_profile.js"></script>
 
 </body>
 </html>
