@@ -158,7 +158,7 @@ async function loadManagedCommunities() {
     
     const createBtnHtml = `
         <div style="width: 100%; text-align: left; margin-bottom: 20px;">
-            <button onclick="window.location.href='new_community.html'" class="btn-primary" style="padding: 10px 20px; border-radius: 5px; cursor: pointer; background-color: #28a745; color: white; border: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+            <button onclick="window.location.href='new_community.html'" class="auth-btn">
                 <i class="fas fa-plus"></i> יצירת קהילה חדשה
             </button>
         </div>
@@ -188,7 +188,7 @@ async function loadManagedSpaces() {
     // כפתור יצירת מרחב חדש
     const createBtnHtml = `
         <div style="width: 100%; text-align: left; margin-bottom: 20px;">
-            <button onclick="window.location.href='add_space.html'" class="btn-primary" style="padding: 10px 20px; border-radius: 5px; cursor: pointer; background-color: #28a745; color: white; border: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+            <button onclick="window.location.href='add_space.html'" class="auth-btn">
                 <i class="fas fa-plus"></i> יצירת מרחב חדש
             </button>
         </div>
@@ -290,8 +290,9 @@ function createOrderCard(order) {
         <div class="card-info"><i class="far fa-clock"></i> ${timeStart} - ${timeEnd}</div>
         <div class="card-info"><i class="fas fa-map-marker-alt"></i> ${order.address}</div>
         <span class="status-badge status-${order.status}">${translateStatus(order.status)}</span>
-        ${canCancel ? `<button onclick="confirmAction('ביטול הזמנה', 'האם לבטל?', () => cancelOrder(${order.order_id}))" class="btn-action btn-danger">ביטול הזמנה</button>` : ''}
+        ${canCancel ? `<button onclick="confirmAction('ביטול הזמנה', 'האם לבטל?', () => cancelOrder(${order.order_id}))" class="btn-danger">ביטול הזמנה</button>` : ''}
     </div>`;
+
 }
 
 function createEventCard(event) {
@@ -318,7 +319,7 @@ function createCommunityCard(c, isManagerMode) {
         <div class="card-info"><i class="fas fa-tag"></i> ${c.main_subject || 'כללי'}</div>
         ${!isManagerMode ? `<div class="card-info"><i class="fas fa-id-badge"></i> תפקיד: <strong>${translateRole(c.my_role)}</strong></div>` : ''}
         
-        <button onclick="navigateToChat(${c.community_id}, '${c.community_name}')" class="btn-action" style="background-color: #4a90e2; color: white; margin-top: 10px; width: 100%; cursor: pointer;">
+        <button onclick="navigateToChat(${c.community_id}, '${c.community_name}')" class="btn-primary">
             <i class="fas fa-comments"></i> כניסה לצ'אט
         </button>
 
@@ -463,4 +464,5 @@ async function saveSpaceChanges() {
 
 function navigateToChat(communityId, communityName) {
     window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
+
 }
