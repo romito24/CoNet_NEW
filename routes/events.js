@@ -426,7 +426,7 @@ router.get('/all', async (req, res) => {
             FROM events e
             JOIN spaces s ON e.space_id = s.space_id
             JOIN communities c ON e.community_id = c.community_id
-            WHERE e.event_date >= CURDATE()
+            WHERE 1=1
         `;
         
         const params = [];
@@ -436,7 +436,7 @@ router.get('/all', async (req, res) => {
             params.push(community_id);
         }
 
-        sql += ` ORDER BY e.event_date ASC`;
+        sql += ` ORDER BY e.event_date DESC`;
 
         const [events] = await db.query(sql, params);
         res.json(events);
