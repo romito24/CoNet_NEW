@@ -1,8 +1,9 @@
 /* =================================================
    HOLISTIC PROFILE – CoNet FINAL (CSS ONLY)
-   ✔ Clean, centered, professional
-   ✔ NO functional changes
-   ✔ auth.css background untouched
+   ✔ CSS fixes only
+   ✔ NO HTML changes
+   ✔ NO JS / logic changes
+   ✔ auth.css background & modal logic preserved
 ================================================= */
 
 :root {
@@ -33,7 +34,7 @@ body {
     padding: 32px 24px 80px;
     box-sizing: border-box;
     min-height: calc(100vh - 80px);
-    background: transparent; /* לא נוגעים ברקע של auth.css */
+    background: transparent;
 }
 
 /* =========================
@@ -94,10 +95,6 @@ body {
     color: #fff;
 }
 
-.tab-btn:hover:not(.active) {
-    background: #eef4ff;
-}
-
 /* =========================
    TAB CONTENT
 ========================= */
@@ -113,33 +110,30 @@ body {
    ACTION BAR (Top buttons)
 ========================= */
 #my-orders > div:first-child,
-#my-communities > div:first-child,
 #managed-communities > div:first-child,
 #managed-spaces > div:first-child {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
     width: 100%;
     margin-bottom: 24px;
 }
 
 /* =========================
-   PRIMARY BUTTON
-   (Override auth.css 100% width SAFELY)
+   PRIMARY BUTTON (auth-btn FIX)
 ========================= */
 .main-container .auth-btn {
-    background: var(--primary-blue);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    padding: 10px 20px;          /* ⬅️ לא ענק */
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    width: auto !important;      /* ⬅️ תיקון קריטי */
+    width: auto !important;
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--primary-blue);
+    color: #fff;
+    border: none;
+    cursor: pointer;
     white-space: nowrap;
 }
 
@@ -148,7 +142,7 @@ body {
 }
 
 /* =========================
-   GRID – ALL TABS
+   GRID
 ========================= */
 .grid-container {
     display: grid;
@@ -158,7 +152,7 @@ body {
 }
 
 /* =========================
-   CARD – unified size
+   CARD
 ========================= */
 .card {
     width: 100%;
@@ -167,21 +161,14 @@ body {
     border-radius: 22px;
     padding: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px rgba(0,0,0,0.08);
 }
 
 .card h3 {
-    margin: 0 0 10px;
+    margin-bottom: 10px;
     font-size: 1.1rem;
     color: var(--primary-blue);
 }
 
-.card p,
 .card-info {
     font-size: 0.85rem;
     color: var(--text-secondary);
@@ -189,18 +176,10 @@ body {
 }
 
 /* =========================
-   CARD ACTIONS (Buttons)
+   CARD BUTTONS – unified
 ========================= */
-.card-actions,
-.card .actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 16px;
-}
-
-.card-actions button,
-.card .actions button {
+.card button {
+    width: 100%;
     border-radius: 999px;
     padding: 10px;
     font-size: 0.8rem;
@@ -219,6 +198,12 @@ body {
     background: var(--primary-hover);
 }
 
+/* Secondary */
+.btn-secondary {
+    background: #f1f5ff;
+    color: var(--primary-blue);
+}
+
 /* Danger */
 .btn-danger {
     background: #fff;
@@ -231,81 +216,32 @@ body {
     color: #fff;
 }
 
-/* Secondary */
-.btn-secondary {
-    background: #f1f5ff;
-    color: var(--primary-blue);
-}
-
 /* =========================
-   FLIGHT BOARD
-========================= */
-.flight-board-container {
-    max-width: 640px;
-    margin: 0 auto;
-}
-
-.flight-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-}
-
-/* =========================
-   PERSONAL DETAILS
-========================= */
-.details-card-wrapper {
-    display: flex;
-    justify-content: center;
-}
-
-.details-card {
-    max-width: 520px;
-    width: 100%;
-}
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border-soft);
-    font-size: 0.85rem;
-}
-
-/* =========================
-   MODALS
-   ❗️מחזירים שליטה ל-auth.css
+   MODALS – FIX (no layout break)
 ========================= */
 .modal {
-    background: initial !important;
+    display: none;           /* 🔑 קריטי */
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9999;
 }
 
 .modal-content {
-    background: initial !important;
-    border-radius: initial !important;
-    padding: initial !important;
-    max-width: initial !important;
-    margin: initial !important;
-    box-shadow: initial !important;
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 420px;
+    margin: 10vh auto;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
 }
 
 /* =========================
    MOBILE
 ========================= */
 @media (max-width: 768px) {
-
     .profile-header h1 {
         font-size: 1.6rem;
-    }
-
-    .grid-container {
-        gap: 18px;
-    }
-
-    .main-container .auth-btn {
-        width: auto !important;
     }
 
     .card {
