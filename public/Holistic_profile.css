@@ -32,6 +32,10 @@ body {
     margin: 0 auto;
     padding: 32px 24px 80px;
     box-sizing: border-box;
+
+    /* 🔑 התיקון */
+    min-height: calc(100vh - 80px);
+    background: transparent;
 }
 
 /* =========================
