@@ -27,7 +27,7 @@ body {
 ========================= */
 .app-container {
     display: flex;
-    height: calc(100vh - 80px); /* מתחת לבאנר הראשי */
+    height: calc(100vh - 80px);
     overflow: hidden;
 }
 
@@ -36,18 +36,13 @@ body {
 ========================= */
 .sidebar {
     width: 380px;
-    background: linear-gradient(
-        180deg,
-        #eaf2ff 0%,
-        #f6f9ff 100%
-    );
+    background: linear-gradient(180deg, #eaf2ff 0%, #f6f9ff 100%);
     display: flex;
     flex-direction: column;
     box-shadow: 4px 0 20px rgba(0,0,0,0.06);
     z-index: 5;
 }
 
-/* ❌ הסרנו את ה-sidebar-header לחלוטין */
 .sidebar-header {
     display: none;
 }
@@ -252,13 +247,13 @@ button:active {
 
 /* =================================================
    GOOGLE MAP INFO WINDOW – FINAL CoNet FIX
-   ✔ Scoped ONLY to popup buttons
 ================================================= */
 
 .info-window-content {
     font-family: 'Poppins', sans-serif;
     color: #1f2937;
     max-width: 260px;
+    overflow: hidden; /* 🔑 מונע גלישה */
 }
 
 .info-window-actions {
@@ -269,6 +264,7 @@ button:active {
 
 .info-window-actions .info-btn {
     flex: 1;
+    max-width: 100%;
     border-radius: 999px;
     padding: 8px 12px;
     font-size: 0.82rem;
@@ -280,11 +276,13 @@ button:active {
     transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 
+/* Order */
 .info-window-actions .info-btn.book {
     background: #2C80FF;
     color: #ffffff;
 }
 
+/* Event */
 .info-window-actions .info-btn.event {
     background: rgba(44,128,255,0.08);
     color: #2C80FF;
