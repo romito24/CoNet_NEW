@@ -74,8 +74,8 @@ function renderEvents(eventsToRender) {
     });
 }
 
-// 3. טיפול בלחיצה על הרשמה (הלוגיקה המורכבת)
-async function handleRegistration(eventId, eventName) {
+// 3. טיפול בלחיצה על הרשמה
+async function handleRegistration(btnElement, eventId, eventName) {
     // שליפת הטוקן
     const token = localStorage.getItem('token'); 
 
