@@ -186,9 +186,9 @@ function renderResults(spaces) {
         const tagsHtml = space.facilities ? space.facilities.map(f => `<span class="tag">#${f}</span>`).join('') : '';
         
         const distanceHtml = space.distance 
-            ? `<span class="distance-badge"><i class="fa-solid fa-person-walking"></i> ${space.distance}</span>` 
+            ? `<span class="distance-badge"><i class="fa-solid fa-person-walking"></i> <span dir="ltr">${space.distance}</span></span>` 
             : '<span></span>';
-        
+
         // יצירת מחרוזות בטוחות לשימוש ב-onclick
         const safeName = space.space_name.replace(/'/g, "\\'");
         const safeAddress = space.address ? space.address.replace(/'/g, "\\'") : '';
@@ -221,6 +221,7 @@ function renderResults(spaces) {
         // --- 2. יצירת הסמן במפה ---
         if (map && space.latitude && space.longitude) {
             const marker = new google.maps.Marker({
+            
                 position: { lat: space.latitude, lng: space.longitude },
                 map: map,
                 title: space.space_name,
