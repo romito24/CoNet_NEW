@@ -57,7 +57,6 @@ body {
     border-radius: 18px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     border: 1px solid var(--border-soft);
-
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
@@ -185,7 +184,6 @@ button:active {
     border-radius: 18px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     border: 1px solid var(--border-soft);
-
     flex: 1;
     overflow-y: auto;
 }
@@ -229,25 +227,33 @@ button:active {
 
 /* =========================
    MOBILE FIXES (CRITICAL)
+   ✔ מאפשר לראות את כל תוצאות החיפוש
+   ✔ בלי לפגוע בדסקטופ
 ========================= */
 @media (max-width: 768px) {
 
     .app-container {
         flex-direction: column-reverse;
-        height: auto;              /* 🔑 מאפשר גלילה */
-        overflow: visible;         /* 🔑 לא חותך תוכן */
+        height: auto;
+        overflow: visible;
     }
 
     .sidebar {
         width: 100%;
         height: auto;
-        max-height: 70vh;
-        overflow-y: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .results-list {
+        max-height: none;
+        overflow: visible;
     }
 
     #map {
         height: 40vh;
         min-height: 280px;
+        flex: none;
     }
 }
 
@@ -266,7 +272,7 @@ button:active {
     display: flex;
     gap: 10px;
     margin-top: 14px;
-    flex-wrap: wrap;              /* 🔑 לא יוצא החוצה */
+    flex-wrap: wrap;
 }
 
 .info-window-actions .info-btn {
