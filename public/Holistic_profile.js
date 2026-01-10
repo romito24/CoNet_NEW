@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('token');
     if (!token) {
         console.warn("⚠️ No token found via localStorage. Redirecting to login.");
-        window.location.href = 'login.html';
+        window.location.href = 'login';
         return;
     }
 
@@ -105,7 +105,7 @@ function logout() {
     console.log("👋 Logging out...");
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = 'login.html';
+    window.location.href = 'login';
 }
 
 // ==========================================
@@ -161,7 +161,7 @@ async function loadManagedCommunities() {
     
     const createBtnHtml = `
         <div style="width: 100%; text-align: left; margin-bottom: 20px;">
-            <button onclick="window.location.href='new_community.html'" class="auth-btn">
+            <button onclick="window.location.href='new_community'" class="auth-btn">
                 <i class="fas fa-plus"></i> יצירת קהילה חדשה
             </button>
         </div>
@@ -191,7 +191,7 @@ async function loadManagedSpaces() {
     // כפתור יצירת מרחב חדש
     const createBtnHtml = `
         <div style="width: 100%; text-align: left; margin-bottom: 20px;">
-            <button onclick="window.location.href='add_space.html'" class="auth-btn">
+            <button onclick="window.location.href='add_space'" class="auth-btn">
                 <i class="fas fa-plus"></i> יצירת מרחב חדש
             </button>
         </div>
