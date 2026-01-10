@@ -29,19 +29,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadUserDetails() {
     let user = null;
 
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-        try {
-            user = JSON.parse(storedUser);
-            console.log("👤 User loaded from LocalStorage:", user);
-        } catch (e) {
-            console.error("⚠️ Error parsing user from storage", e);
+    const serverUser = await fetchData('/auth/me');
+    if (serverUser) {
+        user = serverUser;
+        localStorage.setItem('user', JSON.stringify(user));
+    } else {
+        console.warn("⚠️ Failed to fetch from server, trying LocalStorage fallback");
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                user = JSON.parse(storedUser);
+            } catch (e) {
+                console.error("⚠️ Error parsing user from storage", e);
+            }
         }
-    }
-
-    if (!user) {
-        console.log("🌐 User not in storage, fetching from server...");
-        user = await fetchData('/auth/me');
     }
 
     if (!user) {
@@ -53,7 +54,9 @@ async function loadUserDetails() {
     const navName = document.getElementById('nav-username');
     if (navName) navName.innerText = `שלום, ${user.first_name}`;
 
-    setText('detail-name', `${user.first_name} ${user.last_name}`);
+    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+
+    setText('detail-name', fullName);
     setText('detail-email', user.email);
     setText('detail-phone', user.phone_number || '-');
     setText('detail-type', translateUserType(user.user_type));
