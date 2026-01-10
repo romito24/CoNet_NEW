@@ -94,11 +94,6 @@ app.get('/add_community', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'new_community.html'));
 });
 
-// דף מרחבים
-app.get('/spaces', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'search.html'));
-});
-
 // הפעלת השרת
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
