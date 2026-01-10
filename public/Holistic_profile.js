@@ -161,7 +161,7 @@ async function loadManagedCommunities() {
     
     const createBtnHtml = `
         <div style="width: 100%; text-align: left; margin-bottom: 20px;">
-            <button onclick="window.location.href='new_community'" class="auth-btn">
+            <button onclick="window.location.href='add_community'" class="auth-btn">
                 <i class="fas fa-plus"></i> יצירת קהילה חדשה
             </button>
         </div>
