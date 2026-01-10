@@ -228,20 +228,26 @@ button:active {
 }
 
 /* =========================
-   MOBILE
+   MOBILE FIXES (CRITICAL)
 ========================= */
 @media (max-width: 768px) {
+
     .app-container {
         flex-direction: column-reverse;
+        height: auto;              /* 🔑 מאפשר גלילה */
+        overflow: visible;         /* 🔑 לא חותך תוכן */
     }
 
     .sidebar {
         width: 100%;
-        height: 60%;
+        height: auto;
+        max-height: 70vh;
+        overflow-y: auto;
     }
 
     #map {
-        height: 40%;
+        height: 40vh;
+        min-height: 280px;
     }
 }
 
@@ -253,17 +259,18 @@ button:active {
     font-family: 'Poppins', sans-serif;
     color: #1f2937;
     max-width: 260px;
-    overflow: hidden; /* 🔑 מונע גלישה */
+    overflow: hidden;
 }
 
 .info-window-actions {
     display: flex;
     gap: 10px;
     margin-top: 14px;
+    flex-wrap: wrap;              /* 🔑 לא יוצא החוצה */
 }
 
 .info-window-actions .info-btn {
-    flex: 1;
+    flex: 1 1 100%;
     max-width: 100%;
     border-radius: 999px;
     padding: 8px 12px;
