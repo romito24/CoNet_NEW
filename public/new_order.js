@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token');
         if (!token) {
             alert('יש להתחבר לפני יצירת הזמנה');
-            window.location.href = 'login.html';
+            window.location.href = 'login';
             return;
         }
 
@@ -73,9 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 alert('✅ ההזמנה בוצעה בהצלחה');
                 console.log('Order created:', data);
-                
-                // התיקון כאן: הפניה לשם החדש
-                window.location.href = 'Holistic_profile.html';
+                window.location.href = 'profile';
             }, 100);
 
         } catch (error) {
