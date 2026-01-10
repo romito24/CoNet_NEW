@@ -213,7 +213,7 @@ async function loadManagedSpaces() {
             <h3>${s.space_name}</h3>
             <div class="card-info"><i class="fas fa-map-marker-alt"></i> ${s.address}</div>
             <div class="card-info"><i class="fas fa-chair"></i> ${s.seats_available} מקומות</div>
-            <button onclick="openEditSpaceModal(${s.space_id}, '${s.space_name}', '${s.address}', ${s.seats_available}, '${s.description || ''}')" class="btn-action btn-edit">
+            <button onclick="openEditSpaceModal(${s.space_id}, '${s.space_name}', '${s.address}', ${s.seats_available}, '${s.description || ''}')" class="btn-secondary">
                 <i class="fas fa-edit"></i> ערוך פרטים
             </button>
         </div>
@@ -324,7 +324,7 @@ function createCommunityCard(c, isManagerMode) {
         </button>
 
         ${isManagerMode ? 
-            `<button onclick="openEditCommunityModal(${c.community_id}, '${c.community_name}', '${c.main_subject || ''}', '${c.image_url || ''}')" class="btn-action btn-edit" style="margin-top: 5px;"><i class="fas fa-edit"></i> ערוך פרטים</button>` 
+            `<button onclick="openEditCommunityModal(${c.community_id}, '${c.community_name}', '${c.main_subject || ''}', '${c.image_url || ''}')" class="btn-secondary"><i class="fas fa-edit"></i> ערוך פרטים</button>` 
             : ''}
     </div>`;
 }
@@ -466,3 +466,4 @@ function navigateToChat(communityId, communityName) {
     window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
 
 }
+
