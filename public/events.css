@@ -12,6 +12,7 @@
     --accent-green: #22c55e;
     --accent-gray: #9ca3af;
 }
+
 /* =========================
    PAGE BASE
 ========================= */
@@ -19,8 +20,6 @@ body {
     margin: 0;
     direction: rtl;
     color: var(--text-main);
-
-    /* 🔥 זה התיקון הקריטי */
     min-height: 100vh;
 }
 
@@ -45,7 +44,6 @@ body {
     box-shadow:
         0 10px 25px rgba(0,0,0,0.06),
         0 30px 60px rgba(79,163,247,0.12);
-
     display: flex;
     gap: 12px;
     align-items: center;
@@ -222,22 +220,39 @@ body {
     padding: 0 20px 20px;
 }
 
+/* REGISTER BUTTON – CoNet PRIMARY */
 .register-btn {
     width: 100%;
-    padding: 12px;
-    background: var(--accent-green);
-    color: white;
+    padding: 12px 22px;
+    background: var(--primary-blue);
+    color: #ffffff;
+    border: none;
     border-radius: 999px;
+    font-size: 0.9rem;
     font-weight: 600;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.1s ease, background 0.15s ease;
 }
 
 .register-btn:hover {
-    background: #16a34a;
+    background: var(--primary-hover);
+    box-shadow: 0 0 0 3px rgba(44,128,255,0.25);
 }
 
+.register-btn:active {
+    transform: scale(0.97);
+}
+
+/* EVENT FULL */
 .register-btn.full {
     background: var(--accent-gray);
+    color: #ffffff;
     cursor: not-allowed;
+    box-shadow: none;
+}
+
+.register-btn.full:hover {
+    background: var(--accent-gray);
 }
 
 /* =========================
