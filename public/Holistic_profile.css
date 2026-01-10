@@ -112,9 +112,9 @@ body {
 #my-orders > div:first-child,
 #managed-communities > div:first-child,
 #managed-spaces > div:first-child {
+    width: 100%;
     display: flex;
     justify-content: flex-end;
-    width: 100%;
     margin-bottom: 24px;
 }
 
@@ -217,10 +217,36 @@ body {
 }
 
 /* =========================
-   MODALS – FIX (no layout break)
+   PERSONAL DETAILS – RESTORED
+========================= */
+#personal-details {
+    margin-top: 40px;
+}
+
+.details-card-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.details-card {
+    width: 100%;
+    max-width: 520px;
+    padding: 28px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 0.85rem;
+}
+
+/* =========================
+   MODALS – CoNet BRANDING RESTORED
 ========================= */
 .modal {
-    display: none;           /* 🔑 קריטי */
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.45);
@@ -234,6 +260,33 @@ body {
     max-width: 420px;
     margin: 10vh auto;
     box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+}
+
+/* Community / Space edit */
+.modal-content.modal-form {
+    border-radius: 24px;
+    padding: 28px;
+    max-width: 460px;
+}
+
+.modal-content.modal-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--primary-blue);
+    text-align: center;
+}
+
+.modal-content.modal-form .form-group {
+    margin-bottom: 16px;
+}
+
+.modal-content.modal-form input,
+.modal-content.modal-form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-soft);
+    font-family: inherit;
 }
 
 /* =========================
