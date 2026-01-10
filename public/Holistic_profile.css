@@ -32,10 +32,8 @@ body {
     margin: 0 auto;
     padding: 32px 24px 80px;
     box-sizing: border-box;
-
-    /* 🔑 התיקון */
     min-height: calc(100vh - 80px);
-    background: transparent;
+    background: transparent; /* לא נוגעים ברקע של auth.css */
 }
 
 /* =========================
@@ -120,24 +118,32 @@ body {
 #managed-spaces > div:first-child {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    width: 100%;
     margin-bottom: 24px;
 }
 
 /* =========================
-   PRIMARY BUTTON (New order / Create community)
+   PRIMARY BUTTON
+   (Override auth.css 100% width SAFELY)
 ========================= */
-.auth-btn {
+.main-container .auth-btn {
     background: var(--primary-blue);
     color: #fff;
     border: none;
     border-radius: 999px;
-    padding: 12px 30px;
-    font-size: 0.9rem;
+    padding: 10px 20px;          /* ⬅️ לא ענק */
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    width: auto !important;      /* ⬅️ תיקון קריטי */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
 }
 
-.auth-btn:hover {
+.main-container .auth-btn:hover {
     background: var(--primary-hover);
 }
 
@@ -269,23 +275,20 @@ body {
 }
 
 /* =========================
-   MODALS – overlay, not page flow
+   MODALS
+   ❗️מחזירים שליטה ל-auth.css
 ========================= */
 .modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 9999;
+    background: initial !important;
 }
 
 .modal-content {
-    background: #fff;
-    border-radius: 20px;
-    padding: 24px;
-    max-width: 420px;
-    margin: 10vh auto;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    background: initial !important;
+    border-radius: initial !important;
+    padding: initial !important;
+    max-width: initial !important;
+    margin: initial !important;
+    box-shadow: initial !important;
 }
 
 /* =========================
@@ -301,9 +304,8 @@ body {
         gap: 18px;
     }
 
-    .auth-btn {
-        width: 100%;
-        text-align: center;
+    .main-container .auth-btn {
+        width: auto !important;
     }
 
     .card {
