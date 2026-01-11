@@ -160,7 +160,7 @@ async function loadManagedCommunities() {
     if(!container) return;
     
     const createBtnHtml = `
-        <div style="width: 100%; text-align: left; margin-bottom: 20px;">
+        <div style="width: 100%; text-align: right; margin-bottom: 20px;">
             <button onclick="window.location.href='add_community'" class="auth-btn">
                 <i class="fas fa-plus"></i> יצירת קהילה חדשה
             </button>
@@ -190,7 +190,7 @@ async function loadManagedSpaces() {
 
     // כפתור יצירת מרחב חדש
     const createBtnHtml = `
-        <div style="width: 100%; text-align: left; margin-bottom: 20px;">
+        <div style="width: 100%; text-align: right; margin-bottom: 20px;">
             <button onclick="window.location.href='add_space'" class="auth-btn">
                 <i class="fas fa-plus"></i> יצירת מרחב חדש
             </button>
@@ -477,4 +477,5 @@ function navigateToChat(communityId, communityName) {
     window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
 
 }
+
 
