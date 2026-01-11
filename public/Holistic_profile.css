@@ -111,7 +111,8 @@ body {
 ========================= */
 #my-orders > div:first-child,
 #managed-communities > div:first-child,
-#managed-spaces > div:first-child {
+#managed-spaces > div:first-child,
+#my-events > div:first-child{
     width: 100%;
     display: flex;
     justify-content: flex-end;
@@ -301,3 +302,4 @@ body {
         max-width: 100%;
     }
 }
+
