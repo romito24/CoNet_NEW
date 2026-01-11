@@ -224,6 +224,29 @@ button:active {
     flex: 1;
     height: 100%;
 }
+/* =================================================
+   INFO WINDOW ACTIONS – BASE (DESKTOP + MOBILE)
+================================================= */
+
+.info-window-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.info-window-actions .info-btn {
+    flex: 1;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    line-height: 1.1;
+    white-space: nowrap;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
 
 /* =========================
    MOBILE FIXES (CRITICAL)
@@ -268,25 +291,9 @@ button:active {
     overflow: hidden;
 }
 
-.info-window-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-}
-
 .info-window-actions .info-btn {
-    flex: 1 1 100%;
-    max-width: 100%;
-    border-radius: 999px;
-    padding: 8px 12px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    line-height: 1;
-    white-space: nowrap;
-    transition: box-shadow 0.15s ease, transform 0.1s ease;
+    padding: 6px 8px;
+    font-size: 0.7rem;
 }
 
 /* Order */
