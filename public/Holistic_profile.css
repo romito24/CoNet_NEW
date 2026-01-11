@@ -109,32 +109,11 @@ body {
 /* =========================
    ACTION BAR (Top buttons)
 ========================= */
-#my-orders > div:first-child,
-#managed-communities > div:first-child,
-#managed-spaces > div:first-child{
+.profile-action-bar {
     width: 100%;
     display: flex;
     justify-content: flex-end;
     margin-bottom: 24px;
-}
-/* =========================
-   UNIFY TOP ACTION BUTTONS
-   (override inline styles)
-========================= */
-
-/* הזמנה חדשה */
-#my-orders > div:first-child {
-    text-align: right !important;
-}
-
-/* יצירת קהילה חדשה */
-#managed-communities-list > div:first-child {
-    text-align: right !important;
-}
-
-/* יצירת מרחב חדש */
-#managed-spaces-list > div:first-child {
-    text-align: right !important;
 }
 
 
@@ -321,5 +300,6 @@ body {
         max-width: 100%;
     }
 }
+
 
 
