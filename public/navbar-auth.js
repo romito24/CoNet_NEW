@@ -25,29 +25,44 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // אין טוקן – אורח
-    if (!token) {
+    // 🔁 מצב אורח – פונקציה מרכזית
+    function setGuestState() {
         greetingEl.textContent = "שלום, אורח";
         loginBtn.style.display = "inline-flex";
         logoutBtn.style.display = "none";
+        localStorage.removeItem("token");
+    }
+
+    // אין טוקן בכלל
+    if (!token) {
+        setGuestState();
         return;
     }
 
     const payload = parseJwt(token);
 
-    if (payload) {
-        greetingEl.textContent = `שלום, ${payload.first_name || "משתמש"}`;
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-flex";
-    } else {
-        // טוקן פגום / לא קריא
-        greetingEl.textContent = "שלום, אורח";
-        loginBtn.style.display = "inline-flex";
-        logoutBtn.style.display = "none";
+    // טוקן לא קריא / חסר payload / חסר exp
+    if (!payload || !payload.exp) {
+        setGuestState();
+        return;
     }
+
+    // בדיקת פקיעת תוקף (exp הוא בשניות)
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    if (payload.exp < nowInSeconds) {
+        setGuestState();
+        return;
+    }
+
+    // ✅ טוקן תקין – משתמש מחובר
+    greetingEl.textContent = `שלום, ${payload.first_name || "משתמש"}`;
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-flex";
 });
 
-// התנתקות – רק בלחיצה
+// ==========================================
+// Logout (ידני בלבד)
+// ==========================================
 function logoutUser() {
     localStorage.removeItem("token");
     window.location.href = "login.html";
