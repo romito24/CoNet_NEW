@@ -144,6 +144,10 @@ button:active {
 /* =========================
    MULTISELECT
 ========================= */
+.multiselect {
+    position: relative; /* 🔑 חובה – קובע parent ל-dropdown */
+}
+
 .selectBox select {
     width: 100%;
     padding: 10px 16px;
@@ -155,15 +159,18 @@ button:active {
 .checkboxes-dropdown {
     display: none;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
-    background: white;
+
+    background: #ffffff;
     border: 1px solid var(--border-soft);
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 50;
     border-radius: 16px;
+
+    max-height: 220px;
+    overflow-y: auto;
+
+    z-index: 999; /* מעל הכל */
 }
 
 /* =========================
@@ -233,7 +240,9 @@ button:active {
     display: flex;
     gap: 8px;
     margin-top: 14px;
+    flex-wrap: wrap;
 }
+
 
 .info-window-actions .info-btn {
     flex: 1;
@@ -289,12 +298,12 @@ button:active {
     font-family: 'Poppins', sans-serif;
     color: #1f2937;
     max-width: 260px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .info-window-actions .info-btn {
-    padding: 6px 8px;
-    font-size: 0.7rem;
+    white-space: normal;
+    text-align: center;
 }
 
 /* Order */
