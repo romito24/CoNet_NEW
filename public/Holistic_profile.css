@@ -307,10 +307,10 @@ body {
     margin-bottom: 24px;
 }
 
-/* 2️⃣ Normalize "create" buttons injected via JS (managed sections) */
-.tab-content > div:first-child {
+/* FIX: action bar only for my-orders */
+#my-orders .profile-action-bar {
     display: flex;
-    justify-content: flex-start; /* RTL safe */
+    justify-content: flex-start; /* RTL = ימין */
 }
 
 .tab-content > div:first-child .auth-btn {
@@ -463,5 +463,6 @@ body {
         max-width: 220px;
     }
 }
+
 
 
