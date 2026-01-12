@@ -339,81 +339,50 @@ body {
 /* =========================
    MOBILE
 ========================= */
+/* =========================
+   MOBILE – PROFILE ONLY (FINAL)
+========================= */
 @media (max-width: 768px) {
-    .profile-header h1 {
-        font-size: 1.6rem;
+
+    /* 1️⃣ בטל flex אגרסיבי שמגיע מדסקטופ */
+    .tab-content > div:first-child {
+        display: block;
     }
 
+    /* 2️⃣ כפתורי פעולה – תמיד במרכז */
+    .profile-action-bar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    #managed-communities-list > div:first-child,
+    #managed-spaces-list > div:first-child {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    .profile-action-bar .auth-btn {
+        width: 100%;
+        max-width: 240px;
+    }
+
+    /* 3️⃣ תוכן טאב ו-empty state */
+    .empty-state {
+        text-align: center;
+        margin: 40px auto;
+    }
+
+    .grid-container {
+        justify-items: center;
+    }
+
+    /* 4️⃣ cards נראים טוב */
     .card {
         max-width: 100%;
     }
-
-   /* =================================================
-   HOLISTIC PROFILE – MOBILE STABILIZATION
-   ✔ fixes tab jumping
-   ✔ aligns action buttons
-   ✔ keeps navbar design intact
-================================================= */
-
-@media (max-width: 768px) {
-   
-       /* 1️⃣ Tabs container – stop flex chaos */
-       .tabs-container {
-           margin-bottom: 20px;
-       }
-   
-       .tabs {
-           display: grid;
-           grid-template-columns: repeat(2, 1fr);
-           gap: 8px;
-           border-radius: 16px;
-           padding: 12px;
-       }
-   
-       .tab-btn {
-           justify-content: center;
-           padding: 10px 8px;
-           font-size: 0.8rem;
-           text-align: center;
-           white-space: normal;
-       }
-   
-       /* If odd number of tabs – last one centered */
-       .tab-btn:last-child:nth-child(odd) {
-           grid-column: 1 / -1;
-           justify-self: center;
-           max-width: 200px;
-       }
-   
-       /* 2️⃣ Action buttons – same behavior everywhere */
-       .profile-action-bar,
-       .tab-content > div:first-child {
-           justify-content: center;
-       }
-   
-       .profile-action-bar .auth-btn,
-       .tab-content > div:first-child .auth-btn {
-           width: 100%;
-           max-width: 240px;
-       }
-   
-       /* 3️⃣ Grid spacing consistency */
-       .tab-content {
-           padding-top: 8px;
-       }
-   
-       .grid-container {
-           margin-top: 12px;
-       }
-   
-       /* 4️⃣ Cards – prevent button jumping */
-       .card {
-           min-height: 100%;
-       }
-   
-       .card button {
-           margin-top: 12px;
-       }
-   }
 }
+
+
 
