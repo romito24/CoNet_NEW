@@ -341,15 +341,15 @@ body {
 ========================= */
 /* =========================
    MOBILE – PROFILE ONLY (FINAL)
-========================= */
+=========================
 @media (max-width: 768px) {
 
-    /* 1️⃣ בטל flex אגרסיבי שמגיע מדסקטופ */
+     1️⃣ בטל flex אגרסיבי שמגיע מדסקטופ 
     .tab-content > div:first-child {
         display: block;
     }
 
-    /* 2️⃣ כפתורי פעולה – תמיד במרכז */
+    /* 2️⃣ כפתורי פעולה – תמיד במרכז 
     .profile-action-bar {
         display: flex;
         justify-content: center;
@@ -368,7 +368,7 @@ body {
         max-width: 240px;
     }
 
-    /* 3️⃣ תוכן טאב ו-empty state */
+    /* 3️⃣ תוכן טאב ו-empty state
     .empty-state {
         text-align: center;
         margin: 40px auto;
@@ -378,11 +378,11 @@ body {
         justify-items: center;
     }
 
-    /* 4️⃣ cards נראים טוב */
+    /* 4️⃣ cards נראים טוב
     .card {
         max-width: 100%;
     }
-}
+} */
 /* =========================
    MOBILE – CENTER TABS NAV
 ========================= */
@@ -394,15 +394,16 @@ body {
     }
 
     /* הופך את הטאבים לגריד סימטרי */
-      .tabs {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-          justify-content: center;
-          justify-items: center;
-          gap: 8px;
-          padding: 12px;
-          border-radius: 16px;
-      }
+
+    .tabs {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* תמיד 2 עמודות */
+        gap: 8px;
+        padding: 12px;
+        border-radius: 16px;
+        justify-items: center;
+        max-width: 100%;
+    }
 
     /* כפתור טאב – מיושר ומרוכז */
     .tab-btn {
@@ -414,14 +415,9 @@ body {
         font-size: 0.8rem;
     }
 
-    /* אם יש מספר אי-זוגי של טאבים – האחרון במרכז */
+    /* מספר אי־זוגי → האחרון באמצע */
     .tab-btn:last-child:nth-child(odd) {
         grid-column: 1 / -1;
         max-width: 220px;
     }
 }
-
-
-
-
-
