@@ -287,6 +287,49 @@ body {
     border: 1px solid var(--border-soft);
     font-family: inherit;
 }
+/* =================================================
+   HOLISTIC PROFILE – SAFE LAYOUT FIXES (NON BREAKING)
+   ✔ fixes button alignment
+   ✔ normalizes managed sections
+   ✔ keeps auth.css + existing layout intact
+================================================= */
+
+/* 1️⃣ Action bar – always right in RTL */
+.profile-action-bar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* RTL = right */
+    margin-bottom: 24px;
+}
+
+/* 2️⃣ Normalize "create" buttons injected via JS (managed sections) */
+.tab-content > div:first-child {
+    display: flex;
+    justify-content: flex-start; /* RTL safe */
+}
+
+.tab-content > div:first-child .auth-btn {
+    margin-bottom: 24px;
+}
+
+/* 3️⃣ Keep grid spacing consistent between all tabs */
+.tab-content {
+    min-height: 300px;
+}
+
+.tab-content .grid-container {
+    margin-top: 16px;
+}
+
+/* 4️⃣ Cards – keep buttons aligned & consistent */
+.card {
+    display: flex;
+    flex-direction: column;
+}
+
+.card button {
+    margin-top: auto;
+}
 
 /* =========================
    MOBILE
@@ -300,6 +343,7 @@ body {
         max-width: 100%;
     }
 }
+
 
 
 
