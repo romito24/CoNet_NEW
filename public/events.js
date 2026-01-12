@@ -116,8 +116,8 @@ async function handleRegistration(btnElement, eventId, eventName) {
         }
         else if (response.status === 403) {
             resetButton(btnElement, originalText);
-            if (confirm(data.message + "\n\nהאם תרצה לעבור לדף ההרשמה לקהילה כעת?")) {
-                window.location.href = 'join-community.html'; 
+            if (confirm(data.message + "\n\nהאם תרצה לעבור לדף הקהילות כעת?")) {
+                window.location.href = '/communities'; 
             }
         } 
         else if (response.status === 409) {
