@@ -335,6 +335,29 @@ body {
 .card button {
     margin-top: auto;
 }
+/* =================================================
+   FIX: Managed Spaces – restore card layout
+================================================= */
+
+/* 1️⃣ החזרת Grid לטאב של מרחבים בניהול */
+#managed-spaces-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    justify-items: center;
+}
+
+/* 2️⃣ וידוא שכרטיסי מרחבים נראים כמו כרטיס */
+#managed-spaces-list .card {
+    background: #ffffff;
+    border-radius: 22px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* 3️⃣ מיקום תקין לכפתור "ערוך פרטים" */
+#managed-spaces-list .card button {
+    margin-top: 16px;
+}
 
 /* =========================
    MOBILE
@@ -421,3 +444,4 @@ body {
         max-width: 220px;
     }
 }
+
