@@ -326,3 +326,34 @@ button:active {
 .info-window-actions .info-btn:active {
     transform: scale(0.97);
 }
+
+/* =================================================
+   GOOGLE MAP INFO WINDOW – MOBILE OVERRIDE
+   ✔ fixes internal scroll
+   ✔ keeps desktop behavior
+================================================= */
+
+@media (max-width: 768px) {
+
+    .gm-style .gm-style-iw,
+    .gm-style .gm-style-iw-d {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .info-window-content {
+        max-width: 90vw;
+    }
+
+    .info-window-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .info-window-actions .info-btn {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+}
+
