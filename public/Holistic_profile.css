@@ -400,6 +400,14 @@ body {
     margin-top: auto;
 }
 /* =================================================
+   FINAL FIX: Managed Spaces – align cards to right
+================================================= */
+
+#managed-spaces.active-content #managed-spaces-list {
+    justify-items: start !important; /* RTL = ימין */
+}
+
+/* =================================================
    FIX: Incoming Orders – flight card container
 ================================================= */
 
@@ -504,6 +512,7 @@ body {
         max-width: 220px;
     }
 }
+
 
 
 
