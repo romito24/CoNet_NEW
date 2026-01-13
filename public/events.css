@@ -293,4 +293,18 @@ body {
     .filters-bar button {
         width: 100%;
     }
+      /* הקטנת search-box עצמו */
+    .search-box {
+        flex: none;              /* מבטל התנהגות flex של דסקטופ */
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* הקטנת שדה החיפוש */
+    .search-box input {
+        height: 44px;            /* כמו בקהילות */
+        padding: 0 16px;
+        font-size: 0.9rem;
+    }
 }
