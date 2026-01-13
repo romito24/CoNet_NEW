@@ -420,6 +420,21 @@ body {
 #managed-spaces-list .card {
     justify-self: start; /* RTL = ימין */
 }
+/* =================================================
+   FINAL FIX: Managed Communities – align like Managed Spaces
+================================================= */
+
+/* שורת כפתור "יצירת קהילה חדשה" */
+#managed-communities-list > div:first-child {
+    grid-column: 1 / -1;   /* תופס שורה מלאה */
+    justify-self: end;     /* RTL = ימין */
+    margin-bottom: 24px;  /* רווח פרופורציונלי לכרטיסים */
+}
+
+/* כרטיסי קהילות – יושבים מתחת לכפתור */
+#managed-communities-list .card {
+    justify-self: start;  /* RTL = ימין */
+}
 
 /* =================================================
    FIX: Incoming Orders – flight card container
@@ -526,6 +541,7 @@ body {
         max-width: 220px;
     }
 }
+
 
 
 
