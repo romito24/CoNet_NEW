@@ -238,8 +238,8 @@ button:active {
 
 .info-window-actions {
     display: flex;
-    gap: 7px;
-    margin-top: 13px;
+    gap: 8px;
+    margin-top: 14px;
     flex-wrap: wrap;
 }
 
@@ -252,7 +252,7 @@ button:active {
     font-weight: 600;
     cursor: pointer;
     border: none;
-    line-height: 1.1;
+    line-height: 1.0;
     white-space: nowrap;
     transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
