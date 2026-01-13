@@ -94,6 +94,7 @@ function switchTab(tabId) {
     if (content) content.classList.add('active-content');
 
     if (tabId === 'my-orders') loadMyOrders();
+    if (tabId === 'event-orders') loadEventOrders();
     if (tabId === 'my-events') loadMyEvents();
     if (tabId === 'my-communities') loadMyCommunities();
     if (tabId === 'managed-communities') loadManagedCommunities();
@@ -118,13 +119,29 @@ async function loadMyOrders() {
     container.innerHTML = '<div class="loading">טוען הזמנות...</div>';
     
     const orders = await fetchData('/orders/my-orders');
-    const activeOrders = orders ? orders.filter(order => order.status !== 'canceled') : [];
+    const privateOrders = orders ? orders.filter(order => order.status !== 'canceled' && !order.event_id) : [];
 
-    if (activeOrders.length === 0) {
+    if (privateOrders.length === 0) {
         container.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times" style="font-size:40px; margin-bottom:10px;"></i><p>אין הזמנות פעילות.</p></div>`;
         return;
     }
-    container.innerHTML = activeOrders.map(order => createOrderCard(order)).join('');
+    container.innerHTML = privateOrders.map(order => createOrderCard(order)).join('');
+}
+
+async function loadEventOrders() {
+    const container = document.getElementById('event-orders-list');
+    if(!container) return;
+    container.innerHTML = '<div class="loading">טוען הזמנות לאירועים...</div>';
+    
+    const orders = await fetchData('/orders/my-orders'); 
+    
+    const eventOrders = orders ? orders.filter(order => order.status !== 'canceled' && order.event_id) : [];
+
+    if (eventOrders.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-ticket-alt" style="font-size:40px; margin-bottom:10px;"></i><p>עדיין לא יצרת אירועים.</p></div>`;
+        return;
+    }
+    container.innerHTML = eventOrders.map(order => createOrderCard(order, true)).join('');
 }
 
 async function loadMyEvents() {
@@ -293,13 +310,17 @@ function createOrderCard(order) {
     const timeStart = new Date(order.start_time).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
     const timeEnd = new Date(order.end_time).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
     const canCancel = order.status !== 'declined';
+    const title = isEvent && order.event_name ? `🎉 ${order.event_name}` : order.space_name;
+    const subTitle = isEvent ? `<div class="card-info"><i class="fas fa-map-marker-alt"></i> במרחב: ${order.space_name}</div>` : '';
     
     return `
     <div class="card">
-        <h3>${order.space_name}</h3>
+        <h3>${title}</h3>
+        ${subTitle}
         <div class="card-info"><i class="far fa-calendar-alt"></i> ${dateStr}</div>
         <div class="card-info"><i class="far fa-clock"></i> ${timeStart} - ${timeEnd}</div>
         <div class="card-info"><i class="fas fa-map-marker-alt"></i> ${order.address}</div>
+        <div class="card-info"><i class="fas fa-users"></i> כמות משתתפים: ${order.attendees_count}</div>
         <span class="status-badge status-${order.status}">${translateStatus(order.status)}</span>
         ${canCancel ? `<button onclick="confirmAction('ביטול הזמנה', 'האם לבטל?', () => cancelOrder(${order.order_id}))" class="btn-danger">ביטול הזמנה</button>` : ''}
     </div>`;
