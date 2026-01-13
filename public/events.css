@@ -279,3 +279,42 @@ body {
         width: 100%;
     }
 }
+
+/* =================================================
+   MOBILE FIX: Events search bar – compact like Communities
+================================================= */
+@media (max-width: 768px) {
+
+    /* קונטיינר החיפוש של אירועים */
+    #events-search,
+    .events-search-container {
+        padding: 16px !important;
+        border-radius: 24px;
+    }
+
+    /* שדה חיפוש */
+    #events-search input[type="text"],
+    .events-search-container input {
+        height: 44px;
+        font-size: 0.9rem;
+        padding: 0 16px;
+    }
+
+    /* תאריך */
+    #events-search input[type="date"],
+    .events-search-container input[type="date"] {
+        height: 44px;
+        font-size: 0.85rem;
+        padding: 0 14px;
+    }
+
+    /* כפתור סינון */
+    #events-search button,
+    .events-search-container button {
+        height: 44px;
+        padding: 0 18px;
+        font-size: 0.9rem;
+        border-radius: 999px;
+    }
+}
+
