@@ -68,6 +68,7 @@ async function loadUserDetails() {
     
     if (user.user_type === 'community_manager') {
         showElement('btn-managed-communities');
+        showElement('btn-event-orders');
     }
     if (user.user_type === 'space_manager') {
         showElement('btn-managed-spaces');
@@ -77,6 +78,7 @@ async function loadUserDetails() {
         showElement('btn-managed-communities');
         showElement('btn-managed-spaces');
         showElement('btn-incoming-orders');
+        showElement('btn-event-orders');
     }
 }
 
