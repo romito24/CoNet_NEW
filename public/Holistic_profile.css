@@ -399,6 +399,26 @@ body {
 #managed-spaces.active-content #managed-spaces-list .card button {
     margin-top: auto;
 }
+/* =================================================
+   FIX: Incoming Orders – flight card container
+================================================= */
+
+.flight-board-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    justify-items: center;
+}
+
+.flight-card {
+    width: 100%;
+    max-width: 360px;
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
 /* =========================
    MOBILE
 ========================= */
@@ -484,6 +504,7 @@ body {
         max-width: 220px;
     }
 }
+
 
 
 
