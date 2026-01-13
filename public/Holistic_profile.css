@@ -406,6 +406,20 @@ body {
 #managed-spaces.active-content #managed-spaces-list {
     justify-items: start !important; /* RTL = ימין */
 }
+/* =================================================
+   FINAL FIX: Managed Spaces – ignore action row in grid
+================================================= */
+
+/* שורת הכפתור (ה-div הראשון) */
+#managed-spaces-list > div:first-child {
+    grid-column: 1 / -1;   /* תופס שורה מלאה */
+    justify-self: end;     /* RTL = ימין */
+}
+
+/* כרטיסים עצמם – תמיד לימין */
+#managed-spaces-list .card {
+    justify-self: start; /* RTL = ימין */
+}
 
 /* =================================================
    FIX: Incoming Orders – flight card container
@@ -512,6 +526,7 @@ body {
         max-width: 220px;
     }
 }
+
 
 
 
