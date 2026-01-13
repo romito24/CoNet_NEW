@@ -222,6 +222,7 @@ body {
     font-size: 0.85rem;
     font-weight: 700;
     margin-top: 10px;
+    width: fit-content;
 }
 
 .status-approved {
