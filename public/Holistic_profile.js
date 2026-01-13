@@ -305,7 +305,7 @@ async function loadIncomingOrders() {
 // Helpers
 // ==========================================
 
-function createOrderCard(order) {
+function createOrderCard(order, isEvent = false) { 
     const dateStr = new Date(order.start_time).toLocaleDateString('he-IL');
     const timeStart = new Date(order.start_time).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
     const timeEnd = new Date(order.end_time).toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
