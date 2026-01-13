@@ -319,10 +319,6 @@ button:active {
     border: 1.4px solid rgba(44,128,255,0.25);
 }
 
-.info-window-actions .info-btn:hover {
-    box-shadow: 0 0 0 2px rgba(44,128,255,0.25);
-}
-
 .info-window-actions .info-btn:active {
     filter: brightness(0.96);
 }
