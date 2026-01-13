@@ -344,7 +344,7 @@ body {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 24px;
-    justify-items: center;
+    justify-items: start;
 }
 
 /* 2️⃣ וידוא שכרטיסי מרחבים נראים כמו כרטיס */
@@ -504,6 +504,7 @@ body {
         max-width: 220px;
     }
 }
+
 
 
 
