@@ -84,7 +84,7 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
 }
 
 // =================================================================
-// יצירת הזמנה (לוגיקה משותפת)
+// יצירת הזמנה 
 // =================================================================
 const createOrderLogic = async (orderData) => {
     const { space_id, user_id, start_time, end_time, event_id, attendees_count } = orderData;
@@ -217,7 +217,14 @@ router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
 router.get('/my-orders', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
     try {
-        const sql = `SELECT o.*, s.space_name, s.address FROM orders o JOIN spaces s ON o.space_id = s.space_id WHERE o.user_id = ? ORDER BY o.start_time DESC`;
+        const sql = `
+            SELECT o.*, s.space_name, s.address, e.event_name 
+            FROM orders o 
+            JOIN spaces s ON o.space_id = s.space_id 
+            LEFT JOIN events e ON o.event_id = e.event_id
+            WHERE o.user_id = ? 
+            ORDER BY o.start_time DESC
+        `;
         const [orders] = await db.execute(sql, [user_id]);
         res.json(orders);
     } catch (error) {
