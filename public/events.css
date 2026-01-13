@@ -318,3 +318,23 @@ body {
     }
 }
 
+/* =================================================
+   MOBILE FINAL FIX: shrink filters-bar container
+================================================= */
+@media (max-width: 768px) {
+
+    /* הקונטיינר עצמו – זה שגורם לגובה הענק */
+    .filters-bar {
+        padding: 16px !important;     /* במקום 24px */
+        margin-bottom: 24px;          /* במקום 40px */
+        min-height: unset !important;
+        height: auto !important;
+        gap: 12px;
+    }
+
+    /* מבטל רווחים מיותרים בין ילדים */
+    .filters-bar > * {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
