@@ -324,9 +324,8 @@ button:active {
 }
 
 .info-window-actions .info-btn:active {
-    transform: scale(0.97);
+    filter: brightness(0.96);
 }
-
 /* =================================================
    GOOGLE MAP INFO WINDOW – MOBILE OVERRIDE
    ✔ fixes internal scroll
