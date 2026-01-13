@@ -270,71 +270,25 @@ body {
    MOBILE
 ========================= */
 @media (max-width: 768px) {
+
     .filters-bar {
         flex-direction: column;
         align-items: stretch;
+        justify-content: flex-start;
+
+        padding: 16px;
+        margin-bottom: 24px;
+        gap: 12px;
+
+        min-height: unset;
+        height: auto;
+    }
+
+    .filters-bar > * {
+        margin: 0;
     }
 
     .filters-bar button {
         width: 100%;
-    }
-}
-
-/* =================================================
-   MOBILE FIX: Events search bar – compact like Communities
-================================================= */
-@media (max-width: 768px) {
-
-    /* קונטיינר החיפוש של אירועים */
-    #events-search,
-    .events-search-container {
-        padding: 16px !important;
-        border-radius: 24px;
-    }
-
-    /* שדה חיפוש */
-    #events-search input[type="text"],
-    .events-search-container input {
-        height: 44px;
-        font-size: 0.9rem;
-        padding: 0 16px;
-    }
-
-    /* תאריך */
-    #events-search input[type="date"],
-    .events-search-container input[type="date"] {
-        height: 44px;
-        font-size: 0.85rem;
-        padding: 0 14px;
-    }
-
-    /* כפתור סינון */
-    #events-search button,
-    .events-search-container button {
-        height: 44px;
-        padding: 0 18px;
-        font-size: 0.9rem;
-        border-radius: 999px;
-    }
-}
-
-/* =================================================
-   MOBILE FINAL FIX: shrink filters-bar container
-================================================= */
-@media (max-width: 768px) {
-
-    /* הקונטיינר עצמו – זה שגורם לגובה הענק */
-    .filters-bar {
-        padding: 16px !important;     /* במקום 24px */
-        margin-bottom: 24px;          /* במקום 40px */
-        min-height: unset !important;
-        height: auto !important;
-        gap: 12px;
-    }
-
-    /* מבטל רווחים מיותרים בין ילדים */
-    .filters-bar > * {
-        margin-top: 0;
-        margin-bottom: 0;
     }
 }
