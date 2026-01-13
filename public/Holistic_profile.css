@@ -237,6 +237,44 @@ body {
     border: 1px solid #bfdbfe; 
 }
 
+/* Cancel Pop-Up */
+.modal-content {
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px; 
+    margin-top: 24px;
+}
+
+.modal-actions button {
+    border-radius: 999px;
+    padding: 10px 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+}
+
+.modal-actions .btn-danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.modal-actions .btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.modal-actions .btn-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.modal-actions .btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
 /* =========================
    PERSONAL DETAILS – RESTORED
 ========================= */
