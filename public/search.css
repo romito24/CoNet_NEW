@@ -254,7 +254,7 @@ button:active {
     border: none;
     line-height: 1.0;
     white-space: nowrap;
-    transition: box-shadow 0.15s ease, transform 0.1s ease;
+    transition: box-shadow 0.15s ease;
 }
 
 
