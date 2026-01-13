@@ -231,6 +231,12 @@ body {
     border: 1px solid #a7f3d0; 
 }
 
+.status-registered {
+    background-color: #dbeafe; 
+    color: #1e40af;            
+    border: 1px solid #bfdbfe; 
+}
+
 /* =========================
    PERSONAL DETAILS – RESTORED
 ========================= */
