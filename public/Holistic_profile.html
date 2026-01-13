@@ -60,6 +60,10 @@
                 <i class="fas fa-calendar-check"></i> ההזמנות שלי
             </button>
 
+            <button onclick="switchTab('event-orders')" class="tab-btn" id="btn-event-orders">
+                <i class="fas fa-calendar-star"></i> אירועים בניהולי
+            </button>
+
             <button onclick="switchTab('my-events')" class="tab-btn" id="btn-my-events">
                 <i class="fas fa-ticket-alt"></i> האירועים שלי
             </button>
@@ -95,6 +99,15 @@
             </button>
         </div>
         <div id="orders-list" class="grid-container"></div>
+    </div>
+
+    <div id="event-orders" class="tab-content">
+        <div class="profile-action-bar">
+            <button onclick="window.location.href='search'" class="auth-btn">
+                <i class="fas fa-search"></i> הזמנת מרחב לאירוע קהילה
+            </button>
+        </div>
+        <div id="event-orders-list" class="grid-container"></div>
     </div>
 
     <!-- EVENTS -->
