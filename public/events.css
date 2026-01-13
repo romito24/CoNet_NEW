@@ -271,6 +271,7 @@ body {
 ========================= */
 @media (max-width: 768px) {
 
+    /* Events – filters bar compact mobile layout */
     .filters-bar {
         flex-direction: column;
         align-items: stretch;
@@ -284,6 +285,7 @@ body {
         height: auto;
     }
 
+    /* remove default margins that inflate height */
     .filters-bar > * {
         margin: 0;
     }
