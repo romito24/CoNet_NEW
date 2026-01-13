@@ -366,7 +366,7 @@ button:active {
 
     /* מגדיל טיפה את החלונית */
     .info-window-content {
-        max-width: 300px;
+        max-width: 320px;
     }
 
     /* מסדר את הכפתורים בשורה אחת */
