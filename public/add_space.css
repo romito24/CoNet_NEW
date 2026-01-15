@@ -61,7 +61,7 @@ textarea {
     padding: 10px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    box-sizing: border-box; /* חשוב כדי שה-padding לא ישבור את הרוחב */
+    box-sizing: border-box;
     font-size: 16px;
 }
 
