@@ -5,7 +5,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const communityId = urlParams.get('communityId');
 const communityName = urlParams.get('name');
 
-// אלמנטים
+// אלמנטים כלשהם
 const messagesContainer = document.getElementById('messages-container');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
