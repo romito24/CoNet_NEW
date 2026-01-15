@@ -1,6 +1,6 @@
-/* =========================
-   RESET & SYSTEM COLORS
-========================= */
+/* ===============
+   SYSTEM COLORS
+================ */
 * {
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
@@ -17,7 +17,7 @@
 body {
     margin: 0;
     background: linear-gradient(180deg, #eaf2ff 0%, #f6f9ff 100%);
-    padding-top: 80px; /* תואם לגובה הבאנר */
+    padding-top: 80px;
 }
 
 /* =========================
@@ -141,9 +141,9 @@ button:active {
     text-decoration: none;
 }
 
-/* =================================================
-   TOP NAVBAR – FINAL, CENTERED & CLEAN
-================================================= */
+/* ============
+   TOP NAVBAR
+============== */
 .conet-navbar {
     position: fixed;
     top: 0;
@@ -167,10 +167,6 @@ button:active {
     grid-template-columns: auto 1fr auto;
     align-items: center;
 }
-
-/* =========================
-   SHARED VERTICAL ALIGN
-========================= */
 .conet-logo,
 .conet-nav-links,
 .conet-user {
@@ -189,9 +185,9 @@ button:active {
     width: auto;
 }
 
-/* =========================
-   NAV – TRUE CENTER, FIXED WIDTH
-========================= */
+/* =============
+   NAV – CENTER
+=============== */
 .conet-nav-links {
     justify-self: center;
     gap: 16px;
@@ -266,9 +262,9 @@ button:active {
     font-size: 0.8rem;
 }
 
-/* =================================================
+/* ==========
    MOBILE
-================================================= */
+=========== */
 @media (max-width: 768px) {
     body {
         padding-top: 112px;
