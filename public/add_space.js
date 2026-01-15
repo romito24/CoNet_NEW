@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFacilities();
 });
 
-// 1. בדיקת הרשאות
+// בדיקת הרשאות
 function checkPermissions() {
     const token = localStorage.getItem('token');
     
@@ -30,7 +30,7 @@ function checkPermissions() {
         const navUser = document.getElementById('nav-username');
         if (navUser) navUser.innerText = `שלום, ${userData.first_name || 'מנהל'}`;
 
-        // בדיקה קריטית: האם המשתמש הוא מנהל מרחב?
+        // בדיקה האם המשתמש הוא מנהל מרחב?
         if (userData.user_type !== 'space_manager' && userData.user_type !== 'admin') {
             alert('אין לך הרשאה לגשת לדף זה. הדף מיועד למנהלי מרחב בלבד.');
             window.location.href = 'Holistic_profile.html';
@@ -42,7 +42,7 @@ function checkPermissions() {
     }
 }
 
-// 2. אתחול השלמה אוטומטית (Google Maps)
+// אתחול השלמה אוטומטית (Google Maps)
 function initAutocomplete() {
     const input = document.getElementById("address");
     if (!input) return;
@@ -71,7 +71,7 @@ function fillInAddress() {
     document.getElementById("address").value = place.formatted_address;
 }
 
-// 3. טעינת רשימת הפיצ'רים
+// טעינת רשימת הפיצ'רים
 async function loadFacilities() {
     try {
         const response = await fetch(`${API_URL}/spaces/facilities`);
@@ -99,7 +99,7 @@ async function loadFacilities() {
     }
 }
 
-// 4. שליחת הטופס
+// שליחת הטופס
 document.getElementById('add-space-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
