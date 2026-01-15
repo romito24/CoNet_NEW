@@ -1,7 +1,3 @@
-/* =================================================
-   EVENTS – CoNet FINAL CSS (NO BODY BACKGROUND)
-================================================= */
-
 :root {
     --primary-blue: #2C80FF;
     --primary-hover: #2563eb;
@@ -88,7 +84,7 @@ body {
 }
 
 /* =========================
-   BUTTONS – CoNet STYLE
+   BUTTONS
 ========================= */
 .filters-bar button,
 .card-actions button {
@@ -130,18 +126,12 @@ body {
     background: rgba(44,128,255,0.08);
 }
 
-/* =========================
-   EVENTS GRID
-========================= */
 .events-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 28px;
 }
 
-/* =========================
-   EVENT CARD
-========================= */
 .event-card {
     background: var(--card-bg);
     border-radius: 22px;
@@ -157,7 +147,6 @@ body {
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
-/* Image */
 .card-image {
     height: 170px;
     background-color: #e5ecfb;
@@ -166,7 +155,6 @@ body {
     position: relative;
 }
 
-/* Community badge */
 .community-badge {
     position: absolute;
     top: 12px;
@@ -179,7 +167,6 @@ body {
     font-weight: 600;
 }
 
-/* Content */
 .card-content {
     padding: 20px;
     flex: 1;
@@ -204,7 +191,6 @@ body {
     color: var(--text-secondary);
 }
 
-/* Participants */
 .participants-count {
     margin-top: auto;
     padding-top: 14px;
@@ -220,7 +206,6 @@ body {
     padding: 0 20px 20px;
 }
 
-/* REGISTER BUTTON – CoNet PRIMARY */
 .register-btn {
     width: 100%;
     padding: 12px 22px;
@@ -255,9 +240,6 @@ body {
     background: var(--accent-gray);
 }
 
-/* =========================
-   STATES
-========================= */
 .loading,
 .no-results {
     text-align: center;
@@ -271,7 +253,6 @@ body {
 ========================= */
 @media (max-width: 768px) {
 
-    /* Events – filters bar compact mobile layout */
     .filters-bar {
         flex-direction: column;
         align-items: stretch;
@@ -285,7 +266,6 @@ body {
         height: auto;
     }
 
-    /* remove default margins that inflate height */
     .filters-bar > * {
         margin: 0;
     }
@@ -293,17 +273,16 @@ body {
     .filters-bar button {
         width: 100%;
     }
-      /* הקטנת search-box עצמו */
+   
     .search-box {
-        flex: none;              /* מבטל התנהגות flex של דסקטופ */
+        flex: none;             
         width: 100%;
         max-width: 100%;
         height: auto;
     }
 
-    /* הקטנת שדה החיפוש */
     .search-box input {
-        height: 44px;            /* כמו בקהילות */
+        height: 44px;           
         padding: 0 16px;
         font-size: 0.9rem;
     }
