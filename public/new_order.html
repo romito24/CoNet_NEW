@@ -5,39 +5,37 @@
     <title>הזמנת מרחב | CoNet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Bootstrap (forms only) -->
+    
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
-    <!-- Font -->
+    
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
         rel="stylesheet"
     >
 
-    <!-- Global Design -->
+    
     <link rel="stylesheet" href="auth.css">
     <link rel="stylesheet" href="auth_mobile.css">
 </head>
 
 <body>
 
-<!-- =========================
-     TOP NAVBAR (GLOBAL)
-========================= -->
+<!--החלק העליון של התפריט -->
 <header class="conet-navbar">
     <div class="conet-navbar-inner">
 
-        <!-- LOGO -->
+        
         <div class="conet-logo">
             <a href="/">
                 <img src="conetnew_logo.jpg" alt="CoNet">
             </a>
         </div>
 
-        <!-- NAV -->
+        <!-- תפריט -->
         <nav class="conet-nav-links">
             <a href="profile">הפרופיל שלי</a>
             <a href="communities">הקהילות של CoNet</a>
@@ -45,7 +43,7 @@
             <a href="events">האירועים של CoNet</a>
         </nav>
 
-        <!-- USER AREA -->
+        <!-- שם המשתמש -->
         <div class="conet-user">
             <span class="conet-greeting" id="userGreeting">
                 שלום, אורח
@@ -62,20 +60,20 @@
     </div>
 </header>
 
-<!-- =========================
-     PAGE CONTENT
-========================= -->
+<!-- 
+     תוכן עמוד יצירת הזמנה חדשה
+ -->
 <div class="auth-wrapper">
     <div class="auth-container">
 
         <div class="auth-card">
 
-            <!-- שם המרחב (דינמי) -->
+            <!-- שם המרחב -->
             <h3 class="auth-heading" id="spaceName">
                 שם המרחב
             </h3>
 
-            <!-- כתובת (דינמית) -->
+            <!-- כתובת  -->
             <p class="auth-subtext" id="spaceAddress">
                 כתובת המרחב
             </p>
@@ -128,7 +126,7 @@
                     >
                 </div>
 
-                <!-- כפתור -->
+                
                 <button type="submit" class="auth-btn">
                     שליחת בקשת הזמנה
                 </button>
@@ -140,9 +138,7 @@
     </div>
 </div>
 
-<!-- =========================
-     PAGE LOGIC (UNCHANGED)
-========================= -->
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
@@ -165,10 +161,10 @@
     });
 </script>
 
-<!-- Global navbar auth logic -->
+
 <script src="navbar-auth.js"></script>
 
-<!-- Page-specific logic -->
+
 <script src="new_order.js"></script>
 
 </body>

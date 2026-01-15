@@ -5,21 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>האירועים של CoNet</title>
 
-    <!-- Font (כמו שאר האתר) -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Global CSS (Navbar + Base layout) -->
+    
     <link rel="stylesheet" href="auth.css">
 
-    <!-- Page specific CSS -->
+    
     <link rel="stylesheet" href="events.css">
     <link rel="stylesheet" href="auth_mobile.css">
 </head>
 <body>
 
-<!-- =========================
-     TOP NAVBAR (GLOBAL)
-========================= -->
+
 <header class="conet-navbar">
     <div class="conet-navbar-inner">
 
@@ -30,7 +28,7 @@
           </a>
         </div>
 
-        <!-- NAV -->
+        <!-- תפריט -->
         <nav class="conet-nav-links">
             <a href="profile">הפרופיל שלי</a>
             <a href="communities">הקהילות של CoNet</a>
@@ -38,7 +36,7 @@
             <a href="events" class="active">האירועים של CoNet</a>
         </nav>
 
-        <!-- USER AREA -->
+        <!-- שם המשתמש -->
         <div class="conet-user">
             <span class="conet-greeting" id="userGreeting">שלום, אורח</span>
 
@@ -60,9 +58,7 @@
     </div>
 </header>
 
-<!-- =========================
-     PAGE CONTENT
-========================= -->
+
 <div class="main-container">
 
     <!-- סרגל חיפוש ופילטרים -->
@@ -91,24 +87,24 @@
 
     </div>
 
-    <!-- אזור טעינה -->
+    
     <div id="loading" class="loading">
         טוען אירועים...
     </div>
 
-    <!-- רשת כרטיסי האירועים -->
+    
     <div id="events-grid" class="events-grid">
-        <!-- נטען ע״י JS -->
+        
     </div>
 
-    <!-- אין תוצאות -->
+    
     <div id="no-results" class="no-results" style="display: none;">
         לא נמצאו אירועים תואמים לחיפוש שלך.
     </div>
 
 </div>
 
-<!-- JS -->
+
 <script src="events.js"></script>
 <script src="navbar-auth.js"></script>
 

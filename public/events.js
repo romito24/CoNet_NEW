@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadEvents();
 });
 
-// 1. טעינת אירועים מהשרת
+// טעינת אירועים מהשרת
 async function loadEvents() {
     const loader = document.getElementById('loading');
     const grid = document.getElementById('events-grid');
@@ -26,7 +26,7 @@ async function loadEvents() {
     }
 }
 
-// 2. הצגת האירועים על המסך
+// הצגת האירועים על המסך
 function renderEvents(eventsToRender) {
     const grid = document.getElementById('events-grid');
     const noResults = document.getElementById('no-results');
@@ -48,7 +48,7 @@ function renderEvents(eventsToRender) {
         // תמונת ברירת מחדל אם אין לקהילה תמונה
         const imageUrl = event.community_image || 'https://via.placeholder.com/300x160?text=CoNet+Event';
 
-        // יצירת הכרטיס
+        // יצירת האירוע
         const card = document.createElement('div');
         card.className = 'event-card';
         card.innerHTML = `
@@ -74,12 +74,12 @@ function renderEvents(eventsToRender) {
     });
 }
 
-// 3. טיפול בלחיצה על הרשמה
+// טיפול בלחיצה על הרשמה
 async function handleRegistration(btnElement, eventId, eventName) {
     // שליפת הטוקן
     const token = localStorage.getItem('token'); 
 
-    // תנאי 1: משתמש לא מחובר
+    // בדיקה ראשונה אם משתמש לא מחובר
     if (!token) {
         alert('עליך להתחבר למערכת כדי להירשם לאירוע.');
         window.location.href = 'login';
@@ -92,7 +92,7 @@ async function handleRegistration(btnElement, eventId, eventName) {
     btnElement.disabled = true; 
     btnElement.style.opacity = '0.7'; 
 
-    // תנאי 2: משתמש מחובר - ניסיון הרשמה מול השרת
+    // בדיקה שנייה אם משתמש מחובר ומנסה לבצע הרשמה מול השרת
     try {
         const response = await fetch(`${API_URL}/events/${eventId}/register`, {
             method: 'POST',
@@ -111,7 +111,7 @@ async function handleRegistration(btnElement, eventId, eventName) {
 
         setTimeout(() => {
                 alert(`נרשמת בהצלחה לאירוע "${eventName}"! נשלח אליך אישור במייל.`);
-                loadEvents(); // רענון הדף
+                loadEvents(); 
             }, 100);
         }
         else if (response.status === 403) {
@@ -143,7 +143,7 @@ function resetButton(btn, originalText) {
     btn.style.opacity = '1';
 }
 
-// 4. פונקציות פילטור
+// אפשרויות פילטור
 function filterEvents() {
     const searchText = document.getElementById('search-input').value.toLowerCase();
     const dateValue = document.getElementById('date-input').value;

@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoNet - חיפוש מרחבי עבודה</title>
 
-    <!-- Font -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Icons -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Global CSS (banner + forms) -->
+    
     <link rel="stylesheet" href="auth.css">
 
-    <!-- Page specific CSS -->
+    
     <link rel="stylesheet" href="search.css">
     <link rel="stylesheet" href="auth_mobile.css">
 </head>
@@ -22,19 +22,19 @@
 <body>
 
 <!-- =========================
-     TOP NAVBAR (GLOBAL)
+     החלק העליון של תפריט חיפוש מרחב (GLOBAL)
 ========================= -->
 <header class="conet-navbar">
     <div class="conet-navbar-inner">
 
-        <!-- LOGO -->
+        
         <div class="conet-logo">
             <a href="/">
                 <img src="conetnew_logo.jpg" alt="CoNet">
             </a>
         </div>
 
-        <!-- NAV -->
+        <!-- תפריט -->
         <nav class="conet-nav-links">
             <a href="profile">הפרופיל שלי</a>
             <a href="communities">הקהילות של CoNet</a>
@@ -42,7 +42,7 @@
             <a href="events">האירועים של CoNet</a>
         </nav>
 
-        <!-- USER AREA -->
+        <!-- שם המשתמש -->
         <div class="conet-user">
             <span class="conet-greeting" id="userGreeting">שלום, אורח</span>
 
@@ -64,12 +64,12 @@
     </div>
 </header>
 
-<!-- =========================
-     PAGE CONTENT
-========================= -->
+<!-- 
+     תוכן עמוד חיפוש מרחב
+ -->
 <div class="app-container">
 
-    <!-- SIDEBAR -->
+    
     <aside class="sidebar">
 
         <header class="sidebar-header">
@@ -140,14 +140,12 @@
 
     </aside>
 
-    <!-- MAP -->
+    
     <main id="map"></main>
 
 </div>
 
-<!-- =========================
-     SCRIPTS – KEEP AS IS
-========================= -->
+
 <script src="search.js"></script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2pWQv1C-WebD3Y19f8jjzF79wgOBlRys&callback=initMap&libraries=places&v=weekly" async defer></script>

@@ -1,7 +1,7 @@
 let map;
 let markers = [];
 let userLocation = null;
-let userMarker = null; // משתנה גלובלי לשמירת סמן המשתמש
+let userMarker = null; 
 let infoWindow;
 
 const API_URL = '/api'; 
@@ -27,7 +27,7 @@ function initMap() {
     searchSpaces();
 }
 
-// טעינת שירותים לתוך Dropdown
+
 async function loadFacilities() {
     try {
         const response = await fetch(`${API_URL}/spaces/facilities`);
@@ -52,7 +52,7 @@ async function loadFacilities() {
     }
 }
 
-// עדכון טקסט "נבחרו X שירותים"
+
 function updateSelectionText() {
     const checkedCount = document.querySelectorAll('.facility-check:checked').length;
     const summaryDiv = document.getElementById('selection-summary');
@@ -67,7 +67,7 @@ function updateSelectionText() {
     }
 }
 
-// בקשת מיקום + תיקון הבאג של כפילות סמנים
+// בקשת מיקום
 function getCurrentLocation() {
     const btn = document.querySelector('.location-btn');
     const originalText = btn.innerHTML;
@@ -85,12 +85,12 @@ function getCurrentLocation() {
                     map.setCenter(userLocation);
                     map.setZoom(14);
                     
-                    // בדיקה: האם כבר יש סמן?
+                    
                     if (userMarker) {
-                        // אם כן, רק נעדכן את המיקום שלו
+                        
                         userMarker.setPosition(userLocation);
                     } else {
-                        // אם לא, ניצור חדש
+                        
                         userMarker = new google.maps.Marker({
                             position: userLocation,
                             map: map,
@@ -179,7 +179,7 @@ function renderResults(spaces) {
     clearMarkers();
 
     spaces.forEach(space => {
-        // --- 1. יצירת הכרטיס ברשימה בצד ---
+        // יצירת המרחב ברשימה בצד
         const card = document.createElement('div');
         card.className = 'space-card';
         
@@ -189,11 +189,11 @@ function renderResults(spaces) {
             ? `<span class="distance-badge"><i class="fa-solid fa-person-walking"></i> <span dir="ltr">${space.distance}</span></span>` 
             : '<span></span>';
 
-        // יצירת מחרוזות בטוחות לשימוש ב-onclick
+        
         const safeName = space.space_name.replace(/'/g, "\\'");
         const safeAddress = space.address ? space.address.replace(/'/g, "\\'") : '';
 
-        // ה-HTML המעודכן
+        
         card.innerHTML = `
             <div class="card-meta">
                 ${distanceHtml}
@@ -204,7 +204,7 @@ function renderResults(spaces) {
             <div class="tags">${tagsHtml}</div>
         `;
 
-        // לחיצה על הכרטיס (שאינה על כפתור) מתמקדת במפה
+        
         card.onclick = (e) => {
             if(e.target.tagName !== 'BUTTON') { 
                 if(map) {
@@ -218,7 +218,7 @@ function renderResults(spaces) {
 
         listContainer.appendChild(card);
 
-        // --- 2. יצירת הסמן במפה ---
+        
         if (map && space.latitude && space.longitude) {
             const marker = new google.maps.Marker({
             
@@ -230,7 +230,7 @@ function renderResults(spaces) {
 
             const facilitiesStr = space.facilities ? space.facilities.join(', ') : 'ללא שירותים מיוחדים';
 
-            // HTML של הפופ-אפ
+            
             marker.addListener("click", () => {
                 const contentString = `
                     <div class="info-window-content">
@@ -259,9 +259,7 @@ function renderResults(spaces) {
     });
 } 
 
-// ==========================================
-// פונקציות ניווט ואימות
-// ==========================================
+
 
 // פונקציית עזר לבדיקת תקינות הטוקן
 function checkAuth() {
@@ -269,7 +267,7 @@ function checkAuth() {
     if (!token) return false;
 
     try {
-        // פיענוח ה-Payload 
+        
         const payload = JSON.parse(atob(token.split('.')[1]));
         
         // בדיקת תוקף 
@@ -291,7 +289,7 @@ function checkAuth() {
 
 // יצירת הזמנה עם אימות
 window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
-    // 1. בדיקת התחברות לפני המעבר
+    // בדיקת התחברות לפני המעבר
     if (!checkAuth()) {
         alert("עליך להתחבר למערכת כדי להזמין מקום.");
         localStorage.setItem('returnUrl', window.location.href);
@@ -299,7 +297,7 @@ window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
         return;
     }
 
-    // 2. אם מחובר - המשך כרגיל
+    // אם מחובר - המשך כרגיל
     const addr = spaceAddress || '';
     const url = `new_order?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;
@@ -307,7 +305,7 @@ window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
 
 // יצירת אירוע עם אימות ובדיקת הרשאות
 window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
-    // 1. בדיקת התחברות בסיסית (האם קיים טוקן והוא בתוקף)
+    // בדיקת התחברות בסיסית (האם קיים טוקן והוא בתוקף)
     if (!checkAuth()) {
         alert("עליך להתחבר למערכת כדי ליצור אירוע.");
         localStorage.setItem('returnUrl', window.location.href);
@@ -315,11 +313,11 @@ window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
         return;
     }
 
-    // 2. בדיקת הרשאות (Role Check) - התוספת שביקשת
+    // בדיקת הרשאות
     const token = localStorage.getItem('token');
     if (token) {
         try {
-            // פענוח ה-Payload כדי לבדוק את סוג המשתמש
+            // בדיקת סוג המשתמש
             const payload = JSON.parse(atob(token.split('.')[1]));
             
             // בדיקה: האם המשתמש הוא מנהל קהילה?
@@ -334,7 +332,7 @@ window.navigateToCreateEvent = function(spaceId, spaceName, spaceAddress) {
         }
     }
 
-    // 3. אם הכל תקין (מחובר + מנהל קהילה) - מעבר לדף היצירה
+    // אם הכל תקין (מחובר + מנהל קהילה) - מעבר לדף היצירה
     const addr = spaceAddress || '';
     const url = `new_event?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;

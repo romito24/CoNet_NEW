@@ -1,4 +1,4 @@
-// שורת בדיקה
+
 console.log("✅ Holistic Profile JS Loaded Successfully");
 
 const API_URL = '/api';
@@ -6,7 +6,7 @@ const API_URL = '/api';
 let currentUser = null;
 let currentActionCallback = null;
 
-// --- אתחול ---
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("🚀 DOM Content Loaded");
     
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// --- טעינת פרטי משתמש ---
+// טעינת פרטי משתמש
 async function loadUserDetails() {
     let user = null;
 
@@ -82,7 +82,7 @@ async function loadUserDetails() {
     }
 }
 
-// --- Navigation ---
+// --- ניווט ---
 function switchTab(tabId) {
     console.log("Tab switched to:", tabId);
     
@@ -111,9 +111,8 @@ function logout() {
     window.location.href = 'login';
 }
 
-// ==========================================
+
 // פונקציות טעינת נתונים
-// ==========================================
 
 async function loadMyOrders() {
     const container = document.getElementById('orders-list');
@@ -172,7 +171,7 @@ async function loadMyCommunities() {
     container.innerHTML = communities.map(c => createCommunityCard(c, false)).join('');
 }
 
-// --- מנהלים ---
+// קהילות בניהולי
 
 async function loadManagedCommunities() {
     const container = document.getElementById('managed-communities-list');
@@ -202,7 +201,7 @@ async function loadManagedCommunities() {
     container.innerHTML = createBtnHtml + listHtml;
 }
 
-// --- הפונקציה שעודכנה עבור המרחבים ---
+// מרחבים בניהולי
 async function loadManagedSpaces() {
     const container = document.getElementById('managed-spaces-list');
     if(!container) return;
@@ -220,7 +219,7 @@ async function loadManagedSpaces() {
     
     const spaces = await fetchData('/spaces/my-managing');
     
-    // אם אין מרחבים
+    // במידה ולא קיימים מרחבים
     if (!spaces || spaces.length === 0) {
         container.innerHTML = `
             ${createBtnHtml}
@@ -229,7 +228,7 @@ async function loadManagedSpaces() {
         return;
     }
 
-    // אם יש מרחבים
+    // במידה וקיימים כבר מרחבים
     const listHtml = spaces.map(s => {
         const safeName = s.space_name.replace(/'/g, "\\'");
         const safeAddress = s.address ? s.address.replace(/'/g, "\\'") : '';
@@ -303,9 +302,6 @@ async function loadIncomingOrders() {
     }).join('');
 }
 
-// ==========================================
-// Helpers
-// ==========================================
 
 function createOrderCard(order, isEvent = false) { 
     const dateStr = new Date(order.start_time).toLocaleDateString('he-IL');
@@ -403,7 +399,7 @@ function translateUserType(type) {
 function translateRole(role) { return role==='manager'?'מנהל':'חבר'; }
 function translateStatus(s) { const m={approved:'מאושר', pending:'ממתין', canceled:'בוטל', declined:'נדחה', registered:'רשום'}; return m[s]||s; }
 
-// --- Actions ---
+// פעולות לביצוע
 
 async function cancelOrder(id) { 
     if((await fetch(`${API_URL}/orders/${id}/cancel`, {method:'PATCH', headers:getHeaders()})).ok) { 

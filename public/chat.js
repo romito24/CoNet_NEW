@@ -5,7 +5,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const communityId = urlParams.get('communityId');
 const communityName = urlParams.get('name');
 
-// אלמנטים כלשהם
+// אלמנטים
 const messagesContainer = document.getElementById('messages-container');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
@@ -25,7 +25,7 @@ function getUserFromToken() {
 
 const currentUser = getUserFromToken();
 
-// אתחול
+
 if (!currentUser) {
     alert("אינך מחובר למערכת");
     window.location.href = '/login';
@@ -50,7 +50,7 @@ function sendMessage() {
     const messageData = {
         communityId: communityId,
         userId: currentUser.user_id,
-        userName: currentUser.first_name, // ודאי שזה השדה הנכון בטוקן
+        userName: currentUser.first_name,
         message: text,
         created_at: new Date().toISOString() // הוספנו את הזמן הנוכחי לשליחה המיידית
     };
@@ -59,7 +59,7 @@ function sendMessage() {
     messageInput.value = '';
 }
 
-// === פונקציית עזר לפרמוט זמן כמו בוואטסאפ ===
+// פונקציית עזר לבניית הודעה בפורמט
 function formatMessageTime(dateString) {
     if (!dateString) return new Date().toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'});
     
@@ -68,11 +68,11 @@ function formatMessageTime(dateString) {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    // האם זה היום?
+    
     if (msgDate.toDateString() === now.toDateString()) {
         return msgDate.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
     }
-    // האם זה אתמול?
+    
     if (msgDate.toDateString() === yesterday.toDateString()) {
         return 'אתמול';
     }
@@ -80,7 +80,7 @@ function formatMessageTime(dateString) {
     return msgDate.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
 
-// === פונקציה מעודכנת להצגת ההודעה ===
+// פונקציה מעודכנת להצגת ההודעה
 function appendMessage(data) {
     // זיהוי אם זה אני
     const isMine = (data.userId == currentUser.user_id) || (data.user_id == currentUser.user_id);
@@ -90,14 +90,14 @@ function appendMessage(data) {
     const content = data.message || data.message_text;
     const timeStr = formatMessageTime(data.created_at);
     
-    // יצירת ראשי תיבות לאייקון (למשל "ישראל" -> "י")
+    
     const initial = name.charAt(0);
 
     const rowDiv = document.createElement('div');
     rowDiv.classList.add('message-row');
     rowDiv.classList.add(isMine ? 'mine' : 'others');
 
-    // ה-HTML של ההודעה
+    
     rowDiv.innerHTML = `
         <div class="user-avatar">${initial}</div>
         <div class="message-bubble">

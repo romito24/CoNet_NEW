@@ -1,6 +1,4 @@
-// ==========================================
-// UTF-8 SAFE JWT PARSER (fixes mobile Hebrew)
-// ==========================================
+
 function parseJwt(token) {
     try {
         const base64Url = token.split('.')[1];
@@ -25,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // 🔁 מצב אורח – פונקציה מרכזית
+    // מצב אורח – פונקציה מרכזית
     function setGuestState() {
         greetingEl.textContent = "שלום, אורח";
         loginBtn.style.display = "inline-flex";
@@ -33,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.removeItem("token");
     }
 
-    // אין טוקן בכלל
+    // במידה ולא קיים טוקן בכלל
     if (!token) {
         setGuestState();
         return;
@@ -41,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const payload = parseJwt(token);
 
-    // טוקן לא קריא / חסר payload / חסר exp
+    // בדיקת תקינות פורמט הטוקן
     if (!payload || !payload.exp) {
         setGuestState();
         return;
@@ -60,9 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.style.display = "inline-flex";
 });
 
-// ==========================================
-// Logout (ידני בלבד)
-// ==========================================
+
+// התנתקות
+
 function logoutUser() {
     localStorage.removeItem("token");
     window.location.href = "login.html";
