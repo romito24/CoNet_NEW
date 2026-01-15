@@ -5,35 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>צ'אט קהילה | CoNet</title>
 
-    <!-- Font -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Global CSS (banner + layout) -->
+    
     <link rel="stylesheet" href="auth.css">
 
-    <!-- Chat page CSS -->
+    
     <link rel="stylesheet" href="chat.css">
     <link rel="stylesheet" href="auth_mobile.css">
 
-    <!-- Socket.io -->
+    
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
-<!-- =========================
-     TOP NAVBAR (GLOBAL)
-========================= -->
+
 <header class="conet-navbar">
     <div class="conet-navbar-inner">
 
-        <!-- LOGO -->
+        <!-- לוגו -->
         <div class="conet-logo">
             <a href="/">
                 <img src="conetnew_logo.jpg" alt="CoNet">
             </a>
         </div>
 
-        <!-- NAV -->
+        <!-- תפריט -->
         <nav class="conet-nav-links">
             <a href="profile">הפרופיל שלי</a>
             <a href="communities">הקהילות של CoNet</a>
@@ -41,7 +39,7 @@
             <a href="events">האירועים של CoNet</a>
         </nav>
 
-        <!-- USER AREA -->
+        <!-- שם המשתמש -->
         <div class="conet-user">
             <span class="conet-greeting" id="userGreeting">שלום, אורח</span>
 
@@ -63,9 +61,7 @@
     </div>
 </header>
 
-<!-- =========================
-     CHAT PAGE CONTENT
-========================= -->
+
 <div class="chat-wrapper">
 
     <header class="chat-header">
@@ -73,7 +69,7 @@
     </header>
 
     <div id="messages-container" class="messages-container">
-        <!-- הודעות נטענות ע"י chat.js -->
+        
     </div>
 
     <div class="input-area">
@@ -88,9 +84,7 @@
 
 </div>
 
-<!-- =========================
-     JS FILES
-========================= -->
+
 <script src="chat.js"></script>
 <script src="navbar-auth.js"></script>
 
