@@ -1,7 +1,3 @@
-/* =================================================
-   COMMUNITIES – FINAL & STABLE
-================================================= */
-
 :root {
     --primary-blue: #2C80FF;
     --primary-hover: #2563eb;
@@ -74,7 +70,7 @@ body {
 }
 
 /* =========================
-   BUTTONS (BASE)
+   BUTTONS
 ========================= */
 .filters-bar button,
 .card-actions button {
@@ -157,10 +153,6 @@ body {
     gap: 10px;
 }
 
-/* =================================================
-   ⭐ JOIN COMMUNITY BUTTON – FIXED & POLISHED ⭐
-   Matches auth.css buttons exactly
-================================================= */
 .join-btn {
     width: 100%;
     background: var(--primary-blue);
@@ -191,9 +183,6 @@ body {
     transform: scale(0.97);
 }
 
-/* =========================
-   STATES
-========================= */
 .loading,
 .no-results {
     text-align: center;
