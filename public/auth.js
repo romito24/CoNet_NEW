@@ -10,9 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginTabBtn = document.getElementById("login-tab-btn");
     const signupTabBtn = document.getElementById("signup-tab-btn");
 
-    // ==========================================
-    // לוגיקה להתחברות (Login)
-    // ==========================================
+    
+    // לוגיקה להתחברות
     if (loginForm) {
         loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -53,9 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ==========================================
-    // לוגיקה להרשמה (Signup)
-    // ==========================================
+    
+    // לוגיקה להרשמה
     if (signupForm) {
         signupForm.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -102,13 +100,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ==========================================
-    // פונקציה להצגת הודעות (Error/Info Popup)
-    // ==========================================
+    
+    // פונקציה להצגת הודעות
     function showPopup(message, isError = false) {
         const modalEl = document.getElementById("errorModal");
 
-        // אם אין modal בדף – ניפול חזרה ל-alert (בטוח)
         if (!modalEl) {
             alert(message);
             return;
