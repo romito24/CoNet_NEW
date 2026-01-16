@@ -4,12 +4,25 @@ const socket = io();
 const urlParams = new URLSearchParams(window.location.search);
 const communityId = urlParams.get('communityId');
 const communityName = urlParams.get('name');
+const fromTab = urlParams.get('from'); // my-communities / managed-communities
 
 // אלמנטים
 const messagesContainer = document.getElementById('messages-container');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const titleEl = document.getElementById('chat-title');
+const backBtn = document.getElementById('backBtn');
+
+//כפתור חזור לפרופיל לפי יציאה מטאב של מנהל קהילה או משתמש פרטי בקהילות שלי
+if (backBtn) {
+    backBtn.addEventListener('click', () => {
+        if (fromTab === 'managed-communities') {
+            window.location.href = '/profile?tab=managed-communities';
+        } else {
+            window.location.href = '/profile?tab=my-communities';
+        }
+    });
+}
 
 // פענוח טוקן
 function getUserFromToken() {
