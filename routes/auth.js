@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../db'); 
 
 // ==========================================
-// הרשמה (POST /register)
+// register
 // ==========================================
 router.post('/register', async (req, res) => {
     const { first_name, last_name, email, password, phone_number, user_type } = req.body;
@@ -15,7 +15,7 @@ router.post('/register', async (req, res) => {
     }
 
     try {
-        // בדיקה האם המשתמש כבר קיים
+        // בדיקה אם המשתמש כבר קיים
         const [existingUsers] = await db.execute('SELECT email FROM users WHERE email = ?', [email]);
         if (existingUsers.length > 0) {
             return res.status(409).json({ message: 'כתובת הדוא"ל כבר קיימת במערכת' });
@@ -25,9 +25,9 @@ router.post('/register', async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // הגדרת נתונים נוספים
-        const registrationDate = new Date(); // תאריך של היום
-        const status = 'active'; // סטטוס דיפולטיבי
+        // הגדרת תאריך וסטטוס דיפולטיבי
+        const registrationDate = new Date(); 
+        const status = 'active'; 
 
         // שמירה ב-DB
         const sql = `
@@ -42,7 +42,7 @@ router.post('/register', async (req, res) => {
             email, 
             hashedPassword, 
             phone_number, 
-            user_type || 'regular', // ברירת מחדל
+            user_type || 'regular', 
             status, 
             registrationDate
         ]);
@@ -56,7 +56,7 @@ router.post('/register', async (req, res) => {
 });
 
 // ==========================================
-// התחברות (POST /login)
+// login
 // ==========================================
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -110,20 +110,20 @@ router.post('/login', async (req, res) => {
 });
 
 // ==========================================
-// קבלת פרטי המשתמש המחובר (GET /me) - חדש!
+// קבלת פרטי המשתמש המחובר 
 // ==========================================
 router.get('/me', async (req, res) => {
-    // 1. שליפת הטוקן מה-Header
+    //  שליפת הטוקן מה-Header
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ message: 'לא התקבל טוקן' });
 
     const token = authHeader.split(' ')[1]; // מוריד את המילה Bearer
 
     try {
-        // 2. אימות הטוקן
+        //  אימות הטוקן
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // 3. שליפת הפרטים מהדאטה בייס (ללא סיסמה)
+        //  שליפת הפרטים מהדאטה בייס 
         const [users] = await db.execute(
             'SELECT user_id, first_name, last_name, email, phone_number, user_type, registration_date FROM users WHERE user_id = ?', 
             [decoded.user_id]
@@ -131,7 +131,7 @@ router.get('/me', async (req, res) => {
         
         if (users.length === 0) return res.status(404).json({ message: 'משתמש לא נמצא' });
         
-        // 4. החזרת הפרטים
+        //  החזרת הפרטים
         res.json(users[0]);
 
     } catch (error) {
