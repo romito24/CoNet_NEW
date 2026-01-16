@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFacilities();
 });
 
-// בדיקת הרשאות
+// בדיקת הרשאות משתמש
 function checkPermissions() {
     const token = localStorage.getItem('token');
     
