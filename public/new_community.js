@@ -74,4 +74,18 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = false;
         }
     });
+
+    function addRequiredStars() {
+      const requiredFields = document.querySelectorAll(
+        "input[required], select[required], textarea[required]"
+      );
+    
+      requiredFields.forEach((field) => {
+        if (!field.id) return;
+    
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) label.classList.add("required");
+      });
+    }
+
 });
