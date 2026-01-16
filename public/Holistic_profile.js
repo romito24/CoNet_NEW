@@ -492,9 +492,6 @@ async function saveSpaceChanges() {
     }
 }
 
-function navigateToChat(communityId, communityName) {
-    window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}`;
-
+function navigateToChat(communityId, communityName, fromTab) {
+    window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}&from=${fromTab}`;
 }
-
-
