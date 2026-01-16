@@ -297,7 +297,7 @@ window.navigateToOrder = function(spaceId, spaceName, spaceAddress) {
         return;
     }
 
-    // אם מחובר - המשך כרגיל
+    // אם מחובר המשך כרגיל
     const addr = spaceAddress || '';
     const url = `new_order?spaceId=${spaceId}&spaceName=${encodeURIComponent(spaceName)}&spaceAddress=${encodeURIComponent(addr)}`;
     window.location.href = url;
