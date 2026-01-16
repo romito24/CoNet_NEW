@@ -156,13 +156,15 @@ function filterEvents() {
         // סינון תאריך (אם נבחר)
         let matchDate = true;
         if (dateValue) {
+            // התאריך שנבחר - תחילת יום (00:00)
             const selectedDate = new Date(dateValue);
-            const eventDate = new Date(event.event_date);
+            selectedDate.setHours(0, 0, 0, 0);
         
-            matchDate =
-                eventDate.getFullYear() === selectedDate.getFullYear() &&
-                eventDate.getMonth() === selectedDate.getMonth() &&
-                eventDate.getDate() === selectedDate.getDate();
+            // תאריך האירוע - תחילת יום (00:00)
+            const eventDate = new Date(event.event_date);
+            eventDate.setHours(0, 0, 0, 0);
+        
+            matchDate = eventDate >= selectedDate;
         }
 
         return matchText && matchDate;
