@@ -5,13 +5,13 @@ const verifyToken = require('../middleware/verifyToken');
 const nodemailer = require('nodemailer');
 const ics = require('ics');
 
-// --- הגדרות מייל ---
+// הגדרות מייל
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
-// --- פונקציות עזר ---
+// פונקציות עזר
 function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     const [hours, minutes] = timeStr.split(':').map(Number);
@@ -23,6 +23,7 @@ function getMinutesFromDate(dateObj) {
     return date.getHours() * 60 + date.getMinutes();
 }
 
+// שליחת המייל עם הזימון
 async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) {
     const startArr = [
         orderDetails.start_time.getFullYear(),
@@ -51,6 +52,7 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
         organizer: { name: 'CoNet Team', email: process.env.EMAIL_USER }
     };
 
+    // יצירת ICS
     return new Promise((resolve, reject) => {
         ics.createEvent(event, (error, value) => {
             if (error) {
@@ -58,6 +60,7 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
                 return resolve(false);
             }
 
+            // הגדרת שדות האימייל
             const mailOptions = {
                 from: `"NoReplyconet" <${process.env.EMAIL_USER}>`, 
                 to: userEmail,
@@ -70,6 +73,7 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
                 }
             };
 
+            // שליחת האימייל
             transporter.sendMail(mailOptions, (err, info) => {
                 if (err) {
                     console.error('Error sending email:', err);
@@ -83,32 +87,33 @@ async function sendEmailWithInvite(userEmail, orderDetails, spaceName, address) 
     });
 }
 
-// =================================================================
 // יצירת הזמנה 
-// =================================================================
 const createOrderLogic = async (orderData) => {
     const { space_id, user_id, start_time, end_time, event_id, attendees_count } = orderData;
     
+    // חישוב כמות המושבים
     const requestedSeats = attendees_count && attendees_count > 0 ? attendees_count : 1;
 
+    // חישוב תאריך ושעה
     const start = new Date(start_time);
     const end = new Date(end_time);
     const now = new Date();
 
+    // בדיקת תקינות לתאריך ולשעה
     if (start >= end) throw { status: 400, message: 'שעת ההתחלה חייבת להיות לפני הסיום' };
     if (start < now) throw { status: 400, message: 'לא ניתן להזמין לעבר' };
 
-    // 1. שליפת פרטי המרחב
+    // שליפת פרטי המרחב
     const [spaces] = await db.execute('SELECT * FROM spaces WHERE space_id = ?', [space_id]);
     if (spaces.length === 0) throw { status: 404, message: 'המרחב לא נמצא' };
     const space = spaces[0];
 
-    // 2. בדיקות לוגיות
+    // בדיקת סטטוס מרחב ומקומות פנויים
     if (space.space_status === 'close') throw { status: 400, message: 'המרחב סגור כרגע להזמנות' };
-    
+
     if (requestedSeats > space.seats_available) throw { status: 400, message: `אין מספיק מקום במרחב (פנוי: ${space.seats_available})` };
 
-    // 3. בדיקת שעות פתיחה
+    // בדיקת שעות פתיחה
     const startMinutes = getMinutesFromDate(start);
     const endMinutes = getMinutesFromDate(end);
     const openMinutes = timeToMinutes(space.opening_hours);
@@ -118,7 +123,7 @@ const createOrderLogic = async (orderData) => {
         throw { status: 400, message: `ההזמנה חייבת להיות בתוך שעות הפתיחה: ${space.opening_hours} - ${space.closing_hours}` };
     }
 
-    // 4. בדיקת חפיפה ותפוסה
+    // בדיקת חפיפה ותפוסה
     const overlapSql = `
         SELECT SUM(attendees_count) as total_booked
         FROM orders 
@@ -135,7 +140,7 @@ const createOrderLogic = async (orderData) => {
         throw { status: 409, message: `אין מספיק מקום פנוי בשעות אלו. נותרו ${seatsLeft} מקומות.` };
     }
 
-    // 6. יצירת ההזמנה ב-DB
+    // שמירת ההזמנה ב-DB
     const insertSql = `
         INSERT INTO orders (user_id, space_id, event_id, start_time, end_time, status, attendees_count)
         VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -144,7 +149,7 @@ const createOrderLogic = async (orderData) => {
         user_id, space_id, event_id !== undefined ? event_id : null, start, end, 'approved', requestedSeats
     ]);
 
-    // 7. שליחת מייל
+    // שליחת מייל
     let emailStatus = 'skipped';
     const [users] = await db.execute('SELECT email FROM users WHERE user_id = ?', [user_id]);
     
@@ -166,17 +171,17 @@ const createOrderLogic = async (orderData) => {
     };
 };
 
-// ==========================================
-// Route: יצירת הזמנה
-// ==========================================
+// יצירת הזמנה
 router.post('/create', verifyToken, async (req, res) => {
     try {
+        // שליפת ID של המשתמש מתוך הטוקן
         const userIdFromToken = req.user.id || req.user.user_id;
         if (!userIdFromToken) {
             console.error("User ID missing in token payload. User object:", req.user);
             return res.status(401).json({ message: 'שגיאת הזדהות: לא ניתן לזהות את המשתמש' });
         }
-    
+        
+        // שליפת פרטי ההזמנה ושליחה לפונקציית יצירת ההזמנה
         const result = await createOrderLogic({
             user_id: userIdFromToken,
             space_id: req.body.space_id || req.body.spaceId,
@@ -193,17 +198,21 @@ router.post('/create', verifyToken, async (req, res) => {
     }
 });
 
-// Route: ביטול הזמנה 
+// ביטול הזמנה 
 router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
     const { orderId } = req.params;
     const user_id = req.user.user_id;
     try {
+        // חיפוש ההזמנה ב-DB
         const [orders] = await db.execute('SELECT * FROM orders WHERE order_id = ?', [orderId]);
         if (orders.length === 0) return res.status(404).json({ message: 'הזמנה לא נמצאה' });
         const order = orders[0];
+        // אם המשתמש הוא לא בעל ההזמנה
         if (order.user_id !== user_id) return res.status(403).json({ message: 'אין הרשאה' });
+        // אם ההזמנה בסטטוס מבוטלת
         if (order.status === 'canceled') return res.status(400).json({ message: 'כבר מבוטלת' });
 
+        // עדכון סטטוס הזמנה למבוטלת ב-DB
         await db.execute("UPDATE orders SET status = 'canceled' WHERE order_id = ?", [orderId]);
         
         res.json({ message: 'ההזמנה בוטלה בהצלחה' });
@@ -213,10 +222,11 @@ router.patch('/:orderId/cancel', verifyToken, async (req, res) => {
     }
 });
 
-// Route: ההזמנות שלי
+// ההזמנות שלי
 router.get('/my-orders', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
     try {
+        // שליפת ההזמנות של המשתמש מתוך טבלת ההזמנות
         const sql = `
             SELECT o.*, s.space_name, s.address, e.event_name 
             FROM orders o 
@@ -232,14 +242,12 @@ router.get('/my-orders', verifyToken, async (req, res) => {
     }
 });
 
-// =========================================================
-// לוח טיסות - הזמנות נכנסות למנהל מרחב (GET /incoming) - חדש!
-// =========================================================
+// הזמנות למרחבים בניהולי
 router.get('/incoming', verifyToken, async (req, res) => {
     const managerId = req.user.user_id;
 
     try {
-        // שאילתה: שליפת הזמנות למרחבים שאני המנהל שלהם, כולל פרטי המזמין
+        // שליפת הזמנות למרחבים שאני המנהל שלהם
         const sql = `
             SELECT 
                 o.order_id, o.start_time, o.end_time, o.attendees_count, o.status,
@@ -250,7 +258,7 @@ router.get('/incoming', verifyToken, async (req, res) => {
             JOIN users u ON o.user_id = u.user_id
             WHERE s.manager_id = ? 
             AND o.status = 'approved'
-            AND o.end_time >= NOW() -- מציג רק הווה ועתיד
+            AND o.end_time >= NOW() 
             ORDER BY o.start_time ASC
         `;
         
