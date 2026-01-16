@@ -87,5 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (label) label.classList.add("required");
       });
     }
+    addRequiredStars(); 
 
 });
+
