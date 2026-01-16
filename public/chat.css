@@ -31,6 +31,11 @@ body {
     padding: 18px 24px;
     border-bottom: 1px solid #e5e7eb;
     background: #f9fbff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .chat-header h2 {
