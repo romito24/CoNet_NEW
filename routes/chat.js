@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db'); // ודאי שזה הנתיב הנכון לקובץ החיבור שלך
+const db = require('../db'); 
 
-// ==========================================
-// חלק 1: API רגיל (HTTP) - שליפת היסטוריה
-// ==========================================
+// שליפת היסטוריה
 router.get('/history/:communityId', async (req, res) => {
     const { communityId } = req.params;
     
@@ -25,9 +23,7 @@ router.get('/history/:communityId', async (req, res) => {
     }
 });
 
-// ==========================================
-// חלק 2: לוגיקת Socket.io (Real-Time)
-// ==========================================
+// Socket.io Real-Time
 function initSocket(io) {
     io.on('connection', (socket) => {
         console.log('User connected to chat namespace:', socket.id);
@@ -56,7 +52,5 @@ function initSocket(io) {
     });
 }
 
-// ==========================================
-// ייצוא משולב
-// ==========================================
+
 module.exports = { router, initSocket };
