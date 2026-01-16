@@ -24,7 +24,7 @@ async function loadCommunities() {
     }
 }
 
-// הצגת הקהילות
+// הצגת כל הקהילות
 function renderCommunities(communities) {
     const grid = document.getElementById('communities-grid');
     const noResults = document.getElementById('no-results');
