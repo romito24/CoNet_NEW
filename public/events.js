@@ -156,9 +156,13 @@ function filterEvents() {
         // סינון תאריך (אם נבחר)
         let matchDate = true;
         if (dateValue) {
-            // המרת התאריך מה-DB לפורמט YYYY-MM-DD להשוואה
-            const eventDateStr = event.event_date.split('T')[0];
-            matchDate = eventDateStr === dateValue;
+            const selectedDate = new Date(dateValue);
+            const eventDate = new Date(event.event_date);
+        
+            matchDate =
+                eventDate.getFullYear() === selectedDate.getFullYear() &&
+                eventDate.getMonth() === selectedDate.getMonth() &&
+                eventDate.getDate() === selectedDate.getDate();
         }
 
         return matchText && matchDate;
