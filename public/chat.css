@@ -45,6 +45,26 @@ body {
     color: #1f2937;
 }
 
+.back-btn {
+    border: 1px solid #d1d9e6;
+    background: white;
+    color: #1f2937;
+    padding: 10px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.back-btn:hover {
+    box-shadow: 0 0 0 3px rgba(44,128,255,0.25);
+}
+
+.back-btn:active {
+    transform: scale(0.97);
+}
+
 /* =========================
    MESSAGES AREA
 ========================= */
