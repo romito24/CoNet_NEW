@@ -3,21 +3,15 @@ const router = express.Router();
 const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 const { createOrderLogic } = require('./orders'); 
-
-// --- תוספת: ספריות למייל וליומן (כמו בקובץ orders) ---
 const nodemailer = require('nodemailer');
 const ics = require('ics');
-
-// --- תוספת: הגדרת הטרנספורטר למייל ---
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
 });
 
-// --- תוספת: פונקציה לשליחת מייל אישור הרשמה לאירוע ---
+// שליחת מייל אישור הזמנה לאירוע
 async function sendEventConfirmation(userEmail, eventDetails, spaceDetails) {
-    // פירוק התאריך והשעות למערך עבור ICS
-    // הנחה: eventDetails.event_date הוא אובייקט Date, והשעות הן מחרוזות 'HH:MM:SS'
     const dateObj = new Date(eventDetails.event_date);
     const [startH, startM] = eventDetails.start_hour.split(':').map(Number);
     const [endH, endM] = eventDetails.finish_hour.split(':').map(Number);
@@ -38,6 +32,7 @@ async function sendEventConfirmation(userEmail, eventDetails, spaceDetails) {
         endM
     ];
 
+    // שדות לקובץ ICS
     const eventIcs = {
         start: startArr,
         end: endArr,
@@ -56,6 +51,7 @@ async function sendEventConfirmation(userEmail, eventDetails, spaceDetails) {
                 return resolve(false);
             }
 
+            // הגדרת שדות למייל
             const mailOptions = {
                 from: `"CoNet Events" <${process.env.EMAIL_USER}>`, 
                 to: userEmail,
@@ -68,6 +64,7 @@ async function sendEventConfirmation(userEmail, eventDetails, spaceDetails) {
                 }
             };
 
+            // שליחת המייל
             transporter.sendMail(mailOptions, (err, info) => {
                 if (err) {
                     console.error('Error sending event email:', err);
@@ -81,7 +78,7 @@ async function sendEventConfirmation(userEmail, eventDetails, spaceDetails) {
     });
 }
 
-// --- פונקציות עזר לזמנים (מהקובץ המקורי) ---
+// פונקציות עזר לזמנים 
 function timeToMinutes(timeStr) {
     if (!timeStr) return 0;
     if (typeof timeStr !== 'string') return 0;
@@ -94,13 +91,12 @@ function getMinutesFromDate(dateObj) {
     return date.getHours() * 60 + date.getMinutes();
 }
 
-// ==========================================
-// 1. האירועים שלי (GET /my-events)
-// ==========================================
+// האירועים שלי 
 router.get('/my-events', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
     const { community_id } = req.query;
 
+    // שליפת האירועים של המשתמש
     try {
         let sql = `
             SELECT e.*, ep.status as my_status, s.space_name, c.community_name
@@ -118,8 +114,10 @@ router.get('/my-events', verifyToken, async (req, res) => {
             params.push(community_id);
         }
 
+        // מיון לפי תאריך ושעה
         sql += ` ORDER BY e.event_date DESC, e.start_hour DESC`;
 
+        // שליפה מה-DB
         const [events] = await db.query(sql, params);
         res.json(events);
 
@@ -129,13 +127,12 @@ router.get('/my-events', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// 2. יצירת אירוע חדש (POST /create)
-// ==========================================
+// יצירת אירוע חדש 
 router.post('/create', verifyToken, async (req, res) => {
     const { event_name, event_date, start_hour, finish_hour, space_id, community_id, max_participants } = req.body;
     const owner_id = req.user.user_id;
 
+    //  וידוא שכל הפרטים ליצירת אירוע קיימים
     if (!event_name || !event_date || !start_hour || !finish_hour || !space_id || !community_id) {
         return res.status(400).json({ message: "חסרים פרטים ליצירת האירוע" });
     }
@@ -143,7 +140,7 @@ router.post('/create', verifyToken, async (req, res) => {
     let newEventId = null;
 
     try {
-        // א. בדיקת הרשאה
+        // בדיקת הרשאת מנהל קהילה
         const [roleCheck] = await db.query(
             'SELECT role FROM community_users WHERE community_id = ? AND user_id = ?', 
             [community_id, owner_id]
@@ -153,7 +150,7 @@ router.post('/create', verifyToken, async (req, res) => {
             return res.status(403).json({ message: "רק מנהל הקהילה יכול ליצור אירועים" });
         }
 
-        // ב. יצירת אירוע ב-DB
+        // יצירת אירוע ב-DB
         const eventParticipants = max_participants || 10;
 
         const insertEventSql = `
@@ -165,7 +162,7 @@ router.post('/create', verifyToken, async (req, res) => {
         ]);
         newEventId = eventResult.insertId;
 
-        // ג. יצירת הזמנה (שריון מקום)
+        // יצירת הזמנה ב-DB
         const startDateTime = `${event_date}T${start_hour}`;
         const endDateTime = `${event_date}T${finish_hour}`;
 
@@ -183,7 +180,7 @@ router.post('/create', verifyToken, async (req, res) => {
     } catch (error) {
         console.error("Error creating event:", error);
 
-        // Rollback
+        // במידה והאירוע לא נוצר-ROLLBACK
         if (newEventId) {
             await db.query('DELETE FROM events WHERE event_id = ?', [newEventId]);
         }
@@ -194,27 +191,25 @@ router.post('/create', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// 3. עריכת אירוע (PUT /:eventId)
-// ==========================================
+// עריכת אירוע
 router.put('/:eventId', verifyToken, async (req, res) => {
     const eventId = req.params.eventId;
     const { event_name, event_date, start_hour, finish_hour, space_id, max_participants } = req.body;
     const userId = req.user.user_id;
 
     try {
-        // 1. בדיקת קיום האירוע ובעלות
+        // חיפוש האירוע ב-DB
         const [events] = await db.query('SELECT * FROM events WHERE event_id = ?', [eventId]);
         if (events.length === 0) return res.status(404).json({ message: "האירוע לא נמצא" });
         
         const currentEvent = events[0];
 
-        // 2. הרשאות (רק ה-Owner או Admin)
+        // בדיקת הרשאת יוצר האירוע
         if (currentEvent.owner_id !== userId && req.user.user_type !== 'admin') {
             return res.status(403).json({ message: "אין לך הרשאה לערוך אירוע זה (רק ליוצר האירוע)" });
         }
 
-        // 3. הכנת נתונים (שימוש בקיים אם לא נשלח חדש)
+        // הכנת נתונים 
         let oldDate = currentEvent.event_date;
         if (oldDate instanceof Date) oldDate = oldDate.toISOString().split('T')[0];
         
@@ -224,21 +219,21 @@ router.put('/:eventId', verifyToken, async (req, res) => {
         const newSpaceId = space_id || currentEvent.space_id;
         const newMaxParticipants = max_participants || currentEvent.max_participants;
 
-        // 4. בדיקת זמינות מחדש (רק אם שונו פרטים קריטיים)
+        // בדיקת זמינות מחדש 
         const needsRevalidation = (space_id || event_date || start_hour || finish_hour || max_participants);
 
         if (needsRevalidation) {
             const startDateTime = new Date(`${newDate}T${newStart}`);
             const endDateTime = new Date(`${newDate}T${newFinish}`);
 
-            // א. בדיקת המרחב
+            // חיפוש המרחב המעודכן
             const [spaces] = await db.execute('SELECT * FROM spaces WHERE space_id = ?', [newSpaceId]);
             if (spaces.length === 0) return res.status(404).json({ message: 'המרחב לא נמצא' });
             const space = spaces[0];
 
             if (space.space_status === 'close') return res.status(400).json({ message: 'המרחב סגור' });
 
-            // ב. בדיקת שעות פתיחה
+            // בדיקת שעות פתיחה
             const startMinutes = getMinutesFromDate(startDateTime);
             const endMinutes = getMinutesFromDate(endDateTime);
             const openMinutes = timeToMinutes(space.opening_hours);
@@ -248,7 +243,7 @@ router.put('/:eventId', verifyToken, async (req, res) => {
                 return res.status(400).json({ message: "שעות האירוע חורגות משעות הפתיחה של המרחב" });
             }
 
-            // ג. בדיקת תפוסה (בניכוי האירוע עצמו!)
+            // בדיקת תפוסה
             const overlapSql = `
                 SELECT SUM(attendees_count) as total_booked
                 FROM orders 
@@ -262,11 +257,12 @@ router.put('/:eventId', verifyToken, async (req, res) => {
             const [occupancyResult] = await db.execute(overlapSql, [newSpaceId, endDateTime, startDateTime, eventId]);
             const currentOccupancy = parseInt(occupancyResult[0].total_booked) || 0;
 
+            // במידה וההזמנה + התפוסה עולה על המקומות הפנויים במקום
             if (currentOccupancy + newMaxParticipants > space.seats_available) {
                 return res.status(409).json({ message: "אין מספיק מקום במרחב לשינויים אלו בשעות המבוקשות" });
             }
 
-            // ד. עדכון ההזמנה בטבלת orders
+            // עדכון ההזמנה בטבלת הזמנות
             const updateOrderSql = `
                 UPDATE orders 
                 SET space_id = ?, start_time = ?, end_time = ?, attendees_count = ?
@@ -275,7 +271,7 @@ router.put('/:eventId', verifyToken, async (req, res) => {
             await db.query(updateOrderSql, [newSpaceId, startDateTime, endDateTime, newMaxParticipants, eventId]);
         }
 
-        // 5. עדכון פרטי האירוע בטבלת events
+        // עדכון פרטי האירוע בטבלת אירועים
         const updateEventSql = `
             UPDATE events 
             SET event_name = ?, event_date = ?, start_hour = ?, finish_hour = ?, space_id = ?, max_participants = ?
@@ -300,81 +296,83 @@ router.put('/:eventId', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// 4. הרשמה לאירוע (POST /:eventId/register)
-// ==========================================
+// הרשמה לאירוע
 router.post('/:eventId/register', verifyToken, async (req, res) => {
     const eventId = req.params.eventId;
     const userId = req.user.user_id;
 
+    // חיפוש האירוע ב-DB
     try {
         const [events] = await db.query('SELECT * FROM events WHERE event_id = ?', [eventId]);
         if (events.length === 0) return res.status(404).json({ message: "האירוע לא נמצא" });
         const event = events[0];
 
+        // בדיקה שהמשתמש חבר בקהילה
         const [membership] = await db.query(
             'SELECT * FROM community_users WHERE community_id = ? AND user_id = ?',
             [event.community_id, userId]
         );
 
+        // אם המשתמש לא חבר בקהילה
         if (membership.length === 0) {
             return res.status(403).json({ message: "על מנת שנוכל לאשר את הגעתך עליך להירשם לקהילה" });
         }
 
+        // בדיקת כמות רשומים לאירוע
         const [countResult] = await db.query(
             'SELECT COUNT(*) as current_count FROM event_participants WHERE event_id = ? AND status = "registered"',
             [eventId]
         );
         const registeredCount = countResult[0].current_count;
 
+        // במידה והאירוע מלא
         if (event.max_participants && registeredCount >= event.max_participants) {
             return res.status(409).json({ message: "לצערנו, ההרשמה לאירוע הסתיימה (אין מקום פנוי)" });
         }
 
+        // בדיקה אם המשתמש רשום לאירוע
         const [existing] = await db.query(
             'SELECT * FROM event_participants WHERE event_id = ? AND user_id = ?',
             [eventId, userId]
         );
 
-        let action = 'registered'; // לדעת אם לשלוח מייל
+        let action = 'registered'; 
 
+        // אם המשתמש רשום לאירוע
         if (existing.length > 0) {
             if (existing[0].status === 'registered') {
-                action = 'none';
+                action = 'none'; // לא לשלוח מייל
                 return res.status(409).json({ message: "אתה כבר רשום לאירוע זה" });
             } else {
-                await db.query(
+                await db.query( // הכנסת המשתמש לטבלת הרשומים לאירוע
                     'UPDATE event_participants SET status = "registered", registration_date = NOW() WHERE event_id = ? AND user_id = ?',
                     [eventId, userId]
                 );
-                // ההרשמה חודשה, אז נמשיך לשליחת מייל
             }
         } else {
+            // הכנסת המשתמש לטבלת הרשומים לאירוע
             await db.query(
                 'INSERT INTO event_participants (event_id, user_id, status) VALUES (?, ?, "registered")',
                 [eventId, userId]
             );
         }
 
-        // --- תוספת: שליחת מייל אישור ---
+        // שליחת מייל אישור הזמנה
         if (action !== 'none') {
             try {
-                // 1. שליפת המייל של המשתמש
+                // שליפת המייל של המשתמש
                 const [users] = await db.execute('SELECT email FROM users WHERE user_id = ?', [userId]);
                 
-                // 2. שליפת פרטי המיקום (מרחב)
+                // שליפת פרטי המרחב
                 const [spaces] = await db.execute('SELECT space_name, address FROM spaces WHERE space_id = ?', [event.space_id]);
 
                 if (users.length > 0 && users[0].email && spaces.length > 0) {
-                    // שליחת המייל (בלי לחכות לו שיעכב את התשובה ללקוח - אופציונלי, כאן עשיתי await כדי להבטיח שליחה)
                     await sendEventConfirmation(users[0].email, event, spaces[0]);
                 }
             } catch (mailError) {
                 console.error("Failed to send confirmation email:", mailError);
-                // לא מחזירים שגיאה למשתמש כי ההרשמה עצמה הצליחה
             }
         }
-        // --------------------------------
 
         res.status(201).json({ message: "נרשמת לאירוע בהצלחה!" });
 
@@ -384,19 +382,19 @@ router.post('/:eventId/register', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// 5. ביטול הרשמה לאירוע (PATCH /:eventId/cancel)
-// ==========================================
+// ביטול הרשמה לאירוע
 router.patch('/:eventId/cancel', verifyToken, async (req, res) => {
     const eventId = req.params.eventId;
     const userId = req.user.user_id;
 
+    // עדכון סטטוס הזמנה לבוטלה
     try {
         const [result] = await db.query(
             'UPDATE event_participants SET status = "canceled" WHERE event_id = ? AND user_id = ?',
             [eventId, userId]
         );
 
+        // אם לא נמצאה הרשמה
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "לא נמצאה הרשמה פעילה לאירוע זה" });
         }
@@ -408,12 +406,11 @@ router.patch('/:eventId/cancel', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// 6. כל האירועים של CONET (GET /all)
-// ==========================================
+// הצגת כל האירועים של קונט
 router.get('/all', async (req, res) => {
     const { community_id } = req.query;
 
+    // שליפת השדות הרלוונטיים מטבלאות האירועים
     try {
         let sql = `
             SELECT 
@@ -431,11 +428,13 @@ router.get('/all', async (req, res) => {
         
         const params = [];
 
+        // פילטור לפי מזהה קהילה
         if (community_id) {
             sql += ` AND e.community_id = ?`;
             params.push(community_id);
         }
 
+        // סידור אירועים לפי תאריך
         sql += ` ORDER BY e.event_date DESC`;
 
         const [events] = await db.query(sql, params);
