@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // מצב אורח – פונקציה מרכזית
+    // מצב אורח
     function setGuestState() {
         greetingEl.textContent = "שלום, אורח";
         loginBtn.style.display = "inline-flex";
@@ -45,14 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // בדיקת פקיעת תוקף (exp הוא בשניות)
+    // בדיקת פקיעת תוקף 
     const nowInSeconds = Math.floor(Date.now() / 1000);
     if (payload.exp < nowInSeconds) {
         setGuestState();
         return;
     }
 
-    // ✅ טוקן תקין – משתמש מחובר
+    // טוקן תקין – משתמש מחובר
     greetingEl.textContent = `שלום, ${payload.first_name || "משתמש"}`;
     loginBtn.style.display = "none";
     logoutBtn.style.display = "inline-flex";
