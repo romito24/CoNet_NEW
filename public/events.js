@@ -157,7 +157,7 @@ function filterEvents() {
         let matchDate = true;
         if (dateValue) {
             // המרת התאריך מה-DB לפורמט YYYY-MM-DD להשוואה
-            const eventDateStr = new Date(event.event_date).toISOString().split('T')[0];
+            const eventDateStr = event.event_date.split('T')[0];
             matchDate = eventDateStr === dateValue;
         }
 
