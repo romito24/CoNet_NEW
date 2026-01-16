@@ -3,8 +3,7 @@ const API_URL = '/api/events';
 document.addEventListener('DOMContentLoaded', async () => {
     
     // טיפול בפרטי המרחב 
-    // 
-    
+
     // שליפת נתונים על המרחב עצמו
     const params = new URLSearchParams(window.location.search);
     
