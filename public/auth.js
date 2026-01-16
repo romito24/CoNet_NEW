@@ -86,8 +86,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // אם יש טאבים – נחזור להתחברות
                 if (loginTabBtn) {
-                    const loginTab = new bootstrap.Tab(loginTabBtn);
-                    loginTab.show();
+                    if (window.bootstrap && bootstrap.Tab) {
+                          const loginTab = new bootstrap.Tab(loginTabBtn);
+                          loginTab.show();
+                        } else {
+                          window.location.href = "login";
+                        }
                 } else {
                     // אחרת – מעבר רגיל לדף התחברות
                     window.location.href = "login";
@@ -126,8 +130,12 @@ document.addEventListener("DOMContentLoaded", () => {
             actionBtn.textContent = "אישור";
         }
 
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
+                if (window.bootstrap && bootstrap.Modal) {
+          const modal = new bootstrap.Modal(modalEl);
+          modal.show();
+        } else {
+          alert(message);
+        }
     }
 /* =========================
     REQUIRED STAR (*)
