@@ -3,9 +3,7 @@ const router = express.Router();
 const db = require('../db');
 const verifyToken = require('../middleware/verifyToken');
 
-// ==========================================
-// קבלת כל הקהילות (ציבורי - ללא צורך בטוקן)
-// ==========================================
+// קבלת כל הקהילות 
 router.get('/all', async (req, res) => {
     try {
         const [communities] = await db.query('SELECT * FROM communities ORDER BY community_name ASC');
@@ -16,9 +14,7 @@ router.get('/all', async (req, res) => {
     }
 });
 
-// ==========================================
-// יצירת קהילה חדשה (POST /)
-// ==========================================
+// יצירת קהילה חדשה 
 router.post('/', verifyToken, async (req, res) => {
     const { community_name, main_subject, image_url, establishment_date } = req.body;
     const user_id = req.user.user_id;
@@ -40,6 +36,7 @@ router.post('/', verifyToken, async (req, res) => {
             return res.status(409).json({ message: "קהילה בשם זה כבר קיימת." });
         }
 
+        // שמירה ב-DB
         const insertQuery = `
             INSERT INTO communities (community_name, main_subject, image_url, establishment_date)
             VALUES (?, ?, ?, ?)
@@ -48,6 +45,7 @@ router.post('/', verifyToken, async (req, res) => {
         const [result] = await db.query(insertQuery, [community_name, main_subject, image_url, establishment_date]);
         const newCommunityId = result.insertId;
 
+        // קישור מנהל קהילה
         const linkQuery = `INSERT INTO community_users (community_id, user_id, role) VALUES (?, ?, 'manager')`;
         await db.query(linkQuery, [newCommunityId, user_id]);
 
@@ -63,14 +61,14 @@ router.post('/', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// עריכת קהילה (PUT /:id)
-// ==========================================
+
+// עריכת קהילה 
 router.put('/:id', verifyToken, async (req, res) => {
     const communityId = req.params.id;
     const updates = req.body;
     const userId = req.user.user_id;
 
+    // חיפוש הקהילה ב-DB
     try {
         const [communityExists] = await db.query('SELECT community_id FROM communities WHERE community_id = ?', [communityId]);
         
@@ -85,10 +83,12 @@ router.put('/:id', verifyToken, async (req, res) => {
 
         const userRole = roleCheck.length > 0 ? roleCheck[0].role : null;
 
+        // בדיקה שהמשתמש מנהל קהילה
         if (userRole !== 'manager' && req.user.user_type !== 'admin') {
             return res.status(403).json({ message: "אין לך הרשאה לערוך את הקהילה (נדרש מנהל קהילה)" });
         }
 
+        // בדיקת שדות לעדכון
         const allowedFields = ['community_name', 'main_subject', 'image_url', 'establishment_date'];
         let updateQuery = 'UPDATE communities SET ';
         const updateParams = [];
@@ -120,15 +120,11 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// הקהילות שלי (רק אלו שאני חבר בהן, לא מנהל) - תוקן!
-// ==========================================
+// צפייה בקהילות שלי
 router.get('/my-communities', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
 
     try {
-        // השינוי כאן: הוספנו AND cu.role != 'manager'
-        // זה מבטיח שקהילות שאני מנהל לא יופיעו ברשימה הזו
         const query = `
             SELECT c.*, cu.role as my_role 
             FROM communities c
@@ -143,9 +139,7 @@ router.get('/my-communities', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// קהילות בניהולי בלבד (GET /my-managing)
-// ==========================================
+// קהילות בניהולי 
 router.get('/my-managing', verifyToken, async (req, res) => {
     const user_id = req.user.user_id;
 
@@ -164,9 +158,7 @@ router.get('/my-managing', verifyToken, async (req, res) => {
     }
 });
 
-// ==========================================
-// הצטרפות לקהילה (POST /join)
-// ==========================================
+// הצטרפות לקהילה 
 router.post('/join', verifyToken, async (req, res) => {
     const { community_id } = req.body;
     const user_id = req.user.user_id;
