@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
+        await loadUserDetails();
+        
         const params = new URLSearchParams(window.location.search);
         const tabFromUrl = params.get('tab');
         switchTab(tabFromUrl || 'my-orders');
@@ -500,5 +502,6 @@ async function saveSpaceChanges() {
 function navigateToChat(communityId, communityName, fromTab) {
     window.location.href = `/chat?communityId=${communityId}&name=${encodeURIComponent(communityName)}&from=${fromTab}`;
 }
+
 
 
