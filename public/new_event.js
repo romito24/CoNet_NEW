@@ -96,6 +96,20 @@ async function loadManagedCommunities() {
         console.error('Error loading communities:', error);
         select.innerHTML = '<option value="" disabled>שגיאה בתקשורת</option>';
     }
+    
+    function addRequiredStars() {
+      const requiredFields = document.querySelectorAll(
+        "input[required], select[required], textarea[required]"
+      );
+    
+      requiredFields.forEach((field) => {
+        if (!field.id) return;
+    
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) label.classList.add("required");
+      });
+    }
+    addRequiredStars();
 }
 
 // פונקציה לטיפול בשליחת הטופס
