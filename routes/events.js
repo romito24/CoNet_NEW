@@ -406,6 +406,45 @@ router.patch('/:eventId/cancel', verifyToken, async (req, res) => {
     }
 });
 
+// מחיקת אירוע 
+router.delete('/:eventId', verifyToken, async (req, res) => {
+    const { eventId } = req.params;
+    const userId = req.user.user_id;       // שליפת הID של המשתמש המחובר
+    const userType = req.user.user_type;   // שליפת סוג המשתמש
+
+    try {
+        // שליפת מנהל האירוע
+        const [eventCheck] = await db.execute('SELECT owner_id FROM events WHERE event_id = ?', [eventId]);
+        
+        // אם לא קיימים אירועים שהמשתמש מנהל
+        if (eventCheck.length === 0) {
+            return res.status(404).json({ message: 'אירוע לא נמצא' });
+        }
+
+        const eventOwnerId = eventCheck[0].owner_id;
+
+        // בדיקה שהמשתמש הוא אדמין או מנהל האירוע
+        if (eventOwnerId !== userId && userType !== 'admin') {
+            return res.status(403).json({ message: 'אין לך הרשאה למחוק אירוע שאינו שלך.' });
+        }
+
+        // מחיקת משתתפים
+        await db.execute('DELETE FROM event_participants WHERE event_id = ?', [eventId]);
+
+        // ביטול הזמנת המרחב
+        await db.execute("UPDATE orders SET status = 'canceled' WHERE event_id = ?", [eventId]);
+
+        // מחיקת האירוע
+        await db.execute('DELETE FROM events WHERE event_id = ?', [eventId]);
+
+        res.json({ message: 'האירוע נמחק בהצלחה.' });
+
+    } catch (error) {
+        console.error("Error deleting event:", error);
+        res.status(500).json({ message: 'שגיאה במחיקת האירוע' });
+    }
+});
+
 // הצגת כל האירועים של קונט
 router.get('/all', async (req, res) => {
     const { community_id } = req.query;
