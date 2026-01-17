@@ -414,6 +414,25 @@ async function cancelOrder(id) {
         loadMyOrders(); 
     } 
 }
+
+// מחיקת אירוע בניהולי 
+async function deleteEvent(eventId) {
+    const response = await fetch(`${API_URL}/events/${eventId}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+    });
+
+    if (response.ok) {
+        closeModal('confirmModal');
+        // רענון רשימת אירועים
+        loadEventOrders(); 
+        alert('האירוע בוטל ונמחק מהמערכת בהצלחה.');
+    } else {
+        const data = await response.json();
+        alert('שגיאה: ' + (data.message || 'לא ניתן למחוק את האירוע'));
+    }
+}
+
 async function cancelEventRegistration(id) {
     if((await fetch(`${API_URL}/events/${id}/cancel`, {method:'PATCH', headers:getHeaders()})).ok) { 
         closeModal('confirmModal'); 
