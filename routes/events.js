@@ -432,7 +432,7 @@ router.delete('/:eventId', verifyToken, async (req, res) => {
         await db.execute('DELETE FROM event_participants WHERE event_id = ?', [eventId]);
 
         // ביטול הזמנת המרחב
-        await db.execute("UPDATE orders SET status = 'canceled' WHERE event_id = ?", [eventId]);
+        await db.execute("UPDATE orders SET status = 'canceled', event_id = NULL WHERE event_id = ?", [eventId]);
 
         // מחיקת האירוע
         await db.execute('DELETE FROM events WHERE event_id = ?', [eventId]);
