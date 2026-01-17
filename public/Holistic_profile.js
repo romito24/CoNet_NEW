@@ -333,7 +333,24 @@ function createEventCard(event) {
     const dateStr = new Date(event.event_date).toLocaleDateString('he-IL');
     const start = event.start_hour.substring(0, 5);
     const end = event.finish_hour.substring(0, 5);
-    
+    // יצירת הכפתור המתאים לפי סוג המשתמש
+    let actionButton = '';
+
+    if (isManager) {
+        // מחיקת האירוע 
+        actionButton = `
+            <button onclick="confirmAction('מחיקת אירוע', 'האם אתה בטוח? פעולה זו תמחק את האירוע לצמיתות, תבטל את ההזמנה ותסיר את כל הנרשמים.', () => deleteEvent(${event.event_id}))" class="btn-danger">
+                <i class="fas fa-trash-alt"></i> מחיקת אירוע
+            </button>
+        `;
+    } else if (event.my_status === 'registered') {
+        //הסרת הרשמה לאירוע 
+        actionButton = `
+            <button onclick="confirmAction('ביטול הרשמה', 'האם לבטל את ההרשמה לאירוע?', () => cancelEventRegistration(${event.event_id}))" class="btn-action btn-danger">
+                ביטול הרשמה
+            </button>
+        `;
+    }
     return `
     <div class="card">
         <h3>${event.event_name}</h3>
@@ -342,7 +359,6 @@ function createEventCard(event) {
         <div class="card-info"><i class="fas fa-map-marker-alt"></i> ${event.space_name}</div>
         <div class="card-info"><i class="fas fa-users"></i> קהילה: ${event.community_name}</div>
         <span class="status-badge status-${event.my_status}">${translateStatus(event.my_status)}</span>
-        ${event.my_status === 'registered' ? `<button onclick="confirmAction('ביטול הרשמה', 'האם לבטל?', () => cancelEventRegistration(${event.event_id}))" class="btn-action btn-danger">ביטול הרשמה</button>` : ''}
     </div>`;
 }
 
