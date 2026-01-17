@@ -480,7 +480,9 @@ async function deleteEvent(eventId) {
     if (response.ok) {
         closeModal('confirmModal');
         // רענון רשימת אירועים
-        loadEventOrders(); 
+        if (typeof loadManagedEvents === 'function') {
+            loadManagedEvents(); 
+        } 
         alert('האירוע בוטל ונמחק מהמערכת בהצלחה.');
     } else {
         const data = await response.json();
