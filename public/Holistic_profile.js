@@ -100,7 +100,7 @@ function switchTab(tabId) {
     if (content) content.classList.add('active-content');
 
     if (tabId === 'my-orders') loadMyOrders();
-    if (tabId === 'event-orders') loadEventOrders();
+    if (tabId === 'event-orders') loadManagedEvents();
     if (tabId === 'my-events') loadMyEvents();
     if (tabId === 'my-communities') loadMyCommunities();
     if (tabId === 'managed-communities') loadManagedCommunities();
@@ -131,6 +131,38 @@ async function loadMyOrders() {
         return;
     }
     container.innerHTML = privateOrders.map(order => createOrderCard(order)).join('');
+}
+
+// --- טעינת אירועים בניהולי ---
+async function loadManagedEvents() {
+    const container = document.getElementById('event-orders-list'); 
+    if(!container) return;
+    
+    container.innerHTML = '<div class="loading">טוען אירועים בניהולך...</div>';
+
+    // שליפת כל האירועים
+    const allEvents = await fetchData('/events/all');
+    
+    if (!allEvents) {
+        container.innerHTML = '<div class="empty-state">שגיאה בטעינת הנתונים</div>';
+        return;
+    }
+
+    // סינון רק אירועים שאני מנהל
+    const myManagedEvents = allEvents.filter(event => event.owner_id === currentUser.user_id);
+
+    if (myManagedEvents.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-plus" style="font-size:40px; margin-bottom:10px;"></i>
+                <p>עדיין לא יצרת אירועים.</p>
+                <button onclick="window.location.href='search'" class="fas fa-plus">הזמנת מרחב לאירוע קהילה/button>
+            </div>`;
+        return;
+    }
+
+    // הצגת האירועים בניהולי
+    container.innerHTML = myManagedEvents.map(event => createEventCard(event, true)).join('');
 }
 
 async function loadEventOrders() {
@@ -329,7 +361,7 @@ function createOrderCard(order, isEvent = false) {
 
 }
 
-function createEventCard(event) {
+function createEventCard(event, isManager = false) {
     const dateStr = new Date(event.event_date).toLocaleDateString('he-IL');
     const start = event.start_hour.substring(0, 5);
     const end = event.finish_hour.substring(0, 5);
@@ -351,6 +383,11 @@ function createEventCard(event) {
             </button>
         `;
     }
+
+    const statusHtml = event.my_status 
+        ? `<span class="status-badge status-${event.my_status}">${translateStatus(event.my_status)}</span>` 
+        : '';
+
     return `
     <div class="card">
         <h3>${event.event_name}</h3>
@@ -358,7 +395,9 @@ function createEventCard(event) {
         <div class="card-info"><i class="far fa-clock"></i> ${start} - ${end}</div>
         <div class="card-info"><i class="fas fa-map-marker-alt"></i> ${event.space_name}</div>
         <div class="card-info"><i class="fas fa-users"></i> קהילה: ${event.community_name}</div>
-        <span class="status-badge status-${event.my_status}">${translateStatus(event.my_status)}</span>
+        ${statusHtml}
+        
+        ${actionButton}
     </div>`;
 }
 
